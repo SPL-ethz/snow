@@ -1,6 +1,6 @@
 clear all; close all; clc;
 
-%% Heat conduction model for freezing of packed vials 
+%% Heat conduction model for freezing of packed vials
 %Updated figure annotation scheme in figure18
 
 
@@ -17,7 +17,7 @@ clear all; close all; clc;
 %(1) Make sure that the heat flows are computed based on the temperature readouts of the prior time step. This is currently not the case and leads to some errors regarding voxels that should freeze at the same time
 %(2) Add stochastic nucleation temperature distribution: Use an arbitrary
 %distribution to compute nucleation propabilities for specific temperatures
-%and dt and a random number generator to decide if nucleation occurs. 
+%and dt and a random number generator to decide if nucleation occurs.
 
 %1 is done, but one dimension still behaves anisotropic -> issue fixed
 %2 is done via Braatz approach: empirical nucleation relation with
@@ -37,7 +37,7 @@ clear all; close all; clc;
 
 %Done
 
-%% Next steps: January 20: Improve sublimation model 
+%% Next steps: January 20: Improve sublimation model
 %step 1: consider real mass balance with dried fraction to avoid numerical
 %issues -> Part is done
 %step 2: integrate position-dependent dP and Rp, doing so requires saving
@@ -45,7 +45,7 @@ clear all; close all; clc;
 %in sublimation model
 
 %% Next steps: January 30: Improve sublimation model
-%step1: use non-simplified energy balance, i.e. add dm/dt part 
+%step1: use non-simplified energy balance, i.e. add dm/dt part
 %step2: reevaluate Rp calculation
 
 %% Next steps: February 17: Add variability of shelf heat transfer
@@ -55,7 +55,7 @@ clear all; close all; clc;
 %loop or only once. Both of this may be interesting in fact (one may argue
 %that the actual behavior here is deterministic)
 
-%% February 22: Added parfor loop to increase speed 
+%% February 22: Added parfor loop to increase speed
 %Introduced temporary variables for characteristic times. This allows
 %plotting the CDF and histogram figures, but I lose information on
 %temperature profiles. Need to add separately. Also I removed h_freeze
@@ -89,7 +89,7 @@ T_init = 20; %°C initial temperature
 T_ext0 = 20; %°C external temperature in the beginning
 T_eq = 0; %°C equilibrium freezing temperature
 T_nuc = -10;%°C nucleation temperature
-Dh = 333550; %J/kg heat of fusion water 
+Dh = 333550; %J/kg heat of fusion water
 
 %Nucleation parameters (Braatz)
 kb = 0.000000001; %m−3 s−1 K−b value reduced compared to Braatz paper (he had a value of 10)
@@ -151,27 +151,27 @@ y = x;
 z = 1; %only one layer
 
 %number of cycles
-N = 5000; 
+N = 5000;
 
 %Cooling rate
 CR_min = 0.5; %K/min
 CR = CR_min/60;
 
 Dt = 2; %s timestep
-n = 20000; % number of timesteps to carry out 
+n = 20000; % number of timesteps to carry out
 t_tot = Dt*n/60; %total time in min
 
 
 t_time = linspace(Dt,Dt*n,n);
 T_ext = T_ext0 - t_time.*CR;
 
-%Consider a constant minimum temperature for the shelf 
+%Consider a constant minimum temperature for the shelf
 %otherwise it would go down to -inf which is unreasonable
 T_min = -50; %°C
 T_ext(T_ext < T_min) = T_min;
 
 %Include first holding step
-h_time = 1/6; % duration of holding step in min 
+h_time = 1/6; % duration of holding step in min
 h_length = h_time*60/Dt; %Not ideal here, since it must be an integer.
 h_temp = -12; %holding temperature in °C
 H_temp = ones(h_length,1).*h_temp;
@@ -187,14 +187,14 @@ t_time = linspace(Dt,Dt*n,n);
 %% Include second holding step (for controlled nucleation)
 %If no controlled nucleation, just comment this part of the code out
 
-% h_time2 = 360; % duration of holding step in min 
+% h_time2 = 360; % duration of holding step in min
 % h_length2 = h_time2*60/Dt; %Not ideal here, since it must be an integer.
 % h_temp2 = -10; %holding temperature in °C
 % H_temp2 = ones(h_length2,1).*h_temp2;
-% 
+%
 % T_insert2 = find(T_ext < h_temp2,1);
 % T_ext = [T_ext(1:T_insert2-1) H_temp2' T_ext(T_insert2:end)];
-% 
+%
 % n = length(T_ext);
 % t_time = linspace(Dt,Dt*n,n);
 
@@ -211,7 +211,7 @@ t_time = linspace(Dt,Dt*n,n);
 kbDtV = kb*Dt*V;
 
 
-parpool(16);
+parpool(4);
 
 xyz = zeros(x,y,z);
 xyzt = zeros(x,y,z,n+1);
@@ -260,7 +260,7 @@ dy = ones(x*y*z-x,1);
 for u = 1:(x*y*z-x-1)
     if mod(u,(y*x)) == 0
         for k = 1:x
-        dy(u+1-k) = 0;
+            dy(u+1-k) = 0;
         end
         u = u+x;
     end
@@ -272,7 +272,7 @@ dz = ones(x*y*(z-1),1);
 
 %Final matrix
 
-INT = sparse(diag(d0) + diag(dx,1) + diag(dx,-1) + diag(dy,x) + diag(dy,-x)); 
+INT = sparse(diag(d0) + diag(dx,1) + diag(dx,-1) + diag(dy,x) + diag(dy,-x));
 % + diag(dz,x*y) + diag(dz,-x*y));
 clear d0 dx dy dz;
 %Boundaries
@@ -291,59 +291,59 @@ HEXT = EXT.*HTEXT; %Add shelf heat transfer as external heat transfer
 
 parfor p=1:N
     
-rng(p) 
-
-T_time = (T_init*ones(x*y*z,1));
-sigma_time = zeros(x*y*z,1);
-sigma_init = zeros(x*y*z,1); %initial ice fraction at recalescence 
-
-%Output characteristic quantities    
-time_frozen_temp = zeros(x*y*z,1);
-time_nuc_temp = zeros(x*y*z,1);
-temp_nuc_temp = zeros(x*y*z,1);
-
-%Output for holding
-hold_temp_init = zeros(x*y*z,1);
-hold_temp_final = zeros(x*y*z,1);
-hold_count_temp = 0;
-time_final_temp = 1;
-
-%Output for temperature
-temp_vial_corner = zeros(n,1);
-sigma_vial_corner = zeros(n,1);
-sigma_vial_center = zeros(n,1);
-temp_vial_edge = zeros(n,1);
-temp_vial_center = zeros(n,1);
-
-T_i = T_ext;
-
-KS = zeros(x*y*z,1);
-
-for vial = 1:(x*y*z)
-    KS(vial) = ks0 + ks_sigma*randn(1,1);                
-end   
-
-HS =  sparse(KS'.*A.*Dt);
-HSEXT = (HEXT+HS)';
-HEINT = HINT - diag(HEXT) - diag(HS);
-
-counter = 0; %counts timesteps at hold temperature
-solid_counter = zeros(x*y*z,1);
-
-for i=1:n
+    rng(p)
     
-    %Need to think about automating definition of vial positions 
-    temp_vial_corner(i) = T_time(1);
-    sigma_vial_corner(i) = sigma_time(1);
-    sigma_vial_center(i) = sigma_time(25);
-    temp_vial_edge(i) = T_time(4);
-    temp_vial_center(i) = T_time(25);
-
-    q = HEINT*T_time + HSEXT*T_i(i);
+    T_time = (T_init*ones(x*y*z,1));
+    sigma_time = zeros(x*y*z,1);
+    sigma_init = zeros(x*y*z,1); %initial ice fraction at recalescence
     
-    for vial =1:(x*y*z)
-
-              
+    %Output characteristic quantities
+    time_frozen_temp = zeros(x*y*z,1);
+    time_nuc_temp = zeros(x*y*z,1);
+    temp_nuc_temp = zeros(x*y*z,1);
+    
+    %Output for holding
+    hold_temp_init = zeros(x*y*z,1);
+    hold_temp_final = zeros(x*y*z,1);
+    hold_count_temp = 0;
+    time_final_temp = 1;
+    
+    %Output for temperature
+    temp_vial_corner = zeros(n,1);
+    sigma_vial_corner = zeros(n,1);
+    sigma_vial_center = zeros(n,1);
+    temp_vial_edge = zeros(n,1);
+    temp_vial_center = zeros(n,1);
+    
+    T_i = T_ext;
+    
+    KS = zeros(x*y*z,1);
+    
+    for vial = 1:(x*y*z)
+        KS(vial) = ks0 + ks_sigma*randn(1,1);
+    end
+    
+    HS =  sparse(KS'.*A.*Dt);
+    HSEXT = (HEXT+HS)';
+    HEINT = HINT - diag(HEXT) - diag(HS);
+    
+    counter = 0; %counts timesteps at hold temperature
+    solid_counter = zeros(x*y*z,1);
+    
+    for i=1:n
+        
+        %Need to think about automating definition of vial positions
+        temp_vial_corner(i) = T_time(1);
+        sigma_vial_corner(i) = sigma_time(1);
+        sigma_vial_center(i) = sigma_time(25);
+        temp_vial_edge(i) = T_time(4);
+        temp_vial_center(i) = T_time(25);
+        
+        q = HEINT*T_time + HSEXT*T_i(i);
+        
+        for vial =1:(x*y*z)
+            
+            
             %% decision tree: Two states, liquid and ice growth
             %Note that there is currently no implementation for the reverse shift
             %from ice growth state to liquid.
@@ -352,103 +352,103 @@ for i=1:n
             
             
             %ice growth state
-            if sigma_time(vial) > 0 
+            if sigma_time(vial) > 0
                 beta = (1-solid_fraction);
                 cp_sigma = solid_fraction*cp_s+ beta*(sigma_time(vial)*Dcp + cp_w);
-                alpha = -q(vial)/mass;               
+                alpha = -q(vial)/mass;
                 gamma = -cp_sigma*depression;
                 delta = 1 - sigma_time(vial);
                 
-              %omega = beta*delta*(Dh + T_time(vial)*Dcp);
-              omega = beta*delta*Dh;                
+                %omega = beta*delta*(Dh + T_time(vial)*Dcp);
+                omega = beta*delta*Dh;
                 A1 =  -alpha*delta -(1+sigma_time(vial))*omega + gamma;
                 A0 =  alpha*delta + sigma_time(vial)*(omega-gamma);
                 DIS = sqrt(A1^2 - 4*omega*A0);
                 sigma_time(vial) = (- A1 - DIS)/(2*omega);
-
+                
                 T_time(vial) = T_eq - depression*(1/delta);
                 
                 if solid_counter(vial) == 0
-                     if sigma_time(vial) > 0.9 %identify completely frzoen vials                    
+                    if sigma_time(vial) > 0.9 %identify completely frzoen vials
                         time_frozen_temp(vial) = i+1;
                         solid_counter(vial) = 1;
-                     end
-                end
-           
-            
-            %liquid vials
-            else
-            T_time(vial) = T_time(vial) + (q(vial)./hl);  
-            if T_time(vial) < T_eq %only test for nucleation if nucleation is thermodynamically feasible
-             Xx = kbDtV.*(T_eq - T_time(vial)).^b; %probability of nucleation
-             Yy = rand(); %random number for stochastic nucleation
-             
-             %Condition for controlled nucleation 
-             if cont == 1 %cont yes / no in parameter list
-             if i == T_insert_end %Time at end of holding step
-                 Yy = 0; %Ensure nucleation
-             end
-             end
-            
-                if Yy < Xx %then we have nucleation
-                time_nuc_temp(vial) = i+1;
-                temp_nuc_temp(vial) = T_time(vial);
-                q_0 = (T_eq - T_time(vial))*cp_solution*mass;                                       
-                alpha = q_0/mass;
-                beta = (1-solid_fraction);
-                gamma = -cp_solution*k_f/M_s *(solid_fraction/(1-solid_fraction));
-                delta = 1;
-                
-              %omega = beta*delta*(Dh + T_time(vial)*Dcp);
-              omega = beta*delta*Dh;
-                A2 = omega;
-                A1 =-alpha*delta -(1+sigma_time(vial))*omega + gamma;
-                A0 = alpha*delta + sigma_time(vial)*(omega-gamma);
-                DIS = sqrt(A1^2 - 4*A2*A0);
-                sigma_time(vial) = (- A1 - DIS)/(2*A2);
-                T_time(vial) = T_eq - k_f/M_s *(solid_fraction/(1-solid_fraction))*(1/(1-sigma_time(vial)));
-                   
-                    
-                    if T_i(i) == h_temp
-                        hold_count_temp = hold_count_temp + 1;
                     end
-                 end
-                 
-                 
+                end
+                
+                
+                %liquid vials
+            else
+                T_time(vial) = T_time(vial) + (q(vial)./hl);
+                if T_time(vial) < T_eq %only test for nucleation if nucleation is thermodynamically feasible
+                    Xx = kbDtV.*(T_eq - T_time(vial)).^b; %probability of nucleation
+                    Yy = rand(); %random number for stochastic nucleation
+                    
+                    %Condition for controlled nucleation
+                    if cont == 1 %cont yes / no in parameter list
+                        if i == T_insert_end %Time at end of holding step
+                            Yy = 0; %Ensure nucleation
+                        end
+                    end
+                    
+                    if Yy < Xx %then we have nucleation
+                        time_nuc_temp(vial) = i+1;
+                        temp_nuc_temp(vial) = T_time(vial);
+                        q_0 = (T_eq - T_time(vial))*cp_solution*mass;
+                        alpha = q_0/mass;
+                        beta = (1-solid_fraction);
+                        gamma = -cp_solution*k_f/M_s *(solid_fraction/(1-solid_fraction));
+                        delta = 1;
+                        
+                        %omega = beta*delta*(Dh + T_time(vial)*Dcp);
+                        omega = beta*delta*Dh;
+                        A2 = omega;
+                        A1 =-alpha*delta -(1+sigma_time(vial))*omega + gamma;
+                        A0 = alpha*delta + sigma_time(vial)*(omega-gamma);
+                        DIS = sqrt(A1^2 - 4*A2*A0);
+                        sigma_time(vial) = (- A1 - DIS)/(2*A2);
+                        T_time(vial) = T_eq - k_f/M_s *(solid_fraction/(1-solid_fraction))*(1/(1-sigma_time(vial)));
+                        
+                        
+                        if T_i(i) == h_temp
+                            hold_count_temp = hold_count_temp + 1;
+                        end
+                    end
+                    
+                    
+                end
             end
-            end
             
             
             
             
-    end
-    
-    if T_i(i) == h_temp
-        hold_temp_final = T_time;
-        time_final_temp = i;
-    end
-    if T_i(i) > h_temp
-        hold_temp_init = T_time;
-    end
+        end
         
+        if T_i(i) == h_temp
+            hold_temp_final = T_time;
+            time_final_temp = i;
+        end
+        if T_i(i) > h_temp
+            hold_temp_init = T_time;
+        end
+        
+        
+    end
     
-end
-
-time_frozen_vial(:,p) = time_frozen_temp;
-time_nuc_vial(:,p) = time_nuc_temp;
-temp_nuc_vial(:,p) = temp_nuc_temp;
-hold_count(p) = hold_count_temp;
-hold_final_vial(:,p) = hold_temp_final;
-hold_init_vial(:,p) =  hold_temp_init;
-time_final(p) = time_final_temp;
-KS_all(:,p) = KS;
-
-temp_corner_all(:,p) = temp_vial_corner;
-sigma_corner_all(:,p) = sigma_vial_corner;
-sigma_center_all(:,p) = sigma_vial_center;
-temp_edge_all(:,p) = temp_vial_edge;
-temp_center_all(:,p) = temp_vial_center;
-
+    time_frozen_vial(:,p) = time_frozen_temp;
+    time_nuc_vial(:,p) = time_nuc_temp;
+    temp_nuc_vial(:,p) = temp_nuc_temp;
+    hold_count(p) = hold_count_temp;
+    hold_final_vial(:,p) = hold_temp_final;
+    hold_init_vial(:,p) =  hold_temp_init;
+    time_final(p) = time_final_temp;
+    KS_all(:,p) = KS;
+    
+    temp_corner_all(:,p) = temp_vial_corner;
+    sigma_corner_all(:,p) = sigma_vial_corner;
+    sigma_center_all(:,p) = sigma_vial_center;
+    temp_edge_all(:,p) = temp_vial_edge;
+    temp_center_all(:,p) = temp_vial_center;
+    
 end
 %% Data extraction from loop
 
@@ -486,39 +486,39 @@ Temp_nuc_all = temp_nuc;
 
 %% Data extraction from loop
 for p=1:N
-
     
-Time_nuc(p,1) = time_nuc(1,1,1,p).*Dt./60; %[min] nucleation times in min
-Time_nuc(p,2) = time_nuc(1,4,1,p).*Dt./60; %[min] nucleation times in min
-Time_nuc(p,3) = time_nuc(2,2,1,p).*Dt./60; %[min] nucleation times in min
-Time_nuc(p,4) = time_nuc(4,4,1,p).*Dt./60; %[min] nucleation times in min
-
-Time_frozen(p,1) = time_frozen(1,1,1,p).*Dt./60; %[min] nucleation times in min
-Time_frozen(p,2) = time_frozen(1,4,1,p).*Dt./60; %[min] nucleation times in min
-Time_frozen(p,3) = time_frozen(2,2,1,p).*Dt./60; %[min] nucleation times in min
-Time_frozen(p,4) = time_frozen(4,4,1,p).*Dt./60; %[min] nucleation times in min
+    
+    Time_nuc(p,1) = time_nuc(1,1,1,p).*Dt./60; %[min] nucleation times in min
+    Time_nuc(p,2) = time_nuc(1,4,1,p).*Dt./60; %[min] nucleation times in min
+    Time_nuc(p,3) = time_nuc(2,2,1,p).*Dt./60; %[min] nucleation times in min
+    Time_nuc(p,4) = time_nuc(4,4,1,p).*Dt./60; %[min] nucleation times in min
+    
+    Time_frozen(p,1) = time_frozen(1,1,1,p).*Dt./60; %[min] nucleation times in min
+    Time_frozen(p,2) = time_frozen(1,4,1,p).*Dt./60; %[min] nucleation times in min
+    Time_frozen(p,3) = time_frozen(2,2,1,p).*Dt./60; %[min] nucleation times in min
+    Time_frozen(p,4) = time_frozen(4,4,1,p).*Dt./60; %[min] nucleation times in min
 end
 
 Time_solid = Time_frozen - Time_nuc;
 
 for p=1:N
-C = max(max(max(time_nuc(:,:,:,p))));
-time_max_nuc(p) = C.*Dt./60;
-
-D = min(min(min(time_nuc(:,:,:,p))));
-time_min_nuc(p) = D.*Dt./60;
-
-C_frozen = max(max(max(time_frozen(:,:,:,p))));
-time_max_frozen(p) = C_frozen.*Dt./60;
-
-D_frozen = min(min(min(time_frozen(:,:,:,p))));
-time_min_frozen(p) = D_frozen.*Dt./60;    
-
-C_solid = max(max(max(time_solid(:,:,:,p))));
-time_max_solid(p) = C_solid.*Dt./60;
-
-D_solid = min(min(min(time_solid(:,:,:,p))));
-time_min_solid(p) = D_solid.*Dt./60;    
+    C = max(max(max(time_nuc(:,:,:,p))));
+    time_max_nuc(p) = C.*Dt./60;
+    
+    D = min(min(min(time_nuc(:,:,:,p))));
+    time_min_nuc(p) = D.*Dt./60;
+    
+    C_frozen = max(max(max(time_frozen(:,:,:,p))));
+    time_max_frozen(p) = C_frozen.*Dt./60;
+    
+    D_frozen = min(min(min(time_frozen(:,:,:,p))));
+    time_min_frozen(p) = D_frozen.*Dt./60;
+    
+    C_solid = max(max(max(time_solid(:,:,:,p))));
+    time_max_solid(p) = C_solid.*Dt./60;
+    
+    D_solid = min(min(min(time_solid(:,:,:,p))));
+    time_min_solid(p) = D_solid.*Dt./60;
     
 end
 
@@ -526,7 +526,7 @@ end
 
 
 
-%% Plot temperature vs time 
+%% Plot temperature vs time
 
 times = linspace(0,Dt*n,n+1)./60;
 iterations = linspace(1,N,N);
@@ -537,10 +537,10 @@ TimeS_sort = sort(Time_solid,1,'ascend');
 fraction = [0 linspace(0,1,(N+1)) 1];
 
 for g=1:4
-TimeN_sort_plot(g,:) = [0 TimeN_sort(1,g) TimeN_sort(:,g)' (10*TimeN_sort(end,g))];
-TimeF_sort_plot(g,:) = [0 TimeF_sort(1,g) TimeF_sort(:,g)' (10*TimeF_sort(end,g))];
-TimeS_sort_plot(g,:) = [0 TimeS_sort(1,g) TimeS_sort(:,g)' (10*TimeS_sort(end,g))];
-
+    TimeN_sort_plot(g,:) = [0 TimeN_sort(1,g) TimeN_sort(:,g)' (10*TimeN_sort(end,g))];
+    TimeF_sort_plot(g,:) = [0 TimeF_sort(1,g) TimeF_sort(:,g)' (10*TimeF_sort(end,g))];
+    TimeS_sort_plot(g,:) = [0 TimeS_sort(1,g) TimeS_sort(:,g)' (10*TimeS_sort(end,g))];
+    
 end
 
 % figure(1)
@@ -550,8 +550,8 @@ end
 % ylabel('Temperature [°C]');
 % title('Temperature Evolution of Core Vial (2,2,2) in 5 Cycles');
 % axis([0 150 -40 21]);
-% 
-% % 
+%
+% %
 figure(2)
 plot(TimeN_sort_plot,fraction)
 ylabel('Simulated CDF');
@@ -672,13 +672,13 @@ temp_nuc_1 = temp_nuc(:,:,:,1);
 
 time_solid_1 = (time_frozen(:,:,:,1) - time_nuc(:,:,:,1))./60.*Dt;
 
-%% Differentiate temperature profile to identify nucleation events 
+%% Differentiate temperature profile to identify nucleation events
 % The idea here is that we would see spikes at the times when the
 % neighboring vials nucleate (which is indeed true)
 
 % T1 = Temp(:,1); %temperature profile of core vial in first run
-% T1_diff = diff(T1); 
-% 
+% T1_diff = diff(T1);
+%
 % figure(6)
 % plot(times(2:end),T1_diff.*Dt)
 % xlabel('Time [min]');
@@ -718,7 +718,7 @@ ylabel('Counts');
 axis([60 180 0 5000]);
 title('Histogram of all freezing times for 1000 cycles');
 
-%% 
+%%
 figure(14)
 histogram(temp_nuc, 'BinWidth',0.2)
 xlabel('Nucleation Temperature [°C]');
@@ -945,25 +945,25 @@ grid on;
 % time_nuc_20022020_c05 = Time_nuc_all;
 % time_solid_20022020_c05 = Time_solid_all;
 % temp_hold_20022020_c05 = hold_final;
-% 
+%
 % save('v8_20022020_c05.mat','temp_nuc_20022020_c05',...
 % 'time_nuc_20022020_c05','time_solid_20022020_c05','temp_hold_20022020_c05')
-% 
-% 
+%
+%
 % temp_nuc_20022000_c05_h1m5 = Temp_nuc_all;
 % time_nuc_20022000_c05_h1m5 = Time_nuc_all;
 % time_solid_20022000_c05_h1m5 = Time_solid_all;
 % temp_hold_20022000_c05_h1m5 = hold_final;
-% 
+%
 % save('v8_20022000_c05_h1m5.mat','temp_nuc_20022000_c05_h1m5',...
 % 'time_nuc_20022000_c05_h1m5','time_solid_20022000_c05_h1m5','temp_hold_20022000_c05_h1m5')
-% 
-% 
+%
+%
 % temp_nuc_20022020_c05_h540m12 = Temp_nuc_all;
 % time_nuc_20022020_c05_h540m12 = Time_nuc_all;
 % time_solid_20022020_c05_h540m12 = Time_solid_all;
 % temp_hold_20022020_c05_h540m12 = hold_final;
-% 
+%
 % save('v8e_20022020_c05_h540m12.mat','temp_nuc_20022020_c05_h540m12',...
 % 'time_nuc_20022020_c05_h540m12','time_solid_20022020_c05_h540m12','temp_hold_20022020_c05_h540m12')
 
@@ -972,7 +972,7 @@ grid on;
 % time_nuc_20022020_c05_c180m5h360m10 = Time_nuc_all;
 % time_solid_20022020_c05_c180m5h360m10 = Time_solid_all;
 % temp_hold_20022020_c05_c180m5h360m10 = hold_final;
-% 
+%
 % save('ssie_20022020_c05_c180m5h360m10.mat','temp_nuc_20022020_c05_c180m5h360m10',...
 % 'time_nuc_20022020_c05_c180m5h360m10','time_solid_20022020_c05_c180m5h360m10','temp_hold_20022020_c05_c180m5h360m10')
 
@@ -980,44 +980,44 @@ grid on;
 % time_nuc_20020020_c05_c180m5ramp = Time_nuc_all;
 % time_solid_20020020_c05_c180m5ramp = Time_solid_all;
 % temp_hold_20020020_c05_c180m5ramp = hold_final;
-% 
+%
 % save('v8_20020020_c05_c180m5ramp.mat','temp_nuc_20020020_c05_c180m5ramp',...
 % 'time_nuc_20020020_c05_c180m5ramp','time_solid_20020020_c05_c180m5ramp','temp_hold_20020020_c05_c180m5ramp')
-% 
+%
 
 % temp_nuc_20022020_c05_h640m12 = Temp_nuc_all;
 % time_nuc_20022020_c05_h640m12 = Time_nuc_all;
 % time_solid_20022020_c05_h640m12 = Time_solid_all;
 % temp_hold_20022020_c05_h640m12 = hold_final;
-% 
+%
 % save('ssie_20022020_c05_h640m12.mat','temp_nuc_20022020_c05_h640m12',...
 % 'time_nuc_20022020_c05_h640m12','time_solid_20022020_c05_h640m12','temp_hold_20022020_c05_h640m12')
-% 
+%
 % temp_nuc_20003000_c05_low = Temp_nuc_all;
 % time_nuc_20003000_c05_low = Time_nuc_all;
 % time_solid_20003000_c05_low = Time_solid_all;
 % temp_hold_20003000_c05_low = hold_final;
-% 
+%
 % save('ssie_20003000_c05_low.mat','temp_nuc_20003000_c05_low',...
 % 'time_nuc_20003000_c05_low','time_solid_20003000_c05_low','temp_hold_20003000_c05_low')
-% 
+%
 
 % temp_nuc_20002000_c05_4900s = Temp_nuc_all;
 % time_nuc_20002000_c05_4900s = Time_nuc_all;
 % time_solid_20002000_c05_4900s = Time_solid_all;
 % temp_hold_20002000_c05_4900s = hold_final;
-% 
+%
 % save('ssie_20002000_c05_4900s.mat','temp_nuc_20002000_c05_4900s',...
 % 'time_nuc_20002000_c05_4900s','time_solid_20002000_c05_4900s','temp_hold_20002000_c05_4900s')
-% 
+%
 % temp_nuc_20000000_c05n_dt100 = Temp_nuc_all;
 % time_nuc_20000000_c05n_dt100 = Time_nuc_all;
 % time_solid_20000000_c05n_dt100 = Time_solid_all;
 % temp_hold_20000000_c05n_dt100 = hold_final;
-% 
+%
 % save('ssie_20000000_c05n_dt100.mat','temp_nuc_20000000_c05n_dt100',...
 % 'time_nuc_20000000_c05n_dt100','time_solid_20000000_c05n_dt100','temp_hold_20000000_c05n_dt100')
 
 % temp_profile05 = temp_center_all(:,1);
 % save('tempcurvenonuc05.mat','temp_profile05')
-% % % 
+% % %
