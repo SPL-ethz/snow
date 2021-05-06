@@ -146,7 +146,7 @@ sigma_solid = sigma_equivalent.*cp_w./cp_i; %similar temperature rise for a froz
 %% Define model parameters
 
 % Number of vials in each dimension
-x = 7;
+x = 3;
 y = x;
 z = 1; %only one layer
 
@@ -211,7 +211,7 @@ t_time = linspace(Dt,Dt*n,n);
 kbDtV = kb*Dt*V;
 
 
-parpool(4);
+% parpool(4);
 
 xyz = zeros(x,y,z);
 xyzt = zeros(x,y,z,n+1);
@@ -274,7 +274,7 @@ dz = ones(x*y*(z-1),1);
 
 INT = sparse(diag(d0) + diag(dx,1) + diag(dx,-1) + diag(dy,x) + diag(dy,-x));
 % + diag(dz,x*y) + diag(dz,-x*y));
-clear d0 dx dy dz;
+% clear d0 dx dy dz;
 %Boundaries
 
 EXT = - sum(INT);
