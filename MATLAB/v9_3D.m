@@ -144,15 +144,18 @@ parpool(16);
 q = zeros(x*y*z,1);
 %Define interaction matrix
 
+%These are the three heat transfer coefficient terms. We look at the case where heat transfer in z direction may be different from xy, because of the way a vial is formed.
 Hext = A.*h.*Dt;
 Hint_xy = A.*kc_xy.*Dt;
 Hint_z = A.*kc_z.*Dt;
 
-%self interaction
+%self interaction: A vial has 6 contact surfaces. For each surface, heat flow is calculated by subtracting the temperature of the vial of interest. 
+%d0 is in the main diagonal of the matrix
 
 d0 = -6*ones(x*y*z,1);
 
-%x interaction (left and right)
+%x interaction (left and right): interactions with the vials neighboring in +x and -x position. The dx vector is introduced shifted by +- one line to the main diagonal.
+%A vial always experiences interactions in +x and -x, as long as it is not in a position at x=1 or x=X_max. Consequently, every xth vial does only have one x interaction.
 
 dx = ones(x*y*z-1,1);
 
@@ -162,7 +165,8 @@ for u = 1:(x*y*z-1)
     end
 end
 
-%y interaction (up and down)
+%y interaction (up and down): Same as x, but here the interactions are shifted by x lines from the main diagonal; because after every x vials we enter a new y level.
+%Similar to the case with y, we need to remove some ones in case their are no neighboring vials
 
 dy = ones(x*y*z-x,1);
 
@@ -175,16 +179,16 @@ for u = 1:(x*y*z-x-1)
     end
 end
 
-%z interaction (front and back)
-
-dz = ones(x*y*(z-1),1);
+%z interaction (front and back): Same as x, but here the interactions are shifted by x*y lines from the main diagonal; because after each x*y vials, we enter a new z level.
+%
+dz = ones(x*y*(z-1),1); %The reason that this looks so simple here is because of the geometry of the matrix, where we always iterate through all x*y vials before increasing z.
 
 %Final interaction matrix
 
 INT = sparse(diag(d0) + diag(dx,1) + diag(dx,-1) + diag(dy,x) + diag(dy,-x) + diag(dz,x*y) + diag(dz,-x*y));
 %Boundaries
 
-EXT = - sum(INT); %number of contact faces with environment of each vial
+EXT = - sum(INT); %number of contact faces with environment of each vial; we need to know how many faces of each vial belong to each mode of heat transfer
 
 %Heat transfer matrix
 
@@ -192,15 +196,18 @@ d_red = d0' + EXT; %remove external interactions
 
 %Calculation of self contribution requires separation of external HT, xy HT
 %and z HT
+
+%This loop calculates again the main diagonal, i.e. d0 elements considering that we have three types of heat transfer. So, for each vial we need to know the number of xy interactions, z interactions and external surfaces.
+
 for vial = 1:(x*y*z)
-    if vial < (x*y+1) || vial > (length(d_red) - x*y)
+    if vial < (x*y+1) || vial > (length(d_red) - x*y) %this means that the vial is in the layer z=1 or z=Z_max
     d_red(vial) = d_red(vial) +1; 
-    Z_vial = 1;
+    Z_vial = 1; %in this case we have one z interaction
     else
     d_red(vial) = d_red(vial) + 2;
-    Z_vial = 2;
+    Z_vial = 2; %otherwise we have two
     end
-    H0(vial) = d_red(vial)*Hint_xy - Z_vial*Hint_z - EXT(vial)*Hext;
+    H0(vial) = d_red(vial)*Hint_xy - Z_vial*Hint_z - EXT(vial)*Hext; %H0 is the adjusted d0 with the heat transfer information.
     
 end
 
@@ -209,7 +216,7 @@ Hy = dy.*Hint_xy;
 Hz = dz.*Hint_z;
 
 HEXT = EXT.*Hext;
-HINT = sparse(diag(H0) + diag(Hx,1) + diag(Hx,-1) + diag(Hy,x) + diag(Hy,-x) + diag(Hz,x*y) + diag(Hz,-x*y));
+HINT = sparse(diag(H0) + diag(Hx,1) + diag(Hx,-1) + diag(Hy,x) + diag(Hy,-x) + diag(Hz,x*y) + diag(Hz,-x*y)); %Add all heat transfer contributions together
 
 kbDtV = kb*Dt*V;
 
