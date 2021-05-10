@@ -27,9 +27,10 @@ class Snowfall:
     def run():
         
         # 1. build interaction matrices
-        self._buildInteractionMatrices
+        self._buildInteractionMatrices()
         
-        # 2. ...
+        # 2. fix k_shelf
+        self._kShelf()
 
     def _buildInteractionMatrices():
         
@@ -74,3 +75,13 @@ class Snowfall:
         self.H_int = interactionMatrix * self.k['int'] * A * self.dt
 
         self.H_ext = VIAL_EXT * self.k['ext'] * A * self.dt
+
+    def _kShelf():
+
+        if 's_sigma_rel' in self.k.keys():
+
+            self.k['shelf'] = self.k['s0'] + np.random.normal(np.prod(self.N_vials))
+
+        else:
+            
+            self.k['shelf'] = self.k['s0']

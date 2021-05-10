@@ -289,7 +289,7 @@ HINT = sparse(INT.*HTINT); %Only works this way if kint = kext
 HEXT = EXT.*HTEXT; %Add shelf heat transfer as external heat transfer
 
 
-parfor p=1:N
+for p=1:N
     
     rng(p)
     
@@ -333,11 +333,11 @@ parfor p=1:N
     for i=1:n
         
         %Need to think about automating definition of vial positions
-        temp_vial_corner(i) = T_time(1);
-        sigma_vial_corner(i) = sigma_time(1);
-        sigma_vial_center(i) = sigma_time(25);
-        temp_vial_edge(i) = T_time(4);
-        temp_vial_center(i) = T_time(25);
+%         temp_vial_corner(i) = T_time(1);
+%         sigma_vial_corner(i) = sigma_time(1);
+%         sigma_vial_center(i) = sigma_time(25);
+%         temp_vial_edge(i) = T_time(4);
+%         temp_vial_center(i) = T_time(25);
         
         q = HEINT*T_time + HSEXT*T_i(i);
         
