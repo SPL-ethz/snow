@@ -22,7 +22,6 @@ solid_fraction = 0.05 # mass fraction of solute in solution
 Dcp = cp_i - cp_w
 cp_solution = solid_fraction*cp_s + (1-solid_fraction)*cp_w # heat capacity of solution
 T_init = 20 # °C initial temperature
-T_ext0 = 20 # °C external temperature in the beginning
 T_eq = 0 #°C equilibrium freezing temperature
 T_nuc = -10 # °C nucleation temperature
 Dh = 333550 # J/kg heat of fusion water 
@@ -54,4 +53,4 @@ hs = mass *cp_i
 depression = k_f/M_s *(solid_fraction/(1-solid_fraction))
 
 sigma_equivalent = Dh/cp_w # temperature rise required for complete solidification
-sigma_solid = sigma_equivalent.*cp_w./cp_i  # similar temperature rise for a frozen sample, i.e. with solid heat capacity
+sigma_solid = sigma_equivalent *cp_w /cp_i  # similar temperature rise for a frozen sample, i.e. with solid heat capacity
