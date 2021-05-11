@@ -5,11 +5,12 @@ Author: David Ochsenbein (DRO) - dochsenb@its.jnj.com
 Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
 '''
 
-from typing import List, Tuple
 from operatingConditions import OperatingConditions
 from scipy.sparse import csr_matrix
 
 from constants import A, hl, T_eq, kb, V, b, cp_solution, mass, solid_fraction, cp_s, depression
+
+from typing import List, Tuple, Union, Sequence
 
 HEATFLOW_REQUIREDKEYS = ('int','ext','s0')
 class Snowfall:
@@ -127,7 +128,7 @@ class Snowfall:
 
     def nucleationTimes(self):
         
-        I_nucleation, lateBloomers = self._nucleationIndices()
+        I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold = 0)
 
         # nucleation times for all nucleated vials
         t_nucleation = self._t[I_nucleation].astype(float) # need to make sure this is float so no problems arise later
@@ -139,7 +140,7 @@ class Snowfall:
 
     def nucleationTemperatures(self) -> np.ndarray:
         
-        I_nucleation, lateBloomers = self._nucleationIndices()
+        I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold = 0)
 
         T_nucleation = np.array([self.X_T[i,I] for i,I in zip(range(self.N_vials_total), I_nucleation)]).astype(float) # this should always be float, but just to be sure
 
@@ -148,9 +149,25 @@ class Snowfall:
 
         return T_nucleation
 
-    def getVialGroup(group: Union[str, Sequence[str]]) -> np.ndarray:
-        
+    def solidificationTimes(self) -> np.ndarray:
 
+        t_nucleation = self.nucleationTimes()
+
+        I_solidification, neverGrownUp = self._sigmaCrossingIndices(threshold = 0.9)
+
+        # nucleation times for all nucleated vials
+        t_solidified = self._t[I_solidification].astype(float) # need to make sure this is float so no problems arise later
+
+        # never fully solidified vials are set to NaN
+        t_solidified[neverGrownUp] = np.nan
+
+        # solidification is the difference between solidified and nucleated times
+        t_solidification = t_solidified - t_nucleation
+
+        return t_solidification
+
+    def getVialGroup(self, group: Union[str, Sequence[str]]) -> np.ndarray:
+        
         if isinstance(group, str):
             group = [group]
 
@@ -167,15 +184,15 @@ class Snowfall:
 
         return myMask
 
+    def _sigmaCrossingIndices(self, thresold = 0.9) -> Tuple[np.ndarray, np.ndarray]:
 
-    def _nucleationIndices(self) -> Tuple[np.ndarray, np.ndarray]:
         if self.simulationStatus == 0:
             raise ValueError("Simulation needs to be run before induction times can be extracted.")
 
-        I_nucleation = np.argmax(self.X_sigma > 0, axis = 1)
-        lateBloomers = ~np.any(self.X_sigma > 0, axis = 1) # vials that didn't nucleate at all
+        I= np.argmax(self.X_sigma > threshold, axis = 1)
+        neverReached = ~np.any(self.X_sigma > threshold, axis = 1) # vials that never exceeded solidification threshold
 
-        return I_nucleation, lateBloomers
+        return I, neverReached
 
     def _buildInteractionMatrices(self):
         
@@ -216,6 +233,8 @@ class Snowfall:
 
         # at most, any cubic vial on a 2D shelf can have 4 interactions. 4 - VIAL_INT is the number of external interactions (excl. the shelf)
         VIAL_EXT = 4*np.ones((n_x*n_y,)) - VIAL_INT.diagonal() # is it worth storing this as a sparse matrix? - DRO XXX
+
+        return interactionMatrix, VIAL_EXT
 
     def _buildHeatflowMatrices(self):
 
