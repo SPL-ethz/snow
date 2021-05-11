@@ -75,7 +75,7 @@ class Snowfall:
         N_timeSteps = np.ceil(self.opcond.t_tot / self.dt)+1 # the total number of timesteps
 
         # 1. build interaction matrices
-        self._buildInteractionMatrices()
+        self._buildHeatflowMatrices()
 
         # 2. Obtain external temperature profile over time
         T_shelf = self.opcond.tempProfile(self.dt)
@@ -137,7 +137,7 @@ class Snowfall:
 
         return t_nucleation
 
-    def nucleationTemperatures(self):
+    def nucleationTemperatures(self) -> np.ndarray:
         
         I_nucleation, lateBloomers = self._nucleationIndices()
 
@@ -148,7 +148,27 @@ class Snowfall:
 
         return T_nucleation
 
-    def _nucleationIndices(self):
+    def getVialGroup(group: Union[str, Sequence[str]]) -> np.ndarray:
+        
+
+        if isinstance(group, str):
+            group = [group]
+
+        _ , VIAL_EXT = self._buildInteractionMatrices()
+        
+        myMask = np.zeros(self.N_vials_total, dtype = bool)
+        for g in group:
+            if g == 'corner':
+                myMask = myMask | (VIAL_EXT == 2)
+            elif g == 'edge':
+                myMask = myMask | (VIAL_EXT == 1)
+            elif g == 'center':
+                myMask = myMask | (VIAL_EXT == 0)
+
+        return myMask
+
+
+    def _nucleationIndices(self) -> Tuple[np.ndarray, np.ndarray]:
         if self.simulationStatus == 0:
             raise ValueError("Simulation needs to be run before induction times can be extracted.")
 
@@ -156,7 +176,6 @@ class Snowfall:
         lateBloomers = ~np.any(self.X_sigma > 0, axis = 1) # vials that didn't nucleate at all
 
         return I_nucleation, lateBloomers
-        
 
     def _buildInteractionMatrices(self):
         
@@ -196,14 +215,18 @@ class Snowfall:
         interactionMatrix = DX + DY - VIAL_INT
 
         # at most, any cubic vial on a 2D shelf can have 4 interactions. 4 - VIAL_INT is the number of external interactions (excl. the shelf)
-        VIAL_EXT = 4*np.ones((n_x*n_y,)) - VIAL_INT.diagonal() # is it worth storing this as a sparse matrix?
+        VIAL_EXT = 4*np.ones((n_x*n_y,)) - VIAL_INT.diagonal() # is it worth storing this as a sparse matrix? - DRO XXX
 
-        H_int = interactionMatrix * self.k['int'] * A * self.dt
+    def _buildHeatflowMatrices(self):
 
-        H_ext = VIAL_EXT * self.k['ext'] * A * self.dt
+        interactionMatrix, VIAL_EXT = self._buildInteractionMatrices()
+
+        self.H_int = interactionMatrix * self.k['int'] * A * self.dt
+
+        self.H_ext = VIAL_EXT * self.k['ext'] * A * self.dt
 
         self._kShelf()
-        H_shelf = self.k['shelf'] * A * self.dt
+        self.H_shelf = self.k['shelf'] * A * self.dt # either a scalar or a vector
 
     def _kShelf(self):
 
