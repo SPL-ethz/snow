@@ -181,6 +181,8 @@ class Snowfall:
                 myMask = myMask | (VIAL_EXT == 1)
             elif g == 'center':
                 myMask = myMask | (VIAL_EXT == 0)
+            else:
+                raise ValueError(f"Group {g} is not a known vial group.")
 
         return myMask
 
@@ -244,15 +246,13 @@ class Snowfall:
 
         self.H_ext = VIAL_EXT * self.k['ext'] * A * self.dt
 
-        self._kShelf()
+        if 's_sigma_rel' in self.k.keys():
+            self.k['shelf'] = self.k['s0'] + np.random.normal(self.N_vials_total)
+        else:
+            self.k['shelf'] = self.k['s0']
+
         self.H_shelf = self.k['shelf'] * A * self.dt # either a scalar or a vector
 
-    def _kShelf(self):
-
-        if 's_sigma_rel' in self.k.keys():
-
-            self.k['shelf'] = self.k['s0'] + np.random.normal(np.prod(self.N_vials))
-
-        else:
-            
-            self.k['shelf'] = self.k['s0']
+    def __repr__(self):
+        
+        return f"Snowfall([N_vials: {self.N_vials}, Nrep: {self.Nrep}, dt: {self.dt}, pool_size: {self.poolsize}])"
