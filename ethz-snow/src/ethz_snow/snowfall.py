@@ -5,10 +5,10 @@ Author: David Ochsenbein (DRO) - dochsenb@its.jnj.com
 Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
 '''
 
-from operatingConditions import OperatingConditions
+from ethz_snow.operatingConditions import OperatingConditions
 from scipy.sparse import csr_matrix
 
-from constants import A, hl, T_eq, kb, V, b, cp_solution, mass, solid_fraction, cp_s, depression
+from ethz_snow.constants import A, hl, T_eq, kb, V, b, cp_solution, mass, solid_fraction, cp_s, depression, alpha, beta_solution
 
 from typing import List, Tuple, Union, Sequence
 
@@ -99,19 +99,23 @@ class Snowfall:
 
             liquidMask = (sigma_k == 0) # a mask that is True where a vial is still fully liquid
             solidMask = ~liquidMask # for convenience
-            superCooledMask = (T_k < T_eq) # a mask that is True where the temperature is below the equilibrium temperature
-            nucleationCandidatesMask = liquidMask & superCooledMask
-            n_nucleationCandidates = np.sum(nucleationCandidatesMask)
 
             # calculate heatflows for all vials
             q_k = self.H_int @ T_k + self.H_ext * (T_ext_k - T_k) + self.H_shelf * (T_shelf_k - T_k) # [XXX] units? - DRO
 
             ## SOLID(IFYING) VIALS
             # heat capacity of solidifying vials
-            cp_sigma = solid_fraction * cp_s + (1-solid_fraction) * (sigma_k[solidMask] * (cp_i - cp_w) + cp_w)
+            cp_sigma = solid_fraction * cp_s + (1-solid_fraction) * (sigma_k[solidMask] * (cp_i - cp_w) + cp_w) # a vector of cps for all solidifying vials
+            beta = depression * mass * cp_sigma
+
+            sigma_k[solidMask] = sigma_k[solidMask] + q_k[solidMask] / (alpha - beta / (1-sigma_k[solidMask])**2) * self.dt
+            T_k[solidMask] = T_eq - depression * (1/(1-sigma_k[solidMask])) # assumption is that during solidification T = Teq
 
             ## LIQUID VIALS
-            T_k[liquidMask] = T_k[liquidMask] + q_k[liquidMask] / hl
+            T_k[liquidMask] = T_k[liquidMask] + q_k[liquidMask] / hl * self.dt # DRO: Leif, I've moved the dt out of the Hs because I associate Q with fluxes
+            superCooledMask = (T_k < T_eq) # a mask that is True where the temperature is below the equilibrium temperature
+            nucleationCandidatesMask = liquidMask & superCooledMask # a vial that is both liquid and supercooled can nucleate
+            n_nucleationCandidates = np.sum(nucleationCandidatesMask) # the total number of nucleation candidates
 
             # nucleation probabilities for candidates
             P = kb * V *(T_eq - T_k(nucleationCandidatesMask))**b * self.dt
@@ -123,8 +127,11 @@ class Snowfall:
             nucleatedVialsMask = nucleationCandidatesMask & (diceRolls < P)
             q0 = (T_eq - T_k[nucleatedVialsMask]) * cp_solution * mass 
 
+            sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
+            T_k[nucleatedVialsMask] = T_eq - depression * (1/(1-sigma_k[nucleatedVialsMask])) # assumption is that during solidification T = Teq
+
         self._X = X # store the state matrix
-        self._t = t
+        self._t = t # store the time vector
 
     def nucleationTimes(self):
         
@@ -165,6 +172,12 @@ class Snowfall:
         t_solidification = t_solidified - t_nucleation
 
         return t_solidification
+
+    def solidCounter(self, threshold: float = 0.9) -> np.ndarray:
+        if self.simulationStatus == 0:
+            raise ValueError("Simulation needs to be run before induction times can be extracted.")
+
+        return np.sum(self.X_sigma > threshold, axis = 0)
 
     def getVialGroup(self, group: Union[str, Sequence[str]]) -> np.ndarray:
         
@@ -242,16 +255,16 @@ class Snowfall:
 
         interactionMatrix, VIAL_EXT = self._buildInteractionMatrices()
 
-        self.H_int = interactionMatrix * self.k['int'] * A * self.dt
+        self.H_int = interactionMatrix * self.k['int'] * A
 
-        self.H_ext = VIAL_EXT * self.k['ext'] * A * self.dt
+        self.H_ext = VIAL_EXT * self.k['ext'] * A 
 
         if 's_sigma_rel' in self.k.keys():
             self.k['shelf'] = self.k['s0'] + np.random.normal(self.N_vials_total)
         else:
             self.k['shelf'] = self.k['s0']
 
-        self.H_shelf = self.k['shelf'] * A * self.dt # either a scalar or a vector
+        self.H_shelf = self.k['shelf'] * A # either a scalar or a vector
 
     def __repr__(self):
         

@@ -54,3 +54,6 @@ depression = k_f/M_s *(solid_fraction/(1-solid_fraction))
 
 sigma_equivalent = Dh/cp_w # temperature rise required for complete solidification
 sigma_solid = sigma_equivalent *cp_w /cp_i  # similar temperature rise for a frozen sample, i.e. with solid heat capacity
+
+alpha = -mass*Dh*(1-solid_fraction) # used for sigma time step 
+beta_solution = depression * mass * co_solution
