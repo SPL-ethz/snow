@@ -10,19 +10,21 @@ from typing import Optional
 
 class OperatingConditions:
     def __init__(
-        self,
-        t_tot: float = 2e4,
-        cooling: dict = {'rate':0.5/60, 'start': 20, 'end': -50},
-        holding: Optional[dict] = {'duration': 10, 'temp': -12},
-        controlledNuclation: bool = False):
+            self,
+            t_tot: float = 2e4,
+            cooling: dict = {'rate':0.5/60, 'start': 20, 'end': -50},
+            holding: Optional[dict] = {'duration': 10, 'temp': -12},
+            controlledNuclation: bool = False):
 
         self.t_tot = t_tot
-        assert all([key in cooling.keys() for key in ['rate','start','end']]), \
-            "cooling dictionary does not contain all required keys."
+        if not all([key in cooling.keys() for key in ['rate','start','end']]):
+            raise ValueError("Cooling dictionary does not contain all required keys.")
         self.cooling = cooling
-        assert all([key in holding.keys() for key in ['duration','temp']]), \
-            "holding dictionary does not contain all required keys."
+
+        if not all([key in holding.keys() for key in ['duration','temp']]):
+            raise ValueError("Holding dictionary does not contain all required keys.")
         self.holding = holding
+
         self.controlledNuclation = controlledNuclation
 
     def tempProfile(self, dt: float) -> np.ndarray:
@@ -35,12 +37,14 @@ class OperatingConditions:
             duration_hold = self.holding['duration']
 
             # time and number of steps to hold temperature
-            T_vec_toHold = self._simpleCool(Tstart = self.cooling['start'], Tend = T_hold, coolingRate = self.cooling['rate'], dt = dt)
+            T_vec_toHold = self._simpleCool(Tstart = self.cooling['start'], Tend = T_hold, 
+                                            coolingRate = self.cooling['rate'], dt = dt)
 
             # append holding period
             T_vec_holding = [T_hold]*int(np.ceil(duration_hold / dt))
 
-            T_vec_toEnd = self._simpleCool(Tstart = T_hold, Tend = self.cooling['end'], coolingRate = self.cooling['rate'], dt = dt, t_tot = self.t_tot)      
+            T_vec_toEnd = self._simpleCool(Tstart = T_hold, Tend = self.cooling['end'], coolingRate = self.cooling['rate'],
+                                           dt = dt, t_tot = self.t_tot)      
 
             T_vec = np.concatenate([T_vec_toHold, T_vec_holding, T_vec_toEnd])
 
@@ -51,7 +55,14 @@ class OperatingConditions:
 
         return T_vec
     
-    def _simpleCool(self, Tstart: float , Tend: float, coolingRate: float, dt: float, t_tot: Optional[float] = None) -> np.ndarray:
+    def _simpleCool(
+            self, 
+            Tstart: float , 
+            Tend: float, 
+            coolingRate: float, 
+            dt: float, 
+            t_tot: Optional[float] = None) -> np.ndarray:
+
         t_end = (Tstart - Tend) / coolingRate
         n_end = int(np.ceil(t_end / dt))
 
