@@ -6,18 +6,23 @@ Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
 '''
 
 from ethz_snow.operatingConditions import OperatingConditions
-from ethz_snow.constants import A, hl, T_eq, kb, V, b, cp_solution, mass, solid_fraction, cp_s, depression, alpha, beta_solution, cp_i, cp_w
+from ethz_snow.constants import (
+    A, hl, T_eq, kb, V, b, cp_solution,
+    mass, solid_fraction, cp_s, depression,
+    alpha, beta_solution, cp_i, cp_w)
 
 import numpy as np
 from scipy.sparse import csr_matrix
 from typing import List, Tuple, Union, Sequence
 
-HEATFLOW_REQUIREDKEYS = ('int','ext','s0')
+HEATFLOW_REQUIREDKEYS = ('int', 'ext', 's0')
+
+
 class Snowfall:
     def __init__(
         self,
-        k: dict = {'int':20, 'ext': 20, 's0':20, 's_sigma_rel':0.1},
-        N_vials: Tuple[int, int, int] = (7,7,1), # should this be part of operating conditions?
+        k: dict = {'int': 20, 'ext': 20, 's0': 20, 's_sigma_rel': 0.1},
+        N_vials: Tuple[int, int, int] = (7, 7, 1),  # should this be part of operating conditions?
         Nrep: int = 5e3,
         dt: float = 2,
         pool_size: int = 12,
@@ -27,7 +32,8 @@ class Snowfall:
         if not isinstance(k, dict):
             raise TypeError(f"Input k must be of type dict. Was given {type(k)}.")
         elif not all([key in k.keys() for key in HEATFLOW_REQUIREDKEYS]):
-            raise ValueError(f"A required key was missing from dictionary k, specifically {set(HEATFLOW_REQUIREDKEYS) - set(k.keys())}.")
+            raise ValueError((f"A required key was missing from dictionary k, specifically "
+                             + f"{set(HEATFLOW_REQUIREDKEYS) - set(k.keys())}."))
         else:
             self.k = k
 
@@ -53,7 +59,7 @@ class Snowfall:
     def simulationStatus(self):
         if (self._simulationStatus == 1) or (self._X is not None):
             self._simulationStatus = 1
-        
+
         return self._simulationStatus
 
     @property
@@ -62,33 +68,36 @@ class Snowfall:
 
     @property
     def X_T(self):
-        return self._X[:self.N_vials_total,:]
+        return self._X[:self.N_vials_total, :]
 
     @property
     def X_sigma(self):
-        return self._X[self.N_vials_total:,:]
+        return self._X[self.N_vials_total:, :]
 
     def run(self):
         # clean up any potential old simulations
         self._X = None
         self._t = None
 
-        N_timeSteps = int(np.ceil(self.opcond.t_tot / self.dt))+1 # the total number of timesteps
+        N_timeSteps = int(np.ceil(self.opcond.t_tot / self.dt))+1  # the total number of timesteps
 
         # 1. build interaction matrices
         self._buildHeatflowMatrices()
 
         # 2. Obtain external temperature profile over time
         T_shelf = self.opcond.tempProfile(self.dt)
-        T_ext = T_shelf # need to make a switch so that this can be decoupled - DRO XX
+        T_ext = T_shelf  # need to make a switch so that this can be decoupled - DRO XX
 
         # 3. Initial state of the system
-        T_k = np.ones((self.N_vials_total,)) * self.opcond.cooling['start'] # [C] initial temperature
-        sigma_k = np.zeros((self.N_vials_total,)) # state of the vials (0 = liq, 1 = completely frozen)
+        # initial temperature
+        T_k = np.ones((self.N_vials_total,)) * self.opcond.cooling['start']  # [C]
+        # state of the vials
+        sigma_k = np.zeros((self.N_vials_total,))  # (0 = liq, 1 = completely frozen)
 
         # 4. Pre-allocate memory
-        X = np.zeros((2*self.N_vials_total, N_timeSteps)) # our state matrix containing the entire history of the system
-        t = np.arange(0,N_timeSteps * self.dt, self.dt)
+        # our state matrix containing the entire history of the system
+        X = np.zeros((2*self.N_vials_total, N_timeSteps))
+        t = np.arange(0, N_timeSteps * self.dt, self.dt)
 
         # 5. Iterate over time steps
         for k in np.arange(N_timeSteps):
@@ -96,53 +105,67 @@ class Snowfall:
             T_shelf_k = T_shelf[k]
             T_ext_k = T_ext[k]
 
-            X[:,k] = np.concatenate([T_k, sigma_k])
+            X[:, k] = np.concatenate([T_k, sigma_k])
 
-            liquidMask = (sigma_k == 0) # a mask that is True where a vial is still fully liquid
-            solidMask = ~liquidMask # for convenience
+            # a mask that is True where a vial is still fully liquid
+            liquidMask = (sigma_k == 0)
+            solidMask = ~liquidMask  # for convenience
 
             # calculate heatflows for all vials
-            q_k = self.H_int @ T_k + self.H_ext * (T_ext_k - T_k) + self.H_shelf * (T_shelf_k - T_k) # [XXX] units? - DRO
+            q_k = (self.H_int @ T_k
+                   + self.H_ext * (T_ext_k - T_k)
+                   + self.H_shelf * (T_shelf_k - T_k))  # [XXX] units? - DRO
 
-            ## SOLID(IFYING) VIALS
+            # SOLID(IFYING) VIALS
             # heat capacity of solidifying vials
-            cp_sigma = solid_fraction * cp_s + (1-solid_fraction) * (sigma_k[solidMask] * (cp_i - cp_w) + cp_w) # a vector of cps for all solidifying vials
+            # a vector of cps for all solidifying vials
+            cp_sigma = (solid_fraction * cp_s
+                        + (1-solid_fraction) * (sigma_k[solidMask] * (cp_i - cp_w) + cp_w))
             beta = depression * mass * cp_sigma
 
-            sigma_k[solidMask] = sigma_k[solidMask] + q_k[solidMask] / (alpha - beta / (1-sigma_k[solidMask])**2) * self.dt
-            T_k[solidMask] = T_eq - depression * (1/(1-sigma_k[solidMask])) # assumption is that during solidification T = Teq
+            deltaSigma = q_k[solidMask] / (alpha - beta / (1-sigma_k[solidMask])**2) * self.dt
+            sigma_k[solidMask] = sigma_k[solidMask] + deltaSigma
+            # assumption is that during solidification T = Teq
+            T_k[solidMask] = T_eq - depression * (1/(1-sigma_k[solidMask]))
 
-            ## LIQUID VIALS
-            T_k[liquidMask] = T_k[liquidMask] + q_k[liquidMask] / hl * self.dt # DRO: Leif, I've moved the dt out of the Hs because I associate Q with fluxes
-            superCooledMask = (T_k < T_eq) # a mask that is True where the temperature is below the equilibrium temperature
-            nucleationCandidatesMask = liquidMask & superCooledMask # a vial that is both liquid and supercooled can nucleate
-            n_nucleationCandidates = np.sum(nucleationCandidatesMask) # the total number of nucleation candidates
+            # LIQUID VIALS
+            # DRO: Leif, I've moved the dt out of the Hs because I associate Q with fluxes
+            T_k[liquidMask] = T_k[liquidMask] + q_k[liquidMask] / hl * self.dt
+            # a mask that is True where the temperature is below the equilibrium temperature
+            superCooledMask = (T_k < T_eq)
+            # a vial that is both liquid and supercooled can nucleate
+            nucleationCandidatesMask = liquidMask & superCooledMask
+            # the total number of nucleation candidates
+            n_nucleationCandidates = np.sum(nucleationCandidatesMask)
 
             # nucleation probabilities for candidates
             P = np.zeros((self.N_vials_total,))
             diceRolls = np.zeros((self.N_vials_total,))
 
-            P[nucleationCandidatesMask] = kb * V *(T_eq - T_k[nucleationCandidatesMask])**b * self.dt
+            P[nucleationCandidatesMask] = (kb * V * (T_eq - T_k[nucleationCandidatesMask])**b
+                                           * self.dt)
             diceRolls[nucleationCandidatesMask] = np.random.rand(n_nucleationCandidates)
 
             # CONTROLLED NUCLEATION XXX
 
             # Nucleation
             nucleatedVialsMask = nucleationCandidatesMask & (diceRolls < P)
-            q0 = (T_eq - T_k[nucleatedVialsMask]) * cp_solution * mass 
+            q0 = (T_eq - T_k[nucleatedVialsMask]) * cp_solution * mass
 
             sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
-            T_k[nucleatedVialsMask] = T_eq - depression * (1/(1-sigma_k[nucleatedVialsMask])) # assumption is that during solidification T = Teq
+            # assumption is that during solidification T = Teq
+            T_k[nucleatedVialsMask] = T_eq - depression * (1/(1-sigma_k[nucleatedVialsMask]))
 
-        self._X = X # store the state matrix
-        self._t = t # store the time vector
+        self._X = X  # store the state matrix
+        self._t = t  # store the time vector
 
     def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
-        
-        I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold = 0)
+
+        I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold=0)
 
         # nucleation times for all nucleated vials
-        t_nucleation = self._t[I_nucleation].astype(float) # need to make sure this is float so no problems arise later
+        # need to make sure this is float so no problems arise later
+        t_nucleation = self._t[I_nucleation].astype(float)
 
         # non-nucleated vials are set to NaN
         t_nucleation[lateBloomers] = np.nan
@@ -152,10 +175,12 @@ class Snowfall:
         return t_nucleation[I_groups]
 
     def nucleationTemperatures(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
-        
-        I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold = 0)
 
-        T_nucleation = np.array([self.X_T[i,I] for i,I in zip(range(self.N_vials_total), I_nucleation)]).astype(float) # this should always be float, but just to be sure
+        I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold=0)
+
+        T_nucleation = (np.array([self.X_T[i, I]
+                        for i, I in zip(range(self.N_vials_total), I_nucleation)])
+                        .astype(float))  # should always be float, but just to be sure
 
         # non-nucleated vials are set to NaN
         T_nucleation[lateBloomers] = np.nan
@@ -168,10 +193,11 @@ class Snowfall:
 
         t_nucleation = self.nucleationTimes()
 
-        I_solidification, neverGrownUp = self._sigmaCrossingIndices(threshold = 0.9)
+        I_solidification, neverGrownUp = self._sigmaCrossingIndices(threshold=0.9)
 
         # nucleation times for all nucleated vials
-        t_solidified = self._t[I_solidification].astype(float) # need to make sure this is float so no problems arise later
+        # need to make sure this is float so no problems arise later
+        t_solidified = self._t[I_solidification].astype(float)
 
         # never fully solidified vials are set to NaN
         t_solidified[neverGrownUp] = np.nan
@@ -187,16 +213,16 @@ class Snowfall:
         if self.simulationStatus == 0:
             raise ValueError("Simulation needs to be run before induction times can be extracted.")
 
-        return np.sum(self.X_sigma > threshold, axis = 0)
+        return np.sum(self.X_sigma > threshold, axis=0)
 
     def getVialGroup(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
-        
+
         if isinstance(group, str):
             group = [group]
 
-        _ , VIAL_EXT = self._buildInteractionMatrices()
-        
-        myMask = np.zeros(self.N_vials_total, dtype = bool)
+        _, VIAL_EXT = self._buildInteractionMatrices()
+
+        myMask = np.zeros(self.N_vials_total, dtype=bool)
         for g in group:
             if g == 'corner':
                 myMask = myMask | (VIAL_EXT == 2)
@@ -205,62 +231,74 @@ class Snowfall:
             elif g == 'center':
                 myMask = myMask | (VIAL_EXT == 0)
             elif g == 'all':
-                myMask = np.ones(self.N_vials_total, dtype = bool)
+                myMask = np.ones(self.N_vials_total, dtype=bool)
                 break
             else:
                 raise ValueError(f"Group {g} is not a known vial group.")
 
         return myMask
 
-    def _sigmaCrossingIndices(self, threshold = 0.9) -> Tuple[np.ndarray, np.ndarray]:
+    def _sigmaCrossingIndices(self, threshold=0.9) -> Tuple[np.ndarray, np.ndarray]:
 
         if self.simulationStatus == 0:
             raise ValueError("Simulation needs to be run before induction times can be extracted.")
 
-        I= np.argmax(self.X_sigma > threshold, axis = 1)
-        neverReached = ~np.any(self.X_sigma > threshold, axis = 1) # vials that never exceeded solidification threshold
+        Indices = np.argmax(self.X_sigma > threshold, axis=1)
+        # vials that never exceeded solidification threshold
+        neverReached = ~np.any(self.X_sigma > threshold, axis=1)
 
-        return I, neverReached
+        return Indices, neverReached
 
     def _buildInteractionMatrices(self) -> Tuple[csr_matrix, np.ndarray]:
-        
-        # an interaction matrix is a (n_x*n_y*n_z) x (n_x*n_y*n_z) matrix of interactions between vial pairs
+
+        # This is a (n_x*n_y*n_z) x (n_x*n_y*n_z) matrix of interactions between vial pairs
         # Please note that, on any given shelf, we index vials this way:
         # [[1, 2, 3, 4, ..., n_x],
         # [n_x+1, n_x+2, ..., 2*n_x],
         # [...],
         # [(n_y-1)*n_x+1, ... , n_y*n_x]]
-        # If one thinks of a shelf as an array, we hence use 'row-major' ordering. This is the same as numpy (most of the time), but different from Matlab.
-        # These matrices can then be used as a sort of mask to overlay on, e.g., temperatures to calculate the correct driving forces for each vial/pair.
+        # If one thinks of a shelf as an array, we hence use 'row-major' ordering.
+        # This is the same as numpy (most of the time), but different from Matlab.
+        # These matrices can then be used as a sort of mask to overlay on, e.g.,
+        # temperatures to calculate the correct driving forces for each vial/pair.
 
-        n_x = self.N_vials[0] # the number of vials in the horizontal direction
-        n_y = self.N_vials[1] # the number of vials in the vertical direction
-        n_z = self.N_vials[2] # the number of vials in the upwards/downwards direction (perpendicular to the plane spanned by x and y)
+        n_x = self.N_vials[0]  # the number of vials in the horizontal direction
+        n_y = self.N_vials[1]  # the number of vials in the vertical direction
+        n_z = self.N_vials[2]  # the number of vials in the upwards/downwards direction
+        # (perpendicular to the plane spanned by x and y)
 
         # create interaction matrix for horizontal (x-direction) interactions
         # matrix is 1 where two vials have a horizontal interaction and 0 otherwise
         # pairs (1,2), (2,3), ..., (i,i+1) have horizontal interactions, except where i = n_x!
-        # this means that in the IA matrix off-diagonal elements are 1, except where i%n_x==0 or j%n_x==0
+        # this means that in the IA matrix off-diagonal elements are 1
+        # except where i%n_x==0 or j%n_x==0
         dx_pattern = np.ones((n_x*n_y-1,))
-        idx_delete = [i for i in range(n_x*n_y-1) if (i+1)%n_x == 0] # the vial at index position i+1 is at the edge -> one neighbor less
+        # the vial at index position i+1 is at the edge -> one neighbor less
+        idx_delete = [i for i in range(n_x*n_y-1) if (i+1) % n_x == 0]
         dx_pattern[idx_delete] = 0
-        DX = csr_matrix(np.diag(dx_pattern, k = 1) + np.diag(dx_pattern, k = -1)) # we store this as a compressed sparse row (most efficient format?)
+        # we store this as a compressed sparse row (most efficient format?)
+        DX = csr_matrix(np.diag(dx_pattern, k=1) + np.diag(dx_pattern, k=-1))
 
         # create interaction matrix for vertical (y-direction) interactions
         # matrix is 1 where two vials have a horizontal interaction and 0 otherwise
-        # pairs (1,n_x+1), (2,n_x+2), ..., (i,n_x+i) have vertical interactions for i in [1, n_x*(n_y-1)]
+        # pairs (1,n_x+1), (2,n_x+2), ..., (i,n_x+i) have vertical interactions
+        # for i in [1, n_x*(n_y-1)]
         # this means that in the IA matrix n_x-removed-off-diagonal elements are 1
         dy_pattern = np.ones((n_x*n_y - n_x,))
-        DY = csr_matrix(np.diag(dy_pattern, k = n_x) + np.diag(dy_pattern, k = -n_x))
+        DY = csr_matrix(np.diag(dy_pattern, k=n_x) + np.diag(dy_pattern, k=-n_x))
 
         # how many interactions does each vial have with other vials
-        VIAL_INT = csr_matrix(np.diagflat(np.sum(DX + DY, axis = 1))) # diagflat because sum over a sparse matrix returns a np.matrix object, not an ndarray
+        # diagflat because sum over a sparse matrix returns a np.matrix object, not an ndarray
+        VIAL_INT = csr_matrix(np.diagflat(np.sum(DX + DY, axis=1)))
 
-        # the overall interaction matrix is given by the sum of the interaction matrices DX and DY minus the diagonal containing the sum of all vial-vial interactions
+        # the overall interaction matrix is given by the sum of the interaction matrices DX and DY
+        # minus the diagonal containing the sum of all vial-vial interactions
         interactionMatrix = DX + DY - VIAL_INT
 
-        # at most, any cubic vial on a 2D shelf can have 4 interactions. 4 - VIAL_INT is the number of external interactions (excl. the shelf)
-        VIAL_EXT = 4*np.ones((n_x*n_y,)) - VIAL_INT.diagonal() # is it worth storing this as a sparse matrix? - DRO XXX
+        # at most, any cubic vial on a 2D shelf can have 4 interactions. 4 - VIAL_INT is the
+        # number of external interactions (excl. the shelf)
+        # is it worth storing this as a sparse matrix? - DRO XXX
+        VIAL_EXT = 4*np.ones((n_x*n_y,)) - VIAL_INT.diagonal()
 
         return interactionMatrix, VIAL_EXT
 
@@ -270,20 +308,21 @@ class Snowfall:
 
         self.H_int = interactionMatrix * self.k['int'] * A
 
-        self.H_ext = VIAL_EXT * self.k['ext'] * A 
+        self.H_ext = VIAL_EXT * self.k['ext'] * A
 
         if 's_sigma_rel' in self.k.keys():
             self.k['shelf'] = self.k['s0'] + np.random.normal(self.N_vials_total)
         else:
             self.k['shelf'] = self.k['s0']
 
-        self.H_shelf = self.k['shelf'] * A # either a scalar or a vector
+        self.H_shelf = self.k['shelf'] * A  # either a scalar or a vector
 
     def __repr__(self) -> str:
-        """ The string representation of the Snowfall class (what is printed when displaying an object).
+        """ The string representation of the Snowfall class.
 
         Returns:
             str: The Snowfall class string representation giving some basic info.
         """
-        
-        return f"Snowfall([N_vials: {self.N_vials}, Nrep: {self.Nrep}, dt: {self.dt}, pool_size: {self.poolsize}])"
+
+        return (f"Snowfall([N_vials: {self.N_vials}, Nrep: {self.Nrep}, "
+                + f"dt: {self.dt}, pool_size: {self.poolsize}])")
