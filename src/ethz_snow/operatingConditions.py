@@ -28,7 +28,7 @@ class OperatingConditions:
     def tempProfile(self, dt: float) -> np.ndarray:
 
         # total number of steps
-        n = int(np.ceil(self.t_tot/dt))
+        n = int(np.ceil(self.t_tot/dt))+1
 
         if self.holding is not None:
             T_hold = self.holding['temp']
