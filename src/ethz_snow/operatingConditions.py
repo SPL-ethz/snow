@@ -82,3 +82,16 @@ class OperatingConditions:
             T_profile = np.append(T_profile, [Tend]*add_n)
 
         return T_profile
+
+    def __repr__(self) -> str:
+        """ The string representation of the OperatingConditions class.
+
+        Returns:
+            str: The OperatingConditions class string representation giving some basic info.
+        """
+
+        return (f"OperatingConditions([t_tot: {self.t_tot}, "
+                + f"Cooling: {self.cooling['start']} to {self.cooling['end']} "
+                + f"with {self.cooling['rate']}, "
+                + f"Hold: {self.holding['duration']} @ {self.holding['temp']}, "
+                + f"Controlled Nucleation: {'ON' if self.controlledNuclation else 'OFF'}")
