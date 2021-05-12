@@ -93,8 +93,8 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = "ethz-snow"
-copyright = "2021, David Ochsenbein"
+project = "ethz_snow"
+copyright = "2021, Leif-Thore Deck, David Ochsenbein"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -228,7 +228,7 @@ html_static_path = ["_static"]
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "ethz-snow-doc"
+htmlhelp_basename = "ethz_snow-doc"
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -245,7 +245,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ("index", "user_guide.tex", "ethz-snow Documentation", "David Ochsenbein", "manual")
+    ("index", "user_guide.tex", "ethz_snow Documentation", "David Ochsenbein", "manual")
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

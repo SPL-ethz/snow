@@ -1,5 +1,5 @@
 =========
-ethz-snow
+ethz_snow
 =========
 
 

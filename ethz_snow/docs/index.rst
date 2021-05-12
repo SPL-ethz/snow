@@ -1,8 +1,8 @@
 =========
-ethz-snow
+ethz_snow
 =========
 
-This is the documentation of **ethz-snow**.
+This is the documentation of **ethz_snow**.
 
 .. note::
 
