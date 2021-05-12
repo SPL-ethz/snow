@@ -6,10 +6,11 @@ Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
 '''
 
 from ethz_snow.operatingConditions import OperatingConditions
-from scipy.sparse import csr_matrix
+
 
 from ethz_snow.constants import A, hl, T_eq, kb, V, b, cp_solution, mass, solid_fraction, cp_s, depression, alpha, beta_solution
 
+from scipy.sparse import csr_matrix
 from typing import List, Tuple, Union, Sequence
 
 HEATFLOW_REQUIREDKEYS = ('int','ext','s0')
@@ -17,7 +18,7 @@ class Snowfall:
     def __init__(
         self,
         k: dict = {'int':20, 'ext': 20, 's0':20, 's_sigma_rel':0.1},
-        N_vials: Tuple[int] = (7,7,1), # should this be part of operating conditions?
+        N_vials: Tuple[int, int, int] = (7,7,1), # should this be part of operating conditions?
         Nrep: int = 5e3,
         dt: float = 2,
         pool_size: int = 12,
@@ -58,7 +59,7 @@ class Snowfall:
 
     @property
     def N_vials_total(self):
-        return np.prod(self.N_vials)
+        return int(np.prod(self.N_vials))
 
     @property
     def X_T(self):
@@ -68,12 +69,12 @@ class Snowfall:
     def X_sigma(self):
         return self._X[self.N_vials_total:,:]
 
-    def run():
+    def run(self):
         # clean up any potential old simulations
         self._X = None
         self._t = None
 
-        N_timeSteps = np.ceil(self.opcond.t_tot / self.dt)+1 # the total number of timesteps
+        N_timeSteps = int(np.ceil(self.opcond.t_tot / self.dt))+1 # the total number of timesteps
 
         # 1. build interaction matrices
         self._buildHeatflowMatrices()
@@ -85,8 +86,6 @@ class Snowfall:
         # 3. Initial state of the system
         T_k = np.ones((self.N_vials_total,)) * self.opcond.cooling['start'] # [C] initial temperature
         sigma_k = np.zeros((self.N_vials_total,)) # state of the vials (0 = liq, 1 = completely frozen)
-        T_shelf_k = T_shelf[0]
-        T_ext_k = T_text[0]
 
         # 4. Pre-allocate memory
         X = np.zeros((2*self.N_vials_total, N_timeSteps)) # our state matrix containing the entire history of the system
@@ -94,6 +93,9 @@ class Snowfall:
 
         # 5. Iterate over time steps
         for k in np.arange(N_timeSteps):
+
+            T_shelf_k = T_shelf[k]
+            T_ext_k = T_ext[k]
 
             X[:,k] = np.concatenate([T_k, sigma_k])
 
@@ -118,8 +120,11 @@ class Snowfall:
             n_nucleationCandidates = np.sum(nucleationCandidatesMask) # the total number of nucleation candidates
 
             # nucleation probabilities for candidates
-            P = kb * V *(T_eq - T_k(nucleationCandidatesMask))**b * self.dt
-            diceRolls = np.random.rand(n_nucleationCandidates)
+            P = np.zeros((self.N_vials_total,))
+            diceRolls = np.zeros((self.N_vials_total,))
+
+            P[nucleationCandidatesMask] = kb * V *(T_eq - T_k[nucleationCandidatesMask])**b * self.dt
+            diceRolls[nucleationCandidatesMask] = np.random.rand(n_nucleationCandidates)
 
             # CONTROLLED NUCLEATION XXX
 
@@ -133,7 +138,7 @@ class Snowfall:
         self._X = X # store the state matrix
         self._t = t # store the time vector
 
-    def nucleationTimes(self):
+    def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all'):
         
         I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold = 0)
 
@@ -143,9 +148,11 @@ class Snowfall:
         # non-nucleated vials are set to NaN
         t_nucleation[lateBloomers] = np.nan
 
-        return t_nucleation
+        I_groups = self.getVialGroup(group)
 
-    def nucleationTemperatures(self) -> np.ndarray:
+        return t_nucleation[I_groups]
+
+    def nucleationTemperatures(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
         
         I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold = 0)
 
@@ -154,9 +161,11 @@ class Snowfall:
         # non-nucleated vials are set to NaN
         T_nucleation[lateBloomers] = np.nan
 
-        return T_nucleation
+        I_groups = self.getVialGroup(group)
 
-    def solidificationTimes(self) -> np.ndarray:
+        return T_nucleation[I_groups]
+
+    def solidificationTimes(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
 
         t_nucleation = self.nucleationTimes()
 
@@ -171,7 +180,9 @@ class Snowfall:
         # solidification is the difference between solidified and nucleated times
         t_solidification = t_solidified - t_nucleation
 
-        return t_solidification
+        I_groups = self.getVialGroup(group)
+
+        return t_solidification[I_groups]
 
     def solidCounter(self, threshold: float = 0.9) -> np.ndarray:
         if self.simulationStatus == 0:
@@ -194,12 +205,15 @@ class Snowfall:
                 myMask = myMask | (VIAL_EXT == 1)
             elif g == 'center':
                 myMask = myMask | (VIAL_EXT == 0)
+            elif g == 'all':
+                myMask = np.ones(self.N_vials_total, dtype = bool)
+                break
             else:
                 raise ValueError(f"Group {g} is not a known vial group.")
 
         return myMask
 
-    def _sigmaCrossingIndices(self, thresold = 0.9) -> Tuple[np.ndarray, np.ndarray]:
+    def _sigmaCrossingIndices(self, threshold = 0.9) -> Tuple[np.ndarray, np.ndarray]:
 
         if self.simulationStatus == 0:
             raise ValueError("Simulation needs to be run before induction times can be extracted.")
