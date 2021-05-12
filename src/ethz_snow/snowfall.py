@@ -6,10 +6,9 @@ Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
 '''
 
 from ethz_snow.operatingConditions import OperatingConditions
+from ethz_snow.constants import A, hl, T_eq, kb, V, b, cp_solution, mass, solid_fraction, cp_s, depression, alpha, beta_solution, cp_i, cp_w
 
-
-from ethz_snow.constants import A, hl, T_eq, kb, V, b, cp_solution, mass, solid_fraction, cp_s, depression, alpha, beta_solution
-
+import numpy as np
 from scipy.sparse import csr_matrix
 from typing import List, Tuple, Union, Sequence
 
@@ -138,7 +137,7 @@ class Snowfall:
         self._X = X # store the state matrix
         self._t = t # store the time vector
 
-    def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all'):
+    def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
         
         I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold = 0)
 
@@ -190,7 +189,7 @@ class Snowfall:
 
         return np.sum(self.X_sigma > threshold, axis = 0)
 
-    def getVialGroup(self, group: Union[str, Sequence[str]]) -> np.ndarray:
+    def getVialGroup(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
         
         if isinstance(group, str):
             group = [group]
@@ -223,7 +222,7 @@ class Snowfall:
 
         return I, neverReached
 
-    def _buildInteractionMatrices(self):
+    def _buildInteractionMatrices(self) -> Tuple[csr_matrix, np.ndarray]:
         
         # an interaction matrix is a (n_x*n_y*n_z) x (n_x*n_y*n_z) matrix of interactions between vial pairs
         # Please note that, on any given shelf, we index vials this way:
@@ -280,6 +279,11 @@ class Snowfall:
 
         self.H_shelf = self.k['shelf'] * A # either a scalar or a vector
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """ The string representation of the Snowfall class (what is printed when displaying an object).
+
+        Returns:
+            str: The Snowfall class string representation giving some basic info.
+        """
         
         return f"Snowfall([N_vials: {self.N_vials}, Nrep: {self.Nrep}, dt: {self.dt}, pool_size: {self.poolsize}])"

@@ -151,7 +151,7 @@ y = x;
 z = 1; %only one layer
 
 %number of cycles
-N = 5000;
+N = 1;
 
 %Cooling rate
 CR_min = 0.5; %K/min
