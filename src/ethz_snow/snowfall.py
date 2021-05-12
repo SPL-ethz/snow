@@ -12,7 +12,7 @@ from ethz_snow.constants import (
     alpha, beta_solution, cp_i, cp_w)
 
 import numpy as np
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, lil, lil_matrix
 from typing import List, Tuple, Union, Sequence
 
 HEATFLOW_REQUIREDKEYS = ('int', 'ext', 's0')
@@ -96,7 +96,7 @@ class Snowfall:
 
         # 4. Pre-allocate memory
         # our state matrix containing the entire history of the system
-        X = np.zeros((2*self.N_vials_total, N_timeSteps))
+        X = csr_matrix(np.zeros((2*self.N_vials_total, N_timeSteps)))
         t = np.arange(0, N_timeSteps * self.dt, self.dt)
 
         # 5. Iterate over time steps
@@ -105,7 +105,9 @@ class Snowfall:
             T_shelf_k = T_shelf[k]
             T_ext_k = T_ext[k]
 
-            X[:, k] = np.concatenate([T_k, sigma_k])
+            x_k = np.concatenate([T_k, sigma_k])
+            storeMask = Snowfall._storeStep(X[:, :k], x_k)
+            X[storeMask, k] = x_k[storeMask]
 
             # a mask that is True where a vial is still fully liquid
             liquidMask = (sigma_k == 0)
@@ -158,6 +160,15 @@ class Snowfall:
 
         self._X = X  # store the state matrix
         self._t = t  # store the time vector
+
+    @classmethod
+    def _storeStep(cls, X_soFar, x):
+        if X_soFar.shape[1] > 0:
+            myMask = (np.argmax(X_soFar[:, ::-1] != 0, axis=1) + 1) > 100
+        else:
+            myMask = np.ones(X_soFar.shape[0], dtype=bool)
+
+        return np.squeeze(np.asarray(myMask))
 
     def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
 
