@@ -12,7 +12,7 @@ from ethz_snow.constants import (
     alpha, beta_solution, cp_i, cp_w)
 
 import numpy as np
-import re
+import re, sys
 from scipy.sparse import csr_matrix, lil, lil_matrix
 from typing import List, Tuple, Union, Sequence, Optional
 
@@ -26,6 +26,7 @@ class Snowfall:
         k: dict = {'int': 20, 'ext': 20, 's0': 20, 's_sigma_rel': 0.1},
         N_vials: Tuple[int, int, int] = (7, 7, 1),  # should this be part of operating conditions?
         storeStates: Optional[Union[str, Sequence[str], Sequence[int]]] = None,
+        solidificationThreshold: float = 0.9,
         Nrep: int = 5e3,
         dt: float = 2,
         pool_size: int = 12,
@@ -66,6 +67,8 @@ class Snowfall:
             storageMask = np.zeros(self.N_vials_total, dtype=bool)
 
         self._storageMask = storageMask
+
+        self.solidificationThreshold = solidificationThreshold
         self._X = None
         self._t = None
 
@@ -84,13 +87,14 @@ class Snowfall:
 
     @property
     def X_T(self):
-        return self._X[:self.N_vials_total, :]
+        return self._X[:int(np.sum(self._storageMask)), :]
 
     @property
     def X_sigma(self):
-        return self._X[self.N_vials_total:, :]
+        return self._X[int(np.sum(self._storageMask)):, :]
 
     def _interpretStorageString(self, myString):
+        myString = myString.lower()
         if not any([word in myString for word in list(VIAL_GROUPS)+['random', 'uniform']]):
             raise ValueError("No valid vial group or key word used in storeStates.")
         elif any([word in myString for word in list(VIAL_GROUPS)]):
@@ -142,12 +146,16 @@ class Snowfall:
         # initial temperature
         T_k = np.ones((self.N_vials_total,)) * self.opcond.cooling['start']  # [C]
         # state of the vials
-        sigma_k = np.zeros((self.N_vials_total,))  # (0 = liq, 1 = completely frozen)
+        sigma_k = np.zeros(self.N_vials_total)  # (0 = liq, 1 = completely frozen)
 
         # 4. Pre-allocate memory
         # our state matrix containing the entire history of the system
-        X = csr_matrix(np.zeros((2*self.N_vials_total, N_timeSteps)))
+        X = np.zeros((2*np.sum(self._storageMask), N_timeSteps))
         t = np.arange(0, N_timeSteps * self.dt, self.dt)
+        stats = dict(
+            nucleationTimes=np.full(self.N_vials_total, np.nan),
+            nucleationTemperatures=np.full(self.N_vials_total, np.nan),
+            solidificationTimes=np.full(self.N_vials_total, np.nan))
 
         # 5. Iterate over time steps
         for k in np.arange(N_timeSteps):
@@ -156,12 +164,15 @@ class Snowfall:
             T_ext_k = T_ext[k]
 
             x_k = np.concatenate([T_k, sigma_k])
-            storeMask = Snowfall._storeStep(X[:, :k], x_k)
-            X[storeMask, k] = x_k[storeMask]
+            X[:, k] = x_k[np.tile(self._storageMask, 2)]
 
             # a mask that is True where a vial is still fully liquid
             liquidMask = (sigma_k == 0)
             solidMask = ~liquidMask  # for convenience
+            solidifiedMask = ((sigma_k > self.solidificationThreshold)
+                              & np.isnan(stats['solidificationTimes']))
+            stats['solidificationTimes'][solidifiedMask] = (t[k]
+                                                            - stats['nucleationTimes'][solidifiedMask])
 
             # calculate heatflows for all vials
             q_k = (self.H_int @ T_k
@@ -202,69 +213,88 @@ class Snowfall:
 
             # Nucleation
             nucleatedVialsMask = nucleationCandidatesMask & (diceRolls < P)
+
+            stats['nucleationTimes'][nucleatedVialsMask] = t[k] + self.dt
+            stats['nucleationTemperatures'][nucleatedVialsMask] = T_k[nucleatedVialsMask]
+
             q0 = (T_eq - T_k[nucleatedVialsMask]) * cp_solution * mass
 
             sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
             # assumption is that during solidification T = Teq
             T_k[nucleatedVialsMask] = T_eq - depression * (1/(1-sigma_k[nucleatedVialsMask]))
 
+        self.stats = stats
         self._X = X  # store the state matrix
         self._t = t  # store the time vector
 
-    @classmethod
-    def _storeStep(cls, X_soFar, x):
-        if X_soFar.shape[1] > 0:
-            myMask = (np.argmax(X_soFar[:, ::-1] != 0, axis=1) + 1) > 100
+    def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all',
+                        fromStates: bool = False) -> np.ndarray:
+
+        if fromStates:
+            I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold=0)
+
+            # nucleation times for all nucleated vials
+            # need to make sure this is float so no problems arise later
+            t_nucleation_states = self._t[I_nucleation].astype(float)
+
+            # non-nucleated vials are set to NaN
+            t_nucleation_states[lateBloomers] = np.nan
+
+            t_nucleation = np.full(self.N_vials_total, np.nan)
+            t_nucleation[self._storageMask] = t_nucleation_states
         else:
-            myMask = np.ones(X_soFar.shape[0], dtype=bool)
-
-        return np.squeeze(np.asarray(myMask))
-
-    def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
-
-        I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold=0)
-
-        # nucleation times for all nucleated vials
-        # need to make sure this is float so no problems arise later
-        t_nucleation = self._t[I_nucleation].astype(float)
-
-        # non-nucleated vials are set to NaN
-        t_nucleation[lateBloomers] = np.nan
+            t_nucleation = self.stats['nucleationTimes']
 
         I_groups = self.getVialGroup(group)
 
         return t_nucleation[I_groups]
 
-    def nucleationTemperatures(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
+    def nucleationTemperatures(self, group: Union[str, Sequence[str]] = 'all',
+                               fromStates: bool = False) -> np.ndarray:
 
-        I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold=0)
+        if fromStates:
+            I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold=0)
+            T_nucleation_states = (np.array([self.X_T[i, I-1]
+                                   for i, I in zip(range(self.N_vials_total), I_nucleation)])
+                                   .astype(float))  # should always be float, but just to be sure
 
-        T_nucleation = (np.array([self.X_T[i, I]
-                        for i, I in zip(range(self.N_vials_total), I_nucleation)])
-                        .astype(float))  # should always be float, but just to be sure
+            # non-nucleated vials are set to NaN
+            T_nucleation_states[lateBloomers] = np.nan
 
-        # non-nucleated vials are set to NaN
-        T_nucleation[lateBloomers] = np.nan
+            T_nucleation = np.full(self.N_vials_total, np.nan)
+            T_nucleation[self._storageMask] = T_nucleation_states
+
+        else:
+            T_nucleation = self.stats['nucleationTemperatures']
 
         I_groups = self.getVialGroup(group)
 
         return T_nucleation[I_groups]
 
-    def solidificationTimes(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
+    def solidificationTimes(self, group: Union[str, Sequence[str]] = 'all', threshold: float = 0.9,
+                            fromStates: bool = False) -> np.ndarray:
 
-        t_nucleation = self.nucleationTimes()
+        if fromStates:
+            t_nucleation = self.nucleationTimes(fromStates=fromStates)
 
-        I_solidification, neverGrownUp = self._sigmaCrossingIndices(threshold=0.9)
+            I_solidification, neverGrownUp = self._sigmaCrossingIndices(threshold=threshold)
 
-        # nucleation times for all nucleated vials
-        # need to make sure this is float so no problems arise later
-        t_solidified = self._t[I_solidification].astype(float)
+            # nucleation times for all nucleated vials
+            # need to make sure this is float so no problems arise later
+            t_solidified = self._t[I_solidification].astype(float)
 
-        # never fully solidified vials are set to NaN
-        t_solidified[neverGrownUp] = np.nan
+            # never fully solidified vials are set to NaN
+            t_solidified[neverGrownUp] = np.nan
 
-        # solidification is the difference between solidified and nucleated times
-        t_solidification = t_solidified - t_nucleation
+            # solidification is the difference between solidified and nucleated times
+            t_solidification_states = t_solidified
+
+            t_solidification = np.full(self.N_vials_total, np.nan)
+            t_solidification[self._storageMask] = t_solidification_states
+
+            t_solidification = t_solidification - t_nucleation
+        else:
+            t_solidification = self.stats['solidificationTimes']
 
         I_groups = self.getVialGroup(group)
 
