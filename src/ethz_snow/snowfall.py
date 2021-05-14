@@ -12,10 +12,12 @@ from ethz_snow.constants import (
     alpha, beta_solution, cp_i, cp_w)
 
 import numpy as np
+import re
 from scipy.sparse import csr_matrix, lil, lil_matrix
-from typing import List, Tuple, Union, Sequence
+from typing import List, Tuple, Union, Sequence, Optional
 
 HEATFLOW_REQUIREDKEYS = ('int', 'ext', 's0')
+VIAL_GROUPS = ('corner', 'edge', 'center','all')
 
 
 class Snowfall:
@@ -23,6 +25,7 @@ class Snowfall:
         self,
         k: dict = {'int': 20, 'ext': 20, 's0': 20, 's_sigma_rel': 0.1},
         N_vials: Tuple[int, int, int] = (7, 7, 1),  # should this be part of operating conditions?
+        storeStates: Optional[Union[str, Sequence[str], Sequence[int]]] = None,
         Nrep: int = 5e3,
         dt: float = 2,
         pool_size: int = 12,
@@ -50,6 +53,19 @@ class Snowfall:
 
         self.opcond = opcond
 
+        if isinstance(storeStates, (list, tuple)):
+            if all([isinstance(x, int) for x in storeStates]):
+                storageMask = np.zeros(self.N_vials_total, dtype=bool)
+                storageMask[storeStates] = True
+            elif all([isinstance(x, str) for x in storeStates]):
+                storageMasks = list(map(lambda x: self._interpretStorageString(x), storeStates))
+                storageMask = np.logical_or.reduce(storageMasks)
+        elif isinstance(storeStates, str):
+            storageMask = self._interpretStorageString(storeStates)
+        elif storeStates is None:
+            storageMask = np.zeros(self.N_vials_total, dtype=bool)
+
+        self._storageMask = storageMask
         self._X = None
         self._t = None
 
@@ -73,6 +89,40 @@ class Snowfall:
     @property
     def X_sigma(self):
         return self._X[self.N_vials_total:, :]
+
+    def _interpretStorageString(self, myString):
+        if not any([word in myString for word in list(VIAL_GROUPS)+['random', 'uniform']]):
+            raise ValueError("No valid vial group or key word used in storeStates.")
+        elif any([word in myString for word in list(VIAL_GROUPS)]):
+            for group in VIAL_GROUPS:
+                if group in myString:
+                    storageMask = self.getVialGroup(group)
+                    break
+        elif ('random' in myString) or ('uniform' in myString):
+            # assume vial group 'all' is implied
+            storageMask = np.ones(self.N_vials_total, dtype=bool)
+
+        if ('random' in myString) or ('uniform' in myString):
+            howMany = re.findall(r'\d+', myString)
+            if len(howMany) == 0:
+                # unclear how many to pick, default is 10%
+                howMany = int(np.ceil(0.1*self.N_vials_total))
+            elif len(howMany) == 1:
+                howMany = int(howMany[0])
+            elif len(howMany) > 1:
+                raise ValueError("storeStates strings must contain one number at most.")
+
+            I_candidates = np.where(storageMask)[0]
+            if 'random' in myString:
+                I_toStore = np.random.choice(I_candidates, size=howMany, replace=False)
+            elif 'uniform' in myString:
+                stepSize = int(np.ceil(len(I_candidates)/howMany))
+                I_fromCandidates = np.arange(0, len(I_candidates), stepSize, dtype=int)
+                I_toStore = I_candidates[I_fromCandidates]
+            storageMask = np.zeros(self.N_vials_total, dtype=bool)
+            storageMask[I_toStore] = True
+
+        return storageMask
 
     def run(self):
         # clean up any potential old simulations
