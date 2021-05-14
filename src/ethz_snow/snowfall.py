@@ -13,7 +13,7 @@ from ethz_snow.constants import (
 
 import numpy as np
 import pandas as pd
-import re, sys
+import re
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -22,7 +22,7 @@ from scipy.sparse import csr_matrix, lil, lil_matrix
 from typing import List, Tuple, Union, Sequence, Optional
 
 HEATFLOW_REQUIREDKEYS = ('int', 'ext', 's0')
-VIAL_GROUPS = ('corner', 'edge', 'center','all')
+VIAL_GROUPS = ('corner', 'edge', 'center', 'all')
 
 
 class Snowfall:
@@ -158,9 +158,9 @@ class Snowfall:
         X = np.zeros((2*np.sum(self._storageMask), N_timeSteps))
         t = np.arange(0, N_timeSteps * self.dt, self.dt)
         stats = dict(
-            nucleationTimes=np.full(self.N_vials_total, np.nan),
-            nucleationTemperatures=np.full(self.N_vials_total, np.nan),
-            solidificationTimes=np.full(self.N_vials_total, np.nan))
+            t_nucleation=np.full(self.N_vials_total, np.nan),
+            T_nucleation=np.full(self.N_vials_total, np.nan),
+            t_solidification=np.full(self.N_vials_total, np.nan))
 
         # 5. Iterate over time steps
         for k in np.arange(N_timeSteps):
@@ -175,9 +175,9 @@ class Snowfall:
             liquidMask = (sigma_k == 0)
             solidMask = ~liquidMask  # for convenience
             solidifiedMask = ((sigma_k > self.solidificationThreshold)
-                              & np.isnan(stats['solidificationTimes']))
-            stats['solidificationTimes'][solidifiedMask] = (t[k]
-                                                            - stats['nucleationTimes'][solidifiedMask])
+                              & np.isnan(stats['t_solidification']))
+            stats['t_solidification'][solidifiedMask] = (t[k]
+                                                         - stats['t_nucleation'][solidifiedMask])
 
             # calculate heatflows for all vials
             q_k = (self.H_int @ T_k
@@ -219,8 +219,8 @@ class Snowfall:
             # Nucleation
             nucleatedVialsMask = nucleationCandidatesMask & (diceRolls < P)
 
-            stats['nucleationTimes'][nucleatedVialsMask] = t[k] + self.dt
-            stats['nucleationTemperatures'][nucleatedVialsMask] = T_k[nucleatedVialsMask]
+            stats['t_nucleation'][nucleatedVialsMask] = t[k] + self.dt
+            stats['T_nucleation'][nucleatedVialsMask] = T_k[nucleatedVialsMask]
 
             q0 = (T_eq - T_k[nucleatedVialsMask]) * cp_solution * mass
 
@@ -248,7 +248,7 @@ class Snowfall:
             t_nucleation = np.full(self.N_vials_total, np.nan)
             t_nucleation[self._storageMask] = t_nucleation_states
         else:
-            t_nucleation = self.stats['nucleationTimes']
+            t_nucleation = self.stats['t_nucleation']
 
         I_groups = self.getVialGroup(group)
 
@@ -270,7 +270,7 @@ class Snowfall:
             T_nucleation[self._storageMask] = T_nucleation_states
 
         else:
-            T_nucleation = self.stats['nucleationTemperatures']
+            T_nucleation = self.stats['T_nucleation']
 
         I_groups = self.getVialGroup(group)
 
@@ -299,7 +299,7 @@ class Snowfall:
 
             t_solidification = t_solidification - t_nucleation
         else:
-            t_solidification = self.stats['solidificationTimes']
+            t_solidification = self.stats['t_solidification']
 
         I_groups = self.getVialGroup(group)
 
@@ -334,16 +334,27 @@ class Snowfall:
 
         return myMask
 
-    def plot(self, what: str = 'temperature', kind: str = 'trajectories', group: Union[str, Sequence[str]] = 'all'):
+    def plot(self,
+             what: str = 'temperature', kind: str = 'trajectories',
+             group: Union[str, Sequence[str]] = 'all'):
 
-        self.toDataframe()
-        df = self.stats_df
+        stats_df, traj_df = self.toDataframe()
+        if not kind.lower().startswith('traj'):
+            df = stats_df
+        else:
+            df = traj_df
+
         if group != 'all':
+            if not isinstance(group, (tuple, list)):
+                group = [group]
             df = df[df.group.isin(group)]
 
         if not kind.lower().startswith('traj'):
             df = df[df.variable.str.lower().str.contains(what.lower())]
             sns.catplot(data=df, hue='group', y='value', kind=kind, x='variable')
+        else:
+            df = df[df.state.str.lower().str.contains(what.lower())]
+            sns.lineplot(data=df, hue='group', y='value', x='Time')
 
     def _sigmaCrossingIndices(self, threshold=0.9) -> Tuple[np.ndarray, np.ndarray]:
 
@@ -424,7 +435,7 @@ class Snowfall:
 
         self.H_shelf = self.k['shelf'] * A  # either a scalar or a vector
 
-    def toDataframe(self):
+    def toDataframe(self) -> Tuple[np.ndarray, Optional[np.ndarray]]:
 
         if self.simulationStatus == 0:
             raise ValueError("Simulation needs to be run before induction times can be extracted.")
@@ -440,7 +451,29 @@ class Snowfall:
         df.loc[df.group == 1, 'group'] = 'edge'
         df.loc[df.group == 0, 'group'] = 'center'
 
-        self.stats_df = df.melt(id_vars=['group', 'vial'])
+        stats_df = df.melt(id_vars=['group', 'vial'])
+
+        n_storedStates = np.sum(self._storageMask)
+        if n_storedStates > 0:
+            # to reduce computational cost we limit number of timepoints to 251
+            df = pd.DataFrame(self._X[:, ::int(self._X.shape[1]/250)])
+            df.columns = self._t[::int(self._X.shape[1]/250)]
+            df.columns.name = 'Time'
+
+            df['state'] = np.concatenate([np.repeat('temperature', n_storedStates),
+                                          np.repeat('sigma', n_storedStates)])
+            df['vial'] = np.tile(np.where(self._storageMask)[0], 2)
+            df['group'] = np.tile(VIAL_EXT[self._storageMask], 2)
+
+            df.loc[df.group == 2, 'group'] = 'corner'
+            df.loc[df.group == 1, 'group'] = 'edge'
+            df.loc[df.group == 0, 'group'] = 'center'
+
+            self.traj_df = df.melt(id_vars=['group', 'vial', 'state'])
+        else:
+            traj_df = None
+
+        return stats_df, traj_df
 
     def __repr__(self) -> str:
         """ The string representation of the Snowfall class.
