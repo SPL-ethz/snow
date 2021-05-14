@@ -57,15 +57,24 @@ class Snowfall:
 
         self.pool_size = pool_size
 
-        self.opcond = opcond
+        if not isinstance(opcond, OperatingConditions):
+            raise TypeError("Input opcond must be an instance of class OperatingConditions.")
+        else:
+            self.opcond = opcond
 
         if isinstance(storeStates, (list, tuple)):
             if all([isinstance(x, int) for x in storeStates]):
+                if (any(np.array(storeStates) > self.N_vials_total - 1)
+                        or any(np.array(storeStates) < 0)):
+                    raise ValueError(f"Entries in storeStates must be >0 "
+                                     + f"and <{self.N_vials_total - 1}.")
                 storageMask = np.zeros(self.N_vials_total, dtype=bool)
                 storageMask[storeStates] = True
             elif all([isinstance(x, str) for x in storeStates]):
                 storageMasks = list(map(lambda x: self._interpretStorageString(x), storeStates))
                 storageMask = np.logical_or.reduce(storageMasks)
+            else:
+                raise ValueError("storeStates must be a sequence of all int or all str.")
         elif isinstance(storeStates, str):
             storageMask = self._interpretStorageString(storeStates)
         elif storeStates is None:
@@ -305,11 +314,21 @@ class Snowfall:
 
         return t_solidification[I_groups]
 
-    def solidCounter(self, threshold: float = 0.9) -> np.ndarray:
+    def sigmaCounter(self,
+                     time: Union[Sequence[float], float],
+                     threshold: float = 0.9) -> np.ndarray:
         if self.simulationStatus == 0:
             raise ValueError("Simulation needs to be run before induction times can be extracted.")
 
-        return np.sum(self.X_sigma > threshold, axis=0)
+        if isinstance(time, (float, int)):
+            time = [time]
+
+        counter = np.zeros(len(time))
+        for i, t in enumerate(time):
+            I_time = np.argmax(self._t >= t)
+            counter[i] = np.sum(self.X_sigma[:, I_time] > threshold, axis=0)
+
+        return counter
 
     def getVialGroup(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
 
@@ -469,7 +488,7 @@ class Snowfall:
             df.loc[df.group == 1, 'group'] = 'edge'
             df.loc[df.group == 0, 'group'] = 'center'
 
-            self.traj_df = df.melt(id_vars=['group', 'vial', 'state'])
+            traj_df = df.melt(id_vars=['group', 'vial', 'state'])
         else:
             traj_df = None
 
