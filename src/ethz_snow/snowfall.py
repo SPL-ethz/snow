@@ -12,7 +12,12 @@ from ethz_snow.constants import (
     alpha, beta_solution, cp_i, cp_w)
 
 import numpy as np
+import pandas as pd
 import re, sys
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 from scipy.sparse import csr_matrix, lil, lil_matrix
 from typing import List, Tuple, Union, Sequence, Optional
 
@@ -329,6 +334,17 @@ class Snowfall:
 
         return myMask
 
+    def plot(self, what: str = 'temperature', kind: str = 'trajectories', group: Union[str, Sequence[str]] = 'all'):
+
+        self.toDataframe()
+        df = self.stats_df
+        if group != 'all':
+            df = df[df.group.isin(group)]
+
+        if not kind.lower().startswith('traj'):
+            df = df[df.variable.str.lower().str.contains(what.lower())]
+            sns.catplot(data=df, hue='group', y='value', kind=kind, x='variable')
+
     def _sigmaCrossingIndices(self, threshold=0.9) -> Tuple[np.ndarray, np.ndarray]:
 
         if self.simulationStatus == 0:
@@ -407,6 +423,24 @@ class Snowfall:
             self.k['shelf'] = self.k['s0']
 
         self.H_shelf = self.k['shelf'] * A  # either a scalar or a vector
+
+    def toDataframe(self):
+
+        if self.simulationStatus == 0:
+            raise ValueError("Simulation needs to be run before induction times can be extracted.")
+
+        df = pd.DataFrame(self.stats)
+        df.index.name = 'vial'
+        df = df.reset_index()
+
+        _, VIAL_EXT = self._buildInteractionMatrices()
+
+        df['group'] = VIAL_EXT
+        df.loc[df.group == 2, 'group'] = 'corner'
+        df.loc[df.group == 1, 'group'] = 'edge'
+        df.loc[df.group == 0, 'group'] = 'center'
+
+        self.stats_df = df.melt(id_vars=['group', 'vial'])
 
     def __repr__(self) -> str:
         """ The string representation of the Snowfall class.
