@@ -46,6 +46,47 @@ def test_storageMaskFunction(input_result):
 
 
 @pytest.fixture(scope='module')
+def fakeS():
+    S = Snowfall(N_vials=(2, 2, 1), storeStates='all')
+    S._t = np.array([0, 1, 2, 3])
+    S._X = np.concatenate([np.zeros((4, 4)),
+                           np.array([[0, 0, 0.5, 0.95], [0, 0.7, 0.75, 1],
+                                    [0, 0, 0, 0], [0, 1, 1, 1]])], axis=0)
+    S.stats['t_solidification'] = np.array([3, 3, np.nan, 1])
+    S.stats['t_nucleation'] = np.array([2, 1, np.nan, 1])
+    S.stats['T_nucleation'] = np.array([0, 0, np.nan, 0])
+
+    return S
+
+
+def test_sigmaCounter(fakeS):
+    assert fakeS.sigmaCounter(time=1) == 1
+    assert all(fakeS.sigmaCounter(time=[0, 1, 2, 3]) == np.array([0, 1, 1, 3]))
+    assert fakeS.sigmaCounter(time=2) == fakeS.sigmaCounter(time=2, fromStates=True)
+    assert fakeS.sigmaCounter(time=2, threshold=0.4, fromStates=True) == 3
+
+
+def test_getvialgroup(S_331_all):
+
+    assert np.where(S_331_all.getVialGroup('center'))[0] == 4
+    assert all(np.where(S_331_all.getVialGroup(['center', 'corner']))[0] == [0, 2, 4, 6, 8])
+
+    with pytest.raises(ValueError):
+        S_331_all.getVialGroup('rubbish')
+
+
+def test_toDataframe(fakeS):
+
+    stats_df, traj_df = fakeS.toDataframe(n_timeSteps=4)
+
+    assert all([col in stats_df.columns for col in ['group', 'vial', 'variable', 'value']])
+    assert stats_df.shape[0] == 12
+    assert all(stats_df.group == 'corner')
+
+    assert traj_df.loc[(traj_df.vial == 0) & (traj_df.state == 'sigma') & (traj_df.Time == 3), 'value'].item() == 0.95
+
+
+@pytest.fixture(scope='module')
 def S_331_all():
     S = Snowfall(N_vials=(3, 3, 1), storeStates='all')
     S.run()
@@ -58,10 +99,10 @@ def S_331_edge():
     S.run()
     return S
 
-
+@pytest.mark.slow
 @pytest.mark.parametrize('fun', ('nucleationTimes', 'nucleationTemperatures',
                          'solidificationTimes'))
-def test_Statsconsistency(S_331_all, S_331_edge, fun):
+def test_statsConsistency(S_331_all, S_331_edge, fun):
 
     # the nucleation Temperatures can actually be a bit different, because the
     # fromStates method retrieves only the last Temperature before the nucleation

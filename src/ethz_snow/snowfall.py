@@ -85,6 +85,7 @@ class Snowfall:
         self.solidificationThreshold = solidificationThreshold
         self._X = None
         self._t = None
+        self.stats = dict()
 
         self._simulationStatus = 0
 
@@ -316,7 +317,8 @@ class Snowfall:
 
     def sigmaCounter(self,
                      time: Union[Sequence[float], float],
-                     threshold: float = 0.9) -> np.ndarray:
+                     threshold: float = 0.9,
+                     fromStates: bool = False) -> np.ndarray:
         if self.simulationStatus == 0:
             raise ValueError("Simulation needs to be run before induction times can be extracted.")
 
@@ -325,8 +327,12 @@ class Snowfall:
 
         counter = np.zeros(len(time))
         for i, t in enumerate(time):
-            I_time = np.argmax(self._t >= t)
-            counter[i] = np.sum(self.X_sigma[:, I_time] > threshold, axis=0)
+
+            if fromStates:
+                I_time = np.argmax(self._t >= t)
+                counter[i] = np.sum(self.X_sigma[:, I_time] > threshold, axis=0)
+            else:
+                counter[i] = np.sum(self.stats['t_solidification'] <= t)
 
         return counter
 
@@ -454,7 +460,7 @@ class Snowfall:
 
         self.H_shelf = self.k['shelf'] * A  # either a scalar or a vector
 
-    def toDataframe(self) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+    def toDataframe(self, n_timeSteps=250) -> Tuple[np.ndarray, Optional[np.ndarray]]:
 
         if self.simulationStatus == 0:
             raise ValueError("Simulation needs to be run before induction times can be extracted.")
@@ -474,9 +480,9 @@ class Snowfall:
 
         n_storedStates = np.sum(self._storageMask)
         if n_storedStates > 0:
-            # to reduce computational cost we limit number of timepoints to 251
-            df = pd.DataFrame(self._X[:, ::int(self._X.shape[1]/250)])
-            df.columns = self._t[::int(self._X.shape[1]/250)]
+            # to reduce computational cost we limit number of timepoints to n_timeSteps
+            df = pd.DataFrame(self._X[:, ::int(self._X.shape[1]/(n_timeSteps - 1))])
+            df.columns = self._t[::int(self._X.shape[1]/(n_timeSteps - 1))]
             df.columns.name = 'Time'
 
             df['state'] = np.concatenate([np.repeat('temperature', n_storedStates),
