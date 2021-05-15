@@ -25,16 +25,15 @@ HEATFLOW_REQUIREDKEYS = ('int', 'ext', 's0')
 VIAL_GROUPS = ('corner', 'edge', 'center', 'all')
 
 
-class Snowfall:
+class Snowflake:
     def __init__(
         self,
         k: dict = {'int': 20, 'ext': 20, 's0': 20, 's_sigma_rel': 0.1},
         N_vials: Tuple[int, int, int] = (7, 7, 1),  # should this be part of operating conditions?
         storeStates: Optional[Union[str, Sequence[str], Sequence[int]]] = None,
         solidificationThreshold: float = 0.9,
-        Nrep: int = 5e3,
         dt: float = 2,
-        pool_size: int = 12,
+        seed: int = 2021,
         opcond: OperatingConditions = OperatingConditions()
     ):
 
@@ -51,11 +50,13 @@ class Snowfall:
         else:
             self.N_vials = N_vials
 
-        self.Nrep = Nrep
-
         self.dt = dt
 
-        self.pool_size = pool_size
+        # best practice is now to store the rng in an object and pass it around
+        # https://towardsdatascience.com/stop-using-numpy-random-seed-581a9972805f
+        self.rng = np.random.default_rng(seed)
+        # store the seed to look it up if need be
+        self.seed = seed
 
         if not isinstance(opcond, OperatingConditions):
             raise TypeError("Input opcond must be an instance of class OperatingConditions.")
@@ -133,7 +134,7 @@ class Snowfall:
 
             I_candidates = np.where(storageMask)[0]
             if 'random' in myString:
-                I_toStore = np.random.choice(I_candidates, size=howMany, replace=False)
+                I_toStore = self.rng.choice(I_candidates, size=howMany, replace=False)
             elif 'uniform' in myString:
                 stepSize = int(np.ceil(len(I_candidates)/howMany))
                 I_fromCandidates = np.arange(0, len(I_candidates), stepSize, dtype=int)
@@ -222,7 +223,7 @@ class Snowfall:
 
             P[nucleationCandidatesMask] = (kb * V * (T_eq - T_k[nucleationCandidatesMask])**b
                                            * self.dt)
-            diceRolls[nucleationCandidatesMask] = np.random.rand(n_nucleationCandidates)
+            diceRolls[nucleationCandidatesMask] = self.rng.random(n_nucleationCandidates)
 
             # CONTROLLED NUCLEATION XXX
 
@@ -454,7 +455,7 @@ class Snowfall:
         self.H_ext = VIAL_EXT * self.k['ext'] * A
 
         if 's_sigma_rel' in self.k.keys():
-            self.k['shelf'] = self.k['s0'] + np.random.normal(self.N_vials_total)
+            self.k['shelf'] = self.k['s0'] + self.rng.normal(size=self.N_vials_total)
         else:
             self.k['shelf'] = self.k['s0']
 
@@ -501,11 +502,11 @@ class Snowfall:
         return stats_df, traj_df
 
     def __repr__(self) -> str:
-        """ The string representation of the Snowfall class.
+        """ The string representation of the Snowflake class.
 
         Returns:
-            str: The Snowfall class string representation giving some basic info.
+            str: The Snowflake class string representation giving some basic info.
         """
 
-        return (f"Snowfall([N_vials: {self.N_vials}, Nrep: {self.Nrep}, "
-                + f"dt: {self.dt}, pool_size: {self.poolsize}])")
+        return (f"Snowflake([N_vials: {self.N_vials}, Nrep: {self.Nrep}, "
+                + f"dt: {self.dt}, seed: {self.seed}])")

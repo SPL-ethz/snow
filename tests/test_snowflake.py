@@ -6,33 +6,33 @@ Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
 '''
 
 import pytest
-from ethz_snow.snowfall import Snowfall
+from ethz_snow.snowflake import Snowflake
 import numpy as np
 
 
 def test_k_must_be_fine():
     with pytest.raises(TypeError):
-        S = Snowfall(k=[1, 2, 3])
+        S = Snowflake(k=[1, 2, 3])
 
     # make sure k is checked w.r.t. its keys
     with pytest.raises(ValueError):
-        S = Snowfall(k={'int': 1, 'ext': 1, 's0f': 1})
+        S = Snowflake(k={'int': 1, 'ext': 1, 's0f': 1})
 
 
 def test_opcond_must_be_operatingcondition():
     with pytest.raises(TypeError):
-        S = Snowfall(opcond=dict(a=1))
+        S = Snowflake(opcond=dict(a=1))
 
 
 def test_only2D_implemented():
     with pytest.raises(NotImplementedError):
-        S = Snowfall(N_vials=(3, 3, 3))
+        S = Snowflake(N_vials=(3, 3, 3))
 
 
 @pytest.mark.parametrize('input', ['gibberish', '2random3', [1, 'asdf'], [0, 9], (-1, 2)])
 def test_storeStatesMeaningless(input):
     with pytest.raises(ValueError):
-        S = Snowfall(N_vials=(3, 3, 1), storeStates=input)
+        S = Snowflake(N_vials=(3, 3, 1), storeStates=input)
 
 
 @pytest.mark.parametrize('input_result', [(None, 0), ('all', 9), ('corner', 4),
@@ -40,14 +40,14 @@ def test_storeStatesMeaningless(input):
                                           ('random4', 4), ('uniform+3', 3),
                                           (('center', 'corner_random_2'), 3)])
 def test_storageMaskFunction(input_result):
-    S = Snowfall(N_vials=(3, 3, 1), storeStates=input_result[0])
+    S = Snowflake(N_vials=(3, 3, 1), storeStates=input_result[0])
 
     assert np.sum(S._storageMask) == input_result[1]
 
 
 @pytest.fixture(scope='module')
 def fakeS():
-    S = Snowfall(N_vials=(2, 2, 1), storeStates='all')
+    S = Snowflake(N_vials=(2, 2, 1), storeStates='all')
     S._t = np.array([0, 1, 2, 3])
     S._X = np.concatenate([np.zeros((4, 4)),
                            np.array([[0, 0, 0.5, 0.95], [0, 0.7, 0.75, 1],
@@ -88,14 +88,14 @@ def test_toDataframe(fakeS):
 
 @pytest.fixture(scope='module')
 def S_331_all():
-    S = Snowfall(N_vials=(3, 3, 1), storeStates='all')
+    S = Snowflake(N_vials=(3, 3, 1), storeStates='all')
     S.run()
     return S
 
 
 @pytest.fixture(scope='module')
 def S_331_edge():
-    S = Snowfall(N_vials=(3, 3, 1), storeStates='edge')
+    S = Snowflake(N_vials=(3, 3, 1), storeStates='edge')
     S.run()
     return S
 
