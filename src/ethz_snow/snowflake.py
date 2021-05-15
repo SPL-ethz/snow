@@ -508,5 +508,5 @@ class Snowflake:
             str: The Snowflake class string representation giving some basic info.
         """
 
-        return (f"Snowflake([N_vials: {self.N_vials}, Nrep: {self.Nrep}, "
+        return (f"Snowflake([N_vials: {self.N_vials}, "
                 + f"dt: {self.dt}, seed: {self.seed}])")
