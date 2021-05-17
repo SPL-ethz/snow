@@ -145,6 +145,7 @@ class Snowflake:
         return storageMask
 
     def run(self):
+        print(self, "loop")
         # clean up any potential old simulations
         self._X = None
         self._t = None
@@ -508,12 +509,12 @@ class Snowflake:
 
         return stats_df, traj_df
 
-    def __repr__(self) -> str:
-        """ The string representation of the Snowflake class.
+    # def __repr__(self) -> str:
+    #     """ The string representation of the Snowflake class.
 
-        Returns:
-            str: The Snowflake class string representation giving some basic info.
-        """
+    #     Returns:
+    #         str: The Snowflake class string representation giving some basic info.
+    #     """
 
-        return (f"Snowflake([N_vials: {self.N_vials}, "
-                + f"dt: {self.dt}, seed: {self.seed}])")
+    #     return (f"Snowflake([N_vials: {self.N_vials}, "
+    #             + f"dt: {self.dt}, seed: {self.seed}])")
