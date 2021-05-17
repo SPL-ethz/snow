@@ -34,25 +34,39 @@ class Snowfall():
 
         self.pool_size = pool_size
 
-        self.pool = mp.Pool(self.pool_size)
+        # self.pool = mp.Pool(self.pool_size)
         self.Nrep = Nrep
 
         if 'seed' in kwargs.keys():
             del kwargs['seed']
 
+        self.sf_kwargs = kwargs
         # fix seeds
-        self.snowflakes = [Snowflake(seed=i, *kwargs) for i in range(int(Nrep))]
+        # self.snowflakes = [Snowflake(seed=i, *kwargs) for i in range(int(Nrep))]
+
+    @classmethod
+    def uniqueFlake(cls, seed, return_dict):
+        # S = Snowflake(*self.sf_kwargs, seed = seed)
+        # S.run()
+
+        # return S.stats
+        return_dict[seed] = seed
 
     def run(self):
         # run the individual snowflakes in a parallelized manner
-        # processes = []
-        # for sf in self.snowflakes:
-        #     p = mp.Process(target=sf.run)
-        #     processes.append(p)
+        manager = mp.Manager()
+        return_dict = manager.dict()
+        processes = []
+        for i in range(int(self.Nrep)):
+            p = mp.Process(target=self.uniqueFlake, args = (i, return_dict))
+            processes.append(p)
         # print(processes)
-        # [x.start() for x in processes]
+        [x.start() for x in processes]
+        [x.join() for x in processes]
+        print(return_dict.values())
+        # print(self.snowflakes[0].stats)
         # print(self.snowflakes[0], 'main')
-        [sf.run() for sf in self.snowflakes]
+        # [sf.run() for sf in self.snowflakes]
 
     def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all',
                         fromStates: bool = False) -> np.ndarray:

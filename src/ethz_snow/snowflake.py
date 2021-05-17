@@ -144,7 +144,7 @@ class Snowflake:
 
         return storageMask
 
-    def run(self):
+    def run(self, returnSth=False):
         print(self, "loop")
         # clean up any potential old simulations
         self._X = None
@@ -250,6 +250,9 @@ class Snowflake:
         self.stats = stats
         self._X = X  # store the state matrix
         self._t = t  # store the time vector
+
+        # if returnSth:
+        print('asdfasdf')
 
     def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all',
                         fromStates: bool = False) -> np.ndarray:
