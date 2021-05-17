@@ -173,6 +173,8 @@ class Snowflake:
             T_nucleation=np.full(self.N_vials_total, np.nan),
             t_solidification=np.full(self.N_vials_total, np.nan))
 
+        k_CN = np.argmax(t >= self.opcond.cnt)
+
         # 5. Iterate over time steps
         for k in np.arange(N_timeSteps):
 
@@ -223,6 +225,11 @@ class Snowflake:
 
             P[nucleationCandidatesMask] = (kb * V * (T_eq - T_k[nucleationCandidatesMask])**b
                                            * self.dt)
+
+            # when we reach the timepoint of controlled nucleation
+            # all vials (that thermodynamically can) nucleate
+            if k == k_CN:
+                P.fill(1)
             diceRolls[nucleationCandidatesMask] = self.rng.random(n_nucleationCandidates)
 
             # CONTROLLED NUCLEATION XXX

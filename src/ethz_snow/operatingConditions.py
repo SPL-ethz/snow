@@ -22,11 +22,33 @@ class OperatingConditions:
             raise ValueError("Cooling dictionary does not contain all required keys.")
         self.cooling = cooling
 
-        if not all([key in holding.keys() for key in ['duration', 'temp']]):
-            raise ValueError("Holding dictionary does not contain all required keys.")
+        if isinstance(holding, dict):
+            if not all([key in holding.keys() for key in ['duration', 'temp']]):
+                raise ValueError("Holding dictionary does not contain all required keys.")
+        elif holding is not None:
+            raise TypeError("Input holding is neither dict nor None.")
         self.holding = holding
 
         self.controlledNuclation = controlledNuclation
+
+    @property
+    def cnt(self):
+        # controlled nucleation time
+
+        # time it takes to holding
+        if self.holding is None:
+            raise NotImplementedError("Holding profile is not defined."
+                                      + "Cannot calculate controlled nucleation time.")
+
+        if self.controlledNuclation:
+            DT_cool = (self.cooling['start'] - self.holding['temp']) / self.cooling['rate']
+            DT_holding = self.holding['duration']
+
+            DT = DT_cool + DT_holding
+        else:
+            DT = np.inf
+
+        return DT
 
     def tempProfile(self, dt: float) -> np.ndarray:
 
@@ -44,6 +66,7 @@ class OperatingConditions:
             # append holding period
             T_vec_holding = [T_hold]*int(np.ceil(duration_hold / dt))
 
+            # cool to final temperature
             T_vec_toEnd = self._simpleCool(Tstart=T_hold, Tend=self.cooling['end'],
                                            coolingRate=self.cooling['rate'],
                                            dt=dt, t_tot=self.t_tot)

@@ -112,3 +112,19 @@ def test_statsConsistency(S_331_all, S_331_edge, fun):
 
     assert abs(getattr(S_331_edge, fun)(group='edge').mean()
                - getattr(S_331_edge, fun)(group='edge', fromStates=True).mean()) < 0.1
+
+
+def test_interactionMatrix():
+    S = Snowflake(N_vials=(3, 3, 1))
+    mint, mext = S._buildInteractionMatrices()
+
+    assert mint.shape == (9, 9)
+    assert mint.nnz == 33
+    assert mint[3, 0] == 1
+    assert mint[0, 3] == 1
+    assert mint[8, 5] == 1
+    assert mint[4, 4] == -4
+    assert (np.sum(mint, axis=0) == 0).all()
+    assert (np.sum(mint, axis=1) == 0).all()
+
+    assert (4 + mint.diagonal() == mext).all()
