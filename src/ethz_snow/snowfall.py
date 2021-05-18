@@ -5,12 +5,6 @@ Author: David Ochsenbein (DRO) - dochsenb@its.jnj.com
 Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
 '''
 
-from ethz_snow.operatingConditions import OperatingConditions
-from ethz_snow.constants import (
-    A, hl, T_eq, kb, V, b, cp_solution,
-    mass, solid_fraction, cp_s, depression,
-    alpha, beta_solution, cp_i, cp_w)
-
 import numpy as np
 import pandas as pd
 import re
@@ -58,16 +52,16 @@ class Snowfall():
     def run(self, how='async'):
         # run the individual snowflakes in a parallelized manner
         self.stats = dict()
-        S = Snowflake(*self.sf_kwargs)
+        S = Snowflake(**self.sf_kwargs)
         S._buildHeatflowMatrices()  # pre-build H_int, H_ext, H_shelf
         if how == 'async':
             with mp.Pool(self.pool_size) as p:
                 # starmap is only available since python 3.3
                 # it allows passing multiple arguments
                 res = p.starmap_async(Snowfall.uniqueFlake,
-                        [(S, i) for i in range(self.Nrep)]).get()
-
+                                      [(S, i) for i in range(self.Nrep)]).get()
             self.stats = res
+
         elif how == 'sync':
             manager = mp.Manager()
             return_dict = manager.dict()
@@ -77,6 +71,7 @@ class Snowfall():
                 p.starmap(Snowfall.uniqueFlake_sync,
                         [(S, i, return_dict) for i in range(self.Nrep)])
             self.stats = dict(return_dict)
+
         elif how == 'sequential':
             for i in range(self.Nrep):
                 self.stats[i] = self.uniqueFlake(S, i)
@@ -113,4 +108,5 @@ class Snowfall():
             str: The Snowfall class string representation giving some basic info.
         """
 
-        return (f"Snowfall([{self.Nrep} Snowflakes, pool_size: {self.pool_size}])")
+        return (f"Snowfall([{self.Nrep} Snowflake{'s' if self.Nrep > 1 else ''}, "
+                + f"pool_size: {self.pool_size}])")

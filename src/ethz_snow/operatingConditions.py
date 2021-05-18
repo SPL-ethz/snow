@@ -15,7 +15,7 @@ class OperatingConditions:
             t_tot: float = 2e4,
             cooling: dict = {'rate': 0.5/60, 'start': 20, 'end': -50},
             holding: Optional[dict] = {'duration': 10, 'temp': -12},
-            controlledNuclation: bool = False):
+            controlledNucleation: bool = False):
 
         self.t_tot = t_tot
         if not all([key in cooling.keys() for key in ['rate', 'start', 'end']]):
@@ -29,7 +29,7 @@ class OperatingConditions:
             raise TypeError("Input holding is neither dict nor None.")
         self.holding = holding
 
-        self.controlledNuclation = controlledNuclation
+        self.controlledNucleation = controlledNucleation
 
     @property
     def cnt(self):
@@ -40,7 +40,7 @@ class OperatingConditions:
             raise NotImplementedError("Holding profile is not defined."
                                       + "Cannot calculate controlled nucleation time.")
 
-        if self.controlledNuclation:
+        if self.controlledNucleation:
             DT_cool = (self.cooling['start'] - self.holding['temp']) / self.cooling['rate']
             DT_holding = self.holding['duration']
 
@@ -117,4 +117,4 @@ class OperatingConditions:
                 + f"Cooling: {self.cooling['start']} to {self.cooling['end']} "
                 + f"with {self.cooling['rate']}, "
                 + f"Hold: {self.holding['duration']} @ {self.holding['temp']}, "
-                + f"Controlled Nucleation: {'ON' if self.controlledNuclation else 'OFF'}")
+                + f"Controlled Nucleation: {'ON' if self.controlledNucleation else 'OFF'}")

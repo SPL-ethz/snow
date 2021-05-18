@@ -83,6 +83,7 @@ class Snowflake:
             storageMask = self._interpretStorageString(storeStates)
         elif storeStates is None:
             storageMask = np.zeros(self.N_vials_total, dtype=bool)
+            self._emptyStore = True
 
         self._storageMask = storageMask
 
@@ -192,6 +193,7 @@ class Snowflake:
         self._t = None
 
         N_timeSteps = int(np.ceil(self.opcond.t_tot / self.dt))+1  # the total number of timesteps
+        N_vials_total = self.N_vials_total
         # toc1 = time.perf_counter()
         # print(toc1-tic)
         # toc2 = time.perf_counter()
@@ -200,20 +202,24 @@ class Snowflake:
         T_shelf = self.opcond.tempProfile(self.dt)
         T_ext = T_shelf  # need to make a switch so that this can be decoupled - DRO XX
 
+        H_int = self.H_int
+        H_ext = self.H_ext
+        H_shelf = self.H_shelf
+
         # 3. Initial state of the system
         # initial temperature
-        T_k = np.ones((self.N_vials_total,)) * self.opcond.cooling['start']  # [C]
+        T_k = np.ones(N_vials_total) * self.opcond.cooling['start']  # [C]
         # state of the vials
-        sigma_k = np.zeros(self.N_vials_total)  # (0 = liq, 1 = completely frozen)
+        sigma_k = np.zeros(N_vials_total)  # (0 = liq, 1 = completely frozen)
 
         # 4. Pre-allocate memory
         # our state matrix containing the entire history of the system
         X = np.zeros((2*np.sum(self._storageMask), N_timeSteps))
         t = np.arange(0, N_timeSteps * self.dt, self.dt)
         stats = dict(
-            t_nucleation=np.full(self.N_vials_total, np.nan),
-            T_nucleation=np.full(self.N_vials_total, np.nan),
-            t_solidification=np.full(self.N_vials_total, np.nan))
+            t_nucleation=np.full(N_vials_total, np.nan),
+            T_nucleation=np.full(N_vials_total, np.nan),
+            t_solidification=np.full(N_vials_total, np.nan))
 
         k_CN = np.argmax(t >= self.opcond.cnt)
         # toc3 = time.perf_counter()
@@ -224,8 +230,10 @@ class Snowflake:
             T_shelf_k = T_shelf[k]
             T_ext_k = T_ext[k]
             # toc1_l = time.perf_counter()
-            x_k = np.concatenate([T_k, sigma_k])
-            X[:, k] = x_k[np.tile(self._storageMask, 2)]
+            if not self._emptyStore:
+                # does not give a huge boost.
+                x_k = np.concatenate([T_k, sigma_k])
+                X[:, k] = x_k[np.concatenate([self._storageMask, self._storageMask])]
 
             # a mask that is True where a vial is still fully liquid
             liquidMask = (sigma_k == 0)
@@ -238,9 +246,9 @@ class Snowflake:
             # toc2_l = time.perf_counter()
             # print(f"Masks: {toc2_l-toc1_l:4.2e}")
             # calculate heatflows for all vials
-            q_k = (self.H_int @ T_k
-                   + self.H_ext * (T_ext_k - T_k)
-                   + self.H_shelf * (T_shelf_k - T_k))  # [XXX] units? - DRO
+            q_k = (H_int @ T_k
+                   + H_ext * (T_ext_k - T_k)
+                   + H_shelf * (T_shelf_k - T_k))  # [XXX] units? - DRO
             # toc2b_l = time.perf_counter()
             # print(f"q: {toc2b_l-toc2_l:4.2e}")
             # SOLID(IFYING) VIALS
@@ -268,8 +276,8 @@ class Snowflake:
             # print(f"Time steps: {toc3_l-toc2b_l:4.2e}")
 
             # nucleation probabilities for candidates
-            P = np.zeros((self.N_vials_total,))
-            diceRolls = np.zeros((self.N_vials_total,))
+            P = np.zeros(N_vials_total)
+            diceRolls = np.zeros(N_vials_total)
 
             P[nucleationCandidatesMask] = (kb * V * (T_eq - T_k[nucleationCandidatesMask])**b
                                            * self.dt)
@@ -280,8 +288,6 @@ class Snowflake:
             if k == k_CN:
                 P.fill(1)
             diceRolls[nucleationCandidatesMask] = self._rng.random(n_nucleationCandidates)
-
-            # CONTROLLED NUCLEATION XXX
 
             # Nucleation
             nucleatedVialsMask = nucleationCandidatesMask & (diceRolls < P)
@@ -296,7 +302,6 @@ class Snowflake:
             sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
             # assumption is that during solidification T = Teq
             T_k[nucleatedVialsMask] = T_eq - depression * (1/(1-sigma_k[nucleatedVialsMask]))
-            # sys.exit()
 
         # toc4 = time.perf_counter()
         # print(f"For loop: {toc4-toc3:4.2e}")
@@ -437,10 +442,10 @@ class Snowflake:
             df = df[df.group.isin(group)]
 
         if not kind.lower().startswith('traj'):
-            df = df[df.variable.str.lower().str.contains(what.lower())]
+            df = df[df.variable.str.str.contains(what)]
             sns.catplot(data=df, hue='group', y='value', kind=kind, x='variable')
         else:
-            df = df[df.state.str.lower().str.contains(what.lower())]
+            df = df[df.state.str.str.contains(what)]
             sns.lineplot(data=df, hue='group', y='value', x='Time')
 
     def _sigmaCrossingIndices(self, threshold=0.9) -> Tuple[np.ndarray, np.ndarray]:
