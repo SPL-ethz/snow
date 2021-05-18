@@ -35,7 +35,7 @@ class Snowfall():
         self.pool_size = pool_size
 
         # self.pool = mp.Pool(self.pool_size)
-        self.Nrep = Nrep
+        self.Nrep = int(Nrep)
 
         if 'seed' in kwargs.keys():
             del kwargs['seed']
@@ -45,25 +45,26 @@ class Snowfall():
         # self.snowflakes = [Snowflake(seed=i, *kwargs) for i in range(int(Nrep))]
 
     @classmethod
-    def uniqueFlake(cls, seed, return_dict):
-        # S = Snowflake(*self.sf_kwargs, seed = seed)
-        # S.run()
-
-        # return S.stats
-        return_dict[seed] = seed
+    def uniqueFlake(cls, sf_kwargs, seed, return_dict):
+        S = Snowflake(*sf_kwargs, seed=seed)
+        S.run()
+        return_dict[seed] = S.stats
+        # return_dict[seed] = seed
 
     def run(self):
         # run the individual snowflakes in a parallelized manner
         manager = mp.Manager()
         return_dict = manager.dict()
         processes = []
-        for i in range(int(self.Nrep)):
-            p = mp.Process(target=self.uniqueFlake, args = (i, return_dict))
+        for i in range(self.Nrep):
+            p = mp.Process(target=Snowfall.uniqueFlake, args=(self.sf_kwargs, i, return_dict))
             processes.append(p)
         # print(processes)
         [x.start() for x in processes]
         [x.join() for x in processes]
-        print(return_dict.values())
+        
+        self.stats = dict(return_dict)
+
         # print(self.snowflakes[0].stats)
         # print(self.snowflakes[0], 'main')
         # [sf.run() for sf in self.snowflakes]
