@@ -38,36 +38,28 @@ class Snowfall():
         self.Nrep = int(Nrep)
 
         if 'seed' in kwargs.keys():
+            # seed will be chosen by Snowfall
             del kwargs['seed']
 
         self.sf_kwargs = kwargs
-        # fix seeds
-        # self.snowflakes = [Snowflake(seed=i, *kwargs) for i in range(int(Nrep))]
 
     @classmethod
     def uniqueFlake(cls, sf_kwargs, seed, return_dict):
         S = Snowflake(*sf_kwargs, seed=seed)
         S.run()
         return_dict[seed] = S.stats
-        # return_dict[seed] = seed
 
     def run(self):
         # run the individual snowflakes in a parallelized manner
         manager = mp.Manager()
         return_dict = manager.dict()
-        processes = []
-        for i in range(self.Nrep):
-            p = mp.Process(target=Snowfall.uniqueFlake, args=(self.sf_kwargs, i, return_dict))
-            processes.append(p)
-        # print(processes)
-        [x.start() for x in processes]
-        [x.join() for x in processes]
-        
-        self.stats = dict(return_dict)
+        with mp.Pool() as p:
+            # starmap is only available since python 3.3
+            # it allows passing multiple arguments
+            p.starmap(Snowfall.uniqueFlake,
+                      [(self.sf_kwargs, i, return_dict) for i in range(self.Nrep)])
 
-        # print(self.snowflakes[0].stats)
-        # print(self.snowflakes[0], 'main')
-        # [sf.run() for sf in self.snowflakes]
+        self.stats = dict(return_dict)
 
     def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all',
                         fromStates: bool = False) -> np.ndarray:
