@@ -13,13 +13,15 @@ from ethz_snow.constants import (
 
 import numpy as np
 import pandas as pd
-import re
+import re, sys
 
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 from scipy.sparse import csr_matrix, lil, lil_matrix
 from typing import List, Tuple, Union, Sequence, Optional
+
+import time
 
 HEATFLOW_REQUIREDKEYS = ('int', 'ext', 's0')
 VIAL_GROUPS = ('corner', 'edge', 'center', 'all')
@@ -52,9 +54,6 @@ class Snowflake:
 
         self.dt = dt
 
-        # best practice is now to store the rng in an object and pass it around
-        # https://towardsdatascience.com/stop-using-numpy-random-seed-581a9972805f
-        self.rng = np.random.default_rng(seed)
         # store the seed to look it up if need be
         self.seed = seed
 
@@ -109,6 +108,18 @@ class Snowflake:
     def X_sigma(self):
         return self._X[int(np.sum(self._storageMask)):, :]
 
+    @property
+    def seed(self):
+        return self._seed
+
+    @seed.setter
+    def seed(self, value):
+        # best practice is now to store the rng in an object and pass it around
+        # https://towardsdatascience.com/stop-using-numpy-random-seed-581a9972805f
+        self._rng = np.random.default_rng(value)
+        # store the seed to look it up if need be
+        self._seed = value
+
     def _interpretStorageString(self, myString):
         myString = myString.lower()
         if not any([word in myString for word in list(VIAL_GROUPS)+['random', 'uniform']]):
@@ -134,7 +145,7 @@ class Snowflake:
 
             I_candidates = np.where(storageMask)[0]
             if 'random' in myString:
-                I_toStore = self.rng.choice(I_candidates, size=howMany, replace=False)
+                I_toStore = self._rng.choice(I_candidates, size=howMany, replace=False)
             elif 'uniform' in myString:
                 stepSize = int(np.ceil(len(I_candidates)/howMany))
                 I_fromCandidates = np.arange(0, len(I_candidates), stepSize, dtype=int)
@@ -144,17 +155,20 @@ class Snowflake:
 
         return storageMask
 
-    def run(self, returnSth=False):
-        print(self, "loop")
+    def run(self):
+        # tic = time.perf_counter()
+        
         # clean up any potential old simulations
         self._X = None
         self._t = None
 
         N_timeSteps = int(np.ceil(self.opcond.t_tot / self.dt))+1  # the total number of timesteps
-
+        # toc1 = time.perf_counter()
+        # print(toc1-tic)
         # 1. build interaction matrices
         self._buildHeatflowMatrices()
-
+        # toc2 = time.perf_counter()
+        # print(f"BuildHeatflow: {toc2-toc1}")
         # 2. Obtain external temperature profile over time
         T_shelf = self.opcond.tempProfile(self.dt)
         T_ext = T_shelf  # need to make a switch so that this can be decoupled - DRO XX
@@ -175,13 +189,14 @@ class Snowflake:
             t_solidification=np.full(self.N_vials_total, np.nan))
 
         k_CN = np.argmax(t >= self.opcond.cnt)
-
+        # toc3 = time.perf_counter()
+        # print(f"Tempprofile: {toc3-toc2}")
         # 5. Iterate over time steps
         for k in np.arange(N_timeSteps):
 
             T_shelf_k = T_shelf[k]
             T_ext_k = T_ext[k]
-
+            # toc1_l = time.perf_counter()
             x_k = np.concatenate([T_k, sigma_k])
             X[:, k] = x_k[np.tile(self._storageMask, 2)]
 
@@ -193,11 +208,14 @@ class Snowflake:
             stats['t_solidification'][solidifiedMask] = (t[k]
                                                          - stats['t_nucleation'][solidifiedMask])
 
+            # toc2_l = time.perf_counter()
+            # print(f"Masks: {toc2_l-toc1_l:4.2e}")
             # calculate heatflows for all vials
             q_k = (self.H_int @ T_k
                    + self.H_ext * (T_ext_k - T_k)
                    + self.H_shelf * (T_shelf_k - T_k))  # [XXX] units? - DRO
-
+            # toc2b_l = time.perf_counter()
+            # print(f"q: {toc2b_l-toc2_l:4.2e}")
             # SOLID(IFYING) VIALS
             # heat capacity of solidifying vials
             # a vector of cps for all solidifying vials
@@ -219,6 +237,8 @@ class Snowflake:
             nucleationCandidatesMask = liquidMask & superCooledMask
             # the total number of nucleation candidates
             n_nucleationCandidates = np.sum(nucleationCandidatesMask)
+            # toc3_l = time.perf_counter()
+            # print(f"Time steps: {toc3_l-toc2b_l:4.2e}")
 
             # nucleation probabilities for candidates
             P = np.zeros((self.N_vials_total,))
@@ -226,12 +246,13 @@ class Snowflake:
 
             P[nucleationCandidatesMask] = (kb * V * (T_eq - T_k[nucleationCandidatesMask])**b
                                            * self.dt)
-
+            # toc4_l = time.perf_counter()
+            # print(f"Probabilities: {toc4_l-toc3_l:4.2e}")
             # when we reach the timepoint of controlled nucleation
             # all vials (that thermodynamically can) nucleate
             if k == k_CN:
                 P.fill(1)
-            diceRolls[nucleationCandidatesMask] = self.rng.random(n_nucleationCandidates)
+            diceRolls[nucleationCandidatesMask] = self._rng.random(n_nucleationCandidates)
 
             # CONTROLLED NUCLEATION XXX
 
@@ -240,19 +261,21 @@ class Snowflake:
 
             stats['t_nucleation'][nucleatedVialsMask] = t[k] + self.dt
             stats['T_nucleation'][nucleatedVialsMask] = T_k[nucleatedVialsMask]
+            # toc5_l = time.perf_counter()
+            # print(f"Dice rolls: {toc5_l-toc4_l:4.2e}")
 
             q0 = (T_eq - T_k[nucleatedVialsMask]) * cp_solution * mass
 
             sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
             # assumption is that during solidification T = Teq
             T_k[nucleatedVialsMask] = T_eq - depression * (1/(1-sigma_k[nucleatedVialsMask]))
+            # sys.exit()
 
+        # toc4 = time.perf_counter()
+        # print(f"For loop: {toc4-toc3:4.2e}")
         self.stats = stats
         self._X = X  # store the state matrix
         self._t = t  # store the time vector
-
-        # if returnSth:
-        print('asdfasdf')
 
     def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all',
                         fromStates: bool = False) -> np.ndarray:
@@ -466,7 +489,7 @@ class Snowflake:
         self.H_ext = VIAL_EXT * self.k['ext'] * A
 
         if 's_sigma_rel' in self.k.keys():
-            self.k['shelf'] = self.k['s0'] + self.rng.normal(size=self.N_vials_total)
+            self.k['shelf'] = self.k['s0'] + self._rng.normal(size=self.N_vials_total)
         else:
             self.k['shelf'] = self.k['s0']
 

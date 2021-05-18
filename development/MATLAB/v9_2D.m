@@ -68,7 +68,7 @@ clear all; close all; clc;
 
 
 %% Material and geometrical properties
-
+tic
 %Geometry and materials
 lambda = 0.8*0.05; % W/[mK] thermal conductivity of glass / times 0.1 to take into account that the actual contact area is smaller
 thickness = 0.002; % [m] thickness of glass (2 mm, usually 2 layers of 1 mm)
@@ -146,12 +146,12 @@ sigma_solid = sigma_equivalent.*cp_w./cp_i; %similar temperature rise for a froz
 %% Define model parameters
 
 % Number of vials in each dimension
-x = 3;
+x = 7;
 y = x;
 z = 1; %only one layer
 
 %number of cycles
-N = 1;
+N = 250;
 
 %Cooling rate
 CR_min = 0.5; %K/min
@@ -211,7 +211,7 @@ t_time = linspace(Dt,Dt*n,n);
 kbDtV = kb*Dt*V;
 
 
-% parpool(4);
+parpool(4);
 
 xyz = zeros(x,y,z);
 xyzt = zeros(x,y,z,n+1);
@@ -234,7 +234,6 @@ time_min_nuc = zeros(N,1);
 time_max_frozen = zeros(N,1);
 time_min_frozen = zeros(N,1);
 
-tic
 
 %% Vectorization
 
@@ -451,573 +450,575 @@ for p=1:N
     
 end
 %% Data extraction from loop
-
-%Change format of output variables
-for vial = 1:(x*y*z)
-    av = floor( (vial-1)/(x*y));
-    bv = mod( (vial-1),(x*y));
-    cv = floor(bv/x);
-    dv = mod(bv,x);
-    
-    xv = dv + 1;
-    yv = cv + 1;
-    zv = av + 1;
-    
-    time_frozen(xv,yv,zv,:) = time_frozen_vial(vial,:);
-    time_nuc(xv,yv,zv,:) = time_nuc_vial(vial,:);
-    temp_nuc(xv,yv,zv,:) = temp_nuc_vial(vial,:);
-    
-    hold_init(xv,yv,zv,:) = hold_init_vial(vial,:);
-    hold_final(xv,yv,zv,:) = hold_final_vial(vial,:);
-    
-end
-
-
-delete(gcp('nocreate')); %close parallel computing
-
-time_solid = time_frozen - time_nuc;
-
+delete(gcp('nocreate'))
 toc
-
-Time_nuc_all = time_nuc.*Dt./60;
-Time_frozen_all = time_frozen.*Dt./60;
-Time_solid_all = Time_frozen_all - Time_nuc_all;
-Temp_nuc_all = temp_nuc;
-
-%% Data extraction from loop
-for p=1:N
-    
-    
-    Time_nuc(p,1) = time_nuc(1,1,1,p).*Dt./60; %[min] nucleation times in min
-    Time_nuc(p,2) = time_nuc(1,4,1,p).*Dt./60; %[min] nucleation times in min
-    Time_nuc(p,3) = time_nuc(2,2,1,p).*Dt./60; %[min] nucleation times in min
-    Time_nuc(p,4) = time_nuc(4,4,1,p).*Dt./60; %[min] nucleation times in min
-    
-    Time_frozen(p,1) = time_frozen(1,1,1,p).*Dt./60; %[min] nucleation times in min
-    Time_frozen(p,2) = time_frozen(1,4,1,p).*Dt./60; %[min] nucleation times in min
-    Time_frozen(p,3) = time_frozen(2,2,1,p).*Dt./60; %[min] nucleation times in min
-    Time_frozen(p,4) = time_frozen(4,4,1,p).*Dt./60; %[min] nucleation times in min
-end
-
-Time_solid = Time_frozen - Time_nuc;
-
-for p=1:N
-    C = max(max(max(time_nuc(:,:,:,p))));
-    time_max_nuc(p) = C.*Dt./60;
-    
-    D = min(min(min(time_nuc(:,:,:,p))));
-    time_min_nuc(p) = D.*Dt./60;
-    
-    C_frozen = max(max(max(time_frozen(:,:,:,p))));
-    time_max_frozen(p) = C_frozen.*Dt./60;
-    
-    D_frozen = min(min(min(time_frozen(:,:,:,p))));
-    time_min_frozen(p) = D_frozen.*Dt./60;
-    
-    C_solid = max(max(max(time_solid(:,:,:,p))));
-    time_max_solid(p) = C_solid.*Dt./60;
-    
-    D_solid = min(min(min(time_solid(:,:,:,p))));
-    time_min_solid(p) = D_solid.*Dt./60;
-    
-end
-
-
-
-
-
-%% Plot temperature vs time
-
-times = linspace(0,Dt*n,n+1)./60;
-iterations = linspace(1,N,N);
-
-TimeN_sort = sort(Time_nuc,1,'ascend');
-TimeF_sort = sort(Time_frozen,1,'ascend');
-TimeS_sort = sort(Time_solid,1,'ascend');
-fraction = [0 linspace(0,1,(N+1)) 1];
-
-for g=1:4
-    TimeN_sort_plot(g,:) = [0 TimeN_sort(1,g) TimeN_sort(:,g)' (10*TimeN_sort(end,g))];
-    TimeF_sort_plot(g,:) = [0 TimeF_sort(1,g) TimeF_sort(:,g)' (10*TimeF_sort(end,g))];
-    TimeS_sort_plot(g,:) = [0 TimeS_sort(1,g) TimeS_sort(:,g)' (10*TimeS_sort(end,g))];
-    
-end
-
-% figure(1)
-% hold on;
-% plot(times,Temp(:,1:5))
-% xlabel('Time [min]');
-% ylabel('Temperature [°C]');
-% title('Temperature Evolution of Core Vial (2,2,2) in 5 Cycles');
-% axis([0 150 -40 21]);
-%
+% 
+% %Change format of output variables
+% for vial = 1:(x*y*z)
+%     av = floor( (vial-1)/(x*y));
+%     bv = mod( (vial-1),(x*y));
+%     cv = floor(bv/x);
+%     dv = mod(bv,x);
+%     
+%     xv = dv + 1;
+%     yv = cv + 1;
+%     zv = av + 1;
+%     
+%     time_frozen(xv,yv,zv,:) = time_frozen_vial(vial,:);
+%     time_nuc(xv,yv,zv,:) = time_nuc_vial(vial,:);
+%     temp_nuc(xv,yv,zv,:) = temp_nuc_vial(vial,:);
+%     
+%     hold_init(xv,yv,zv,:) = hold_init_vial(vial,:);
+%     hold_final(xv,yv,zv,:) = hold_final_vial(vial,:);
+%     
+% end
+% 
+% 
+% delete(gcp('nocreate')); %close parallel computing
+% 
+% time_solid = time_frozen - time_nuc;
+% 
+% toc
+% 
+% Time_nuc_all = time_nuc.*Dt./60;
+% Time_frozen_all = time_frozen.*Dt./60;
+% Time_solid_all = Time_frozen_all - Time_nuc_all;
+% Temp_nuc_all = temp_nuc;
+% 
+% %% Data extraction from loop
+% for p=1:N
+%     
+%     
+%     Time_nuc(p,1) = time_nuc(1,1,1,p).*Dt./60; %[min] nucleation times in min
+%     Time_nuc(p,2) = time_nuc(1,4,1,p).*Dt./60; %[min] nucleation times in min
+%     Time_nuc(p,3) = time_nuc(2,2,1,p).*Dt./60; %[min] nucleation times in min
+%     Time_nuc(p,4) = time_nuc(4,4,1,p).*Dt./60; %[min] nucleation times in min
+%     
+%     Time_frozen(p,1) = time_frozen(1,1,1,p).*Dt./60; %[min] nucleation times in min
+%     Time_frozen(p,2) = time_frozen(1,4,1,p).*Dt./60; %[min] nucleation times in min
+%     Time_frozen(p,3) = time_frozen(2,2,1,p).*Dt./60; %[min] nucleation times in min
+%     Time_frozen(p,4) = time_frozen(4,4,1,p).*Dt./60; %[min] nucleation times in min
+% end
+% 
+% Time_solid = Time_frozen - Time_nuc;
+% 
+% for p=1:N
+%     C = max(max(max(time_nuc(:,:,:,p))));
+%     time_max_nuc(p) = C.*Dt./60;
+%     
+%     D = min(min(min(time_nuc(:,:,:,p))));
+%     time_min_nuc(p) = D.*Dt./60;
+%     
+%     C_frozen = max(max(max(time_frozen(:,:,:,p))));
+%     time_max_frozen(p) = C_frozen.*Dt./60;
+%     
+%     D_frozen = min(min(min(time_frozen(:,:,:,p))));
+%     time_min_frozen(p) = D_frozen.*Dt./60;
+%     
+%     C_solid = max(max(max(time_solid(:,:,:,p))));
+%     time_max_solid(p) = C_solid.*Dt./60;
+%     
+%     D_solid = min(min(min(time_solid(:,:,:,p))));
+%     time_min_solid(p) = D_solid.*Dt./60;
+%     
+% end
+% 
+% 
+% 
+% 
+% 
+% %% Plot temperature vs time
+% 
+% times = linspace(0,Dt*n,n+1)./60;
+% iterations = linspace(1,N,N);
+% 
+% TimeN_sort = sort(Time_nuc,1,'ascend');
+% TimeF_sort = sort(Time_frozen,1,'ascend');
+% TimeS_sort = sort(Time_solid,1,'ascend');
+% fraction = [0 linspace(0,1,(N+1)) 1];
+% 
+% for g=1:4
+%     TimeN_sort_plot(g,:) = [0 TimeN_sort(1,g) TimeN_sort(:,g)' (10*TimeN_sort(end,g))];
+%     TimeF_sort_plot(g,:) = [0 TimeF_sort(1,g) TimeF_sort(:,g)' (10*TimeF_sort(end,g))];
+%     TimeS_sort_plot(g,:) = [0 TimeS_sort(1,g) TimeS_sort(:,g)' (10*TimeS_sort(end,g))];
+%     
+% end
+% 
+% % figure(1)
+% % hold on;
+% % plot(times,Temp(:,1:5))
+% % xlabel('Time [min]');
+% % ylabel('Temperature [°C]');
+% % title('Temperature Evolution of Core Vial (2,2,2) in 5 Cycles');
+% % axis([0 150 -40 21]);
 % %
-figure(2)
-plot(TimeN_sort_plot,fraction)
-ylabel('Simulated CDF');
-xlabel('Nucleation time [min]');
-title('Simulation of Nucleation Times (2000 Cycles)');
-legend('(1,1)','(1,4)','(2,2)','(4,4)');
-%set(gca,'Xdir','reverse')
-axis([0 175 -0.05 1.05]);
-
-
-%% Find time when last vial nucleates
-
-time_max_sort = sort(time_max_nuc,'ascend');
-time_max_sort_plot = [0 time_max_sort(1) time_max_sort(:)' (10*time_max_sort(end))];
-
-time_min_sort = sort(time_min_nuc,'ascend');
-time_min_sort_plot = [0 time_min_sort(1) time_min_sort(:)' (10*time_min_sort(end))];
-
-time_max_sort_frozen = sort(time_max_frozen,'ascend');
-time_max_sort_plot_frozen = [0 time_max_sort_frozen(1) time_max_sort_frozen(:)' (10*time_max_sort_frozen(end))];
-
-time_min_sort_frozen = sort(time_min_frozen,'ascend');
-time_min_sort_plot_frozen = [0 time_min_sort_frozen(1) time_min_sort_frozen(:)' (10*time_min_sort_frozen(end))];
-
-time_max_sort_solid = sort(time_max_solid,'ascend');
-time_max_sort_plot_solid = [0 time_max_sort_solid(1) time_max_sort_solid(:)' (10*time_max_sort_solid(end))];
-
-time_min_sort_solid = sort(time_min_solid,'ascend');
-time_min_sort_plot_solid = [0 time_min_sort_solid(1) time_min_sort_solid(:)' (10*time_min_sort_solid(end))];
-
-
-figure(3)
-plot(time_max_sort_plot,fraction)
-ylabel('Simulated CDF');
-xlabel('Nucleation time [min]');
-title('Nucleation time of last vial');
-%set(gca,'Xdir','reverse')
-axis([0 175 -0.05 1.05]);
-
-figure(4)
-plot(TimeN_sort_plot,fraction)
-hold on;
-plot(time_min_sort_plot,fraction)
-hold on;
-plot(time_max_sort_plot,fraction)
-ylabel('Simulated CDF');
-xlabel('Nucleation time [min]');
-title('Simulation of Nucleation Times (1000 Cycles)');
-legend('(1,1)','(1,4)','(2,2)','(4,4)','First vial','Last vial');
-%set(gca,'Xdir','reverse')
-axis([0 185 -0.05 1.05]);
-dim = [0.15 0.5 0.4 0.4];
-
-
-figure(44)
-plot(TimeF_sort_plot,fraction)
-hold on;
-plot(time_min_sort_plot_frozen,fraction)
-hold on;
-plot(time_max_sort_plot_frozen,fraction)
-ylabel('Simulated CDF');
-xlabel('Freezing time [min]');
-title('Simulation of Freezing Times (1000 Cycles)');
-legend('(1,1)','(1,4)','(2,2)','(4,4)','First vial','Last vial');
-%set(gca,'Xdir','reverse')
-axis([0 185 -0.05 1.05]);
-dim = [0.15 0.5 0.4 0.4];
-
-figure(444)
-plot(TimeS_sort_plot,fraction)
-hold on;
-plot(time_min_sort_plot_solid,fraction)
-hold on;
-plot(time_max_sort_plot_solid,fraction)
-ylabel('Simulated CDF');
-xlabel('Solidification time [min]');
-title('Simulation of Solidification Times (1000 Cycles)');
-legend('(1,1)','(1,4)','(2,2)','(4,4)','First vial','Last vial');
-%set(gca,'Xdir','reverse')
-axis([0 185 -0.05 1.05]);
-dim = [0.15 0.5 0.4 0.4];
-
-
-% %%
-% figure(5)
+% % %
+% figure(2)
+% plot(TimeN_sort_plot,fraction)
+% ylabel('Simulated CDF');
+% xlabel('Nucleation time [min]');
+% title('Simulation of Nucleation Times (2000 Cycles)');
+% legend('(1,1)','(1,4)','(2,2)','(4,4)');
+% %set(gca,'Xdir','reverse')
+% axis([0 175 -0.05 1.05]);
+% 
+% 
+% %% Find time when last vial nucleates
+% 
+% time_max_sort = sort(time_max_nuc,'ascend');
+% time_max_sort_plot = [0 time_max_sort(1) time_max_sort(:)' (10*time_max_sort(end))];
+% 
+% time_min_sort = sort(time_min_nuc,'ascend');
+% time_min_sort_plot = [0 time_min_sort(1) time_min_sort(:)' (10*time_min_sort(end))];
+% 
+% time_max_sort_frozen = sort(time_max_frozen,'ascend');
+% time_max_sort_plot_frozen = [0 time_max_sort_frozen(1) time_max_sort_frozen(:)' (10*time_max_sort_frozen(end))];
+% 
+% time_min_sort_frozen = sort(time_min_frozen,'ascend');
+% time_min_sort_plot_frozen = [0 time_min_sort_frozen(1) time_min_sort_frozen(:)' (10*time_min_sort_frozen(end))];
+% 
+% time_max_sort_solid = sort(time_max_solid,'ascend');
+% time_max_sort_plot_solid = [0 time_max_sort_solid(1) time_max_sort_solid(:)' (10*time_max_sort_solid(end))];
+% 
+% time_min_sort_solid = sort(time_min_solid,'ascend');
+% time_min_sort_plot_solid = [0 time_min_sort_solid(1) time_min_sort_solid(:)' (10*time_min_sort_solid(end))];
+% 
+% 
+% figure(3)
+% plot(time_max_sort_plot,fraction)
+% ylabel('Simulated CDF');
+% xlabel('Nucleation time [min]');
+% title('Nucleation time of last vial');
+% %set(gca,'Xdir','reverse')
+% axis([0 175 -0.05 1.05]);
+% 
+% figure(4)
+% plot(TimeN_sort_plot,fraction)
 % hold on;
-% plot(times,Temp_corner(:,1:5))
-% xlabel('Time [min]');
-% ylabel('Temperature [°C]');
-% title('Temperature Evolution of Corner Vial (1,1) in 5 Cycles');
-% axis([0 150 -40 21]);
-
-%% Nucleation times for first run
-
-time_firstrun = time_nuc(:,:,:,1)./60.*Dt; %min
-
-time_nuc_mean = xyz;
-time_nuc_std = xyz;
-
-time_frozen_mean = xyz;
-time_frozen_std = xyz;
-
-for a=1:x
-    for d=1:y
-        for c=1:z
-            time_nuc_mean(a,d,c) = sum(time_nuc(a,d,c,:))/(60*N)*Dt;
-            time_frozen_mean(a,d,c) = sum(time_frozen(a,d,c,:)-time_nuc(a,d,c,:))/(60*N)*Dt;
-            time_nuc_std(a,d,c) = std(time_nuc(a,d,c,:))/60.*Dt;
-            time_frozen_std(a,d,c) = std(time_frozen(a,d,c,:)-time_nuc(a,d,c,:))/60.*Dt;
-        end
-    end
-end
-
-%% Individual solidification times for a single batch:
-time_frozen_1 = time_frozen(:,:,:,1)./60;
-time_nuc_1 = time_nuc(:,:,:,1)./60;
-temp_nuc_1 = temp_nuc(:,:,:,1);
-
-time_solid_1 = (time_frozen(:,:,:,1) - time_nuc(:,:,:,1))./60.*Dt;
-
-%% Differentiate temperature profile to identify nucleation events
-% The idea here is that we would see spikes at the times when the
-% neighboring vials nucleate (which is indeed true)
-
-% T1 = Temp(:,1); %temperature profile of core vial in first run
-% T1_diff = diff(T1);
-%
-% figure(6)
-% plot(times(2:end),T1_diff.*Dt)
-% xlabel('Time [min]');
-% ylabel('Temperature Change [K/s]');
-% title('dT/dt Profile of Core Vial (2,2,2) in 1 Cycle');
-% axis([0 150 -0.01 0.01]);
-
-
-%% Freezing distributions for presentations
-%creation of histograms to show how the nucleation/solid/freeze times vary
-
-%histograms for all vials for all runs
-
-figure(11)
-histogram(time_nuc./60.*Dt, 'BinWidth',1,'Normalization','probability')
-xlabel('Nucleation time [min]');
-ylabel('Normalized Distribution [min$$^{-1}$$]','interpreter','latex');
-%title('Histogram of all nucleation times for 1000 cycles');
-axis([80 160 0 0.2]);
-dim = [0.4 0.5 0.4 0.4];
-
-%%
-figure(12)
-histogram(time_solid./60.*Dt, 'BinWidth',1,'Normalization','probability')
-xlabel('Solidification time [min]');
-ylabel('Counts');
-title('Histogram of all solidification times for 1000 cycles');
-axis([0 60 0 1]);
-dim = [0.63 0.5 0.4 0.4];
-
-
-%%
-figure(13)
-histogram(time_frozen./60.*Dt, 'BinWidth',1)
-xlabel('Freezing time [min]');
-ylabel('Counts');
-axis([60 180 0 5000]);
-title('Histogram of all freezing times for 1000 cycles');
-
-%%
-figure(14)
-histogram(temp_nuc, 'BinWidth',0.2)
-xlabel('Nucleation Temperature [°C]');
-ylabel('Counts');
-axis([-20 0 0 5000]);
-title('Histogram of all nucleation temperatures for 1000 cycles');
-
-
-figure(17)
-histogram(time_nuc(1,1,1,:)./60.*Dt, 'BinWidth',1)
-xlabel('Nucleation time [min]');
-ylabel('Counts');
-axis([60 180 0 500]);
-title('Histogram of corner vial (1,1) nucleation times for 1000 cycles');
-
-%%
-figure(18)
-histogram(time_solid(1,1,1,:)./60.*Dt,'BinWidth',1)
-xlabel('Solidification time [min]');
-ylabel('Counts');
-axis([0 60 0 500]);
-
-
-figure(19)
-histogram(time_frozen(1,1,1,:)./60.*Dt, 'BinWidth',1)
-xlabel('Freezing time [min]');
-ylabel('Counts');
-axis([60 180 0 500]);
-title('Histogram of corner vial (1,1) freezing times for 1000 cycles');
-
-
-%histograms for single corner vials for all runs
-
-figure(20)
-histogram(time_nuc(4,4,1,:)./60.*Dt, 'BinWidth',1,'FaceColor', 'magenta')
-xlabel('Nucleation time [min]');
-ylabel('Counts');
-axis([60 180 0 500]);
-title('Histogram of center vial (4,4) nucleation times for 1000 cycles');
-
-
-figure(21)
-histogram(time_solid(4,4,1,:)./60.*Dt, 'BinWidth',1,'FaceColor', 'magenta')
-xlabel('Solidification time [min]');
-ylabel('Counts');
-axis([0 60 0 500]);
-title('Histogram of center vial (4,4) solidification times for 1000 cycles');
-
-
-figure(22)
-histogram(time_frozen(4,4,1,:)./60.*Dt, 'BinWidth',1,'FaceColor', 'magenta')
-xlabel('Freezing time [min]');
-ylabel('Counts');
-axis([60 180 0 500]);
-title('Histogram of center vial (4,4) freezing times for 1000 cycles');
-
-
-%% More figures: Bivariate histograms
-
-Nucedges = linspace(0,200,401);
-Soledges = linspace(0,100,201);
-Tempedges = linspace(-30,-5,501);
-
-figure(1000)
-histogram2(Time_nuc_all(:,:,1,:), Time_solid_all(:,:,1,:),Nucedges,Soledges,'DisplayStyle','tile','Normalization','probability')
-title('Nucleation times vs. Solidification times');
-xlabel('Nucleation time [min]');
-ylabel('Solidification time [min]');
-cb = colorbar;
-cb.Label.String = 'Normalized probability';
-
-
-figure(1001)
-histogram2(Time_nuc_all(:,:,1,:), Temp_nuc_all(:,:,1,:),Nucedges,Tempedges,'DisplayStyle','tile','Normalization','probability')
-title('Nucleation times vs. Nucleation temperatures');
-xlabel('Nucleation time [min]');
-ylabel('Nucleation temperatures [°C]');
-cb = colorbar;
-cb.Label.String = 'Normalized probability';
-
-figure(1002)
-histogram2(Time_solid_all(:,:,1,:), Temp_nuc_all(:,:,1,:),Soledges,Tempedges,'DisplayStyle','tile','Normalization','probability')
-title('Solidification times vs. Nucleation temperatures');
-xlabel('Solidification time [min]');
-ylabel('Nucleation temperatures [°C]');
-cb = colorbar;
-cb.Label.String = 'Normalized probability';
-
-hfig = figure(1003);
-pos = get(hfig,'position');
-set(hfig,'position',pos.*[.5 1 2 1])
-sgtitle('Correlations between the characteristic quantities')
-subplot(1,3,1)
-histogram2(Time_nuc_all(:,:,1,:), Time_solid_all(:,:,1,:),Nucedges,Soledges,'DisplayStyle','tile','Normalization','probability')
-title('(a)');
-xlabel('Nucleation time [min]');
-ylabel('Solidification time [min]');
-cb = colorbar;
-cb.Label.String = 'Normalized probability';
-subplot(1,3,2)
-histogram2(Time_nuc_all(:,:,1,:), Temp_nuc_all(:,:,1,:),Nucedges,Tempedges,'DisplayStyle','tile','Normalization','probability')
-title('(b)');
-xlabel('Nucleation time [min]');
-ylabel('Nucleation temperatures [°C]');
-cb = colorbar;
-cb.Label.String = 'Normalized probability';
-subplot(1,3,3)
-histogram2(Time_solid_all(:,:,1,:), Temp_nuc_all(:,:,1,:),Soledges,Tempedges,'DisplayStyle','tile','Normalization','probability')
-title('(c)');
-xlabel('Solidification time [min]');
-ylabel('Nucleation temperatures [°C]');
-cb = colorbar;
-cb.Label.String = 'Normalized probability';
-
-%% Plot temperature curves
-
-figure(100)
-plot(t_time./3600,T_ext,'LineWidth',1)
-hold on;
+% plot(time_min_sort_plot,fraction)
+% hold on;
+% plot(time_max_sort_plot,fraction)
+% ylabel('Simulated CDF');
+% xlabel('Nucleation time [min]');
+% title('Simulation of Nucleation Times (1000 Cycles)');
+% legend('(1,1)','(1,4)','(2,2)','(4,4)','First vial','Last vial');
+% %set(gca,'Xdir','reverse')
+% axis([0 185 -0.05 1.05]);
+% dim = [0.15 0.5 0.4 0.4];
+% 
+% 
+% figure(44)
+% plot(TimeF_sort_plot,fraction)
+% hold on;
+% plot(time_min_sort_plot_frozen,fraction)
+% hold on;
+% plot(time_max_sort_plot_frozen,fraction)
+% ylabel('Simulated CDF');
+% xlabel('Freezing time [min]');
+% title('Simulation of Freezing Times (1000 Cycles)');
+% legend('(1,1)','(1,4)','(2,2)','(4,4)','First vial','Last vial');
+% %set(gca,'Xdir','reverse')
+% axis([0 185 -0.05 1.05]);
+% dim = [0.15 0.5 0.4 0.4];
+% 
+% figure(444)
+% plot(TimeS_sort_plot,fraction)
+% hold on;
+% plot(time_min_sort_plot_solid,fraction)
+% hold on;
+% plot(time_max_sort_plot_solid,fraction)
+% ylabel('Simulated CDF');
+% xlabel('Solidification time [min]');
+% title('Simulation of Solidification Times (1000 Cycles)');
+% legend('(1,1)','(1,4)','(2,2)','(4,4)','First vial','Last vial');
+% %set(gca,'Xdir','reverse')
+% axis([0 185 -0.05 1.05]);
+% dim = [0.15 0.5 0.4 0.4];
+% 
+% 
+% % %%
+% % figure(5)
+% % hold on;
+% % plot(times,Temp_corner(:,1:5))
+% % xlabel('Time [min]');
+% % ylabel('Temperature [°C]');
+% % title('Temperature Evolution of Corner Vial (1,1) in 5 Cycles');
+% % axis([0 150 -40 21]);
+% 
+% %% Nucleation times for first run
+% 
+% time_firstrun = time_nuc(:,:,:,1)./60.*Dt; %min
+% 
+% time_nuc_mean = xyz;
+% time_nuc_std = xyz;
+% 
+% time_frozen_mean = xyz;
+% time_frozen_std = xyz;
+% 
+% for a=1:x
+%     for d=1:y
+%         for c=1:z
+%             time_nuc_mean(a,d,c) = sum(time_nuc(a,d,c,:))/(60*N)*Dt;
+%             time_frozen_mean(a,d,c) = sum(time_frozen(a,d,c,:)-time_nuc(a,d,c,:))/(60*N)*Dt;
+%             time_nuc_std(a,d,c) = std(time_nuc(a,d,c,:))/60.*Dt;
+%             time_frozen_std(a,d,c) = std(time_frozen(a,d,c,:)-time_nuc(a,d,c,:))/60.*Dt;
+%         end
+%     end
+% end
+% 
+% %% Individual solidification times for a single batch:
+% time_frozen_1 = time_frozen(:,:,:,1)./60;
+% time_nuc_1 = time_nuc(:,:,:,1)./60;
+% temp_nuc_1 = temp_nuc(:,:,:,1);
+% 
+% time_solid_1 = (time_frozen(:,:,:,1) - time_nuc(:,:,:,1))./60.*Dt;
+% 
+% %% Differentiate temperature profile to identify nucleation events
+% % The idea here is that we would see spikes at the times when the
+% % neighboring vials nucleate (which is indeed true)
+% 
+% % T1 = Temp(:,1); %temperature profile of core vial in first run
+% % T1_diff = diff(T1);
+% %
+% % figure(6)
+% % plot(times(2:end),T1_diff.*Dt)
+% % xlabel('Time [min]');
+% % ylabel('Temperature Change [K/s]');
+% % title('dT/dt Profile of Core Vial (2,2,2) in 1 Cycle');
+% % axis([0 150 -0.01 0.01]);
+% 
+% 
+% %% Freezing distributions for presentations
+% %creation of histograms to show how the nucleation/solid/freeze times vary
+% 
+% %histograms for all vials for all runs
+% 
+% figure(11)
+% histogram(time_nuc./60.*Dt, 'BinWidth',1,'Normalization','probability')
+% xlabel('Nucleation time [min]');
+% ylabel('Normalized Distribution [min$$^{-1}$$]','interpreter','latex');
+% %title('Histogram of all nucleation times for 1000 cycles');
+% axis([80 160 0 0.2]);
+% dim = [0.4 0.5 0.4 0.4];
+% 
+% %%
+% figure(12)
+% histogram(time_solid./60.*Dt, 'BinWidth',1,'Normalization','probability')
+% xlabel('Solidification time [min]');
+% ylabel('Counts');
+% title('Histogram of all solidification times for 1000 cycles');
+% axis([0 60 0 1]);
+% dim = [0.63 0.5 0.4 0.4];
+% 
+% 
+% %%
+% figure(13)
+% histogram(time_frozen./60.*Dt, 'BinWidth',1)
+% xlabel('Freezing time [min]');
+% ylabel('Counts');
+% axis([60 180 0 5000]);
+% title('Histogram of all freezing times for 1000 cycles');
+% 
+% %%
+% figure(14)
+% histogram(temp_nuc, 'BinWidth',0.2)
+% xlabel('Nucleation Temperature [°C]');
+% ylabel('Counts');
+% axis([-20 0 0 5000]);
+% title('Histogram of all nucleation temperatures for 1000 cycles');
+% 
+% 
+% figure(17)
+% histogram(time_nuc(1,1,1,:)./60.*Dt, 'BinWidth',1)
+% xlabel('Nucleation time [min]');
+% ylabel('Counts');
+% axis([60 180 0 500]);
+% title('Histogram of corner vial (1,1) nucleation times for 1000 cycles');
+% 
+% %%
+% figure(18)
+% histogram(time_solid(1,1,1,:)./60.*Dt,'BinWidth',1)
+% xlabel('Solidification time [min]');
+% ylabel('Counts');
+% axis([0 60 0 500]);
+% 
+% 
+% figure(19)
+% histogram(time_frozen(1,1,1,:)./60.*Dt, 'BinWidth',1)
+% xlabel('Freezing time [min]');
+% ylabel('Counts');
+% axis([60 180 0 500]);
+% title('Histogram of corner vial (1,1) freezing times for 1000 cycles');
+% 
+% 
+% %histograms for single corner vials for all runs
+% 
+% figure(20)
+% histogram(time_nuc(4,4,1,:)./60.*Dt, 'BinWidth',1,'FaceColor', 'magenta')
+% xlabel('Nucleation time [min]');
+% ylabel('Counts');
+% axis([60 180 0 500]);
+% title('Histogram of center vial (4,4) nucleation times for 1000 cycles');
+% 
+% 
+% figure(21)
+% histogram(time_solid(4,4,1,:)./60.*Dt, 'BinWidth',1,'FaceColor', 'magenta')
+% xlabel('Solidification time [min]');
+% ylabel('Counts');
+% axis([0 60 0 500]);
+% title('Histogram of center vial (4,4) solidification times for 1000 cycles');
+% 
+% 
+% figure(22)
+% histogram(time_frozen(4,4,1,:)./60.*Dt, 'BinWidth',1,'FaceColor', 'magenta')
+% xlabel('Freezing time [min]');
+% ylabel('Counts');
+% axis([60 180 0 500]);
+% title('Histogram of center vial (4,4) freezing times for 1000 cycles');
+% 
+% 
+% %% More figures: Bivariate histograms
+% 
+% Nucedges = linspace(0,200,401);
+% Soledges = linspace(0,100,201);
+% Tempedges = linspace(-30,-5,501);
+% 
+% figure(1000)
+% histogram2(Time_nuc_all(:,:,1,:), Time_solid_all(:,:,1,:),Nucedges,Soledges,'DisplayStyle','tile','Normalization','probability')
+% title('Nucleation times vs. Solidification times');
+% xlabel('Nucleation time [min]');
+% ylabel('Solidification time [min]');
+% cb = colorbar;
+% cb.Label.String = 'Normalized probability';
+% 
+% 
+% figure(1001)
+% histogram2(Time_nuc_all(:,:,1,:), Temp_nuc_all(:,:,1,:),Nucedges,Tempedges,'DisplayStyle','tile','Normalization','probability')
+% title('Nucleation times vs. Nucleation temperatures');
+% xlabel('Nucleation time [min]');
+% ylabel('Nucleation temperatures [°C]');
+% cb = colorbar;
+% cb.Label.String = 'Normalized probability';
+% 
+% figure(1002)
+% histogram2(Time_solid_all(:,:,1,:), Temp_nuc_all(:,:,1,:),Soledges,Tempedges,'DisplayStyle','tile','Normalization','probability')
+% title('Solidification times vs. Nucleation temperatures');
+% xlabel('Solidification time [min]');
+% ylabel('Nucleation temperatures [°C]');
+% cb = colorbar;
+% cb.Label.String = 'Normalized probability';
+% 
+% hfig = figure(1003);
+% pos = get(hfig,'position');
+% set(hfig,'position',pos.*[.5 1 2 1])
+% sgtitle('Correlations between the characteristic quantities')
+% subplot(1,3,1)
+% histogram2(Time_nuc_all(:,:,1,:), Time_solid_all(:,:,1,:),Nucedges,Soledges,'DisplayStyle','tile','Normalization','probability')
+% title('(a)');
+% xlabel('Nucleation time [min]');
+% ylabel('Solidification time [min]');
+% cb = colorbar;
+% cb.Label.String = 'Normalized probability';
+% subplot(1,3,2)
+% histogram2(Time_nuc_all(:,:,1,:), Temp_nuc_all(:,:,1,:),Nucedges,Tempedges,'DisplayStyle','tile','Normalization','probability')
+% title('(b)');
+% xlabel('Nucleation time [min]');
+% ylabel('Nucleation temperatures [°C]');
+% cb = colorbar;
+% cb.Label.String = 'Normalized probability';
+% subplot(1,3,3)
+% histogram2(Time_solid_all(:,:,1,:), Temp_nuc_all(:,:,1,:),Soledges,Tempedges,'DisplayStyle','tile','Normalization','probability')
+% title('(c)');
+% xlabel('Solidification time [min]');
+% ylabel('Nucleation temperatures [°C]');
+% cb = colorbar;
+% cb.Label.String = 'Normalized probability';
+% 
+% %% Plot temperature curves
+% 
+% figure(100)
+% plot(t_time./3600,T_ext,'LineWidth',1)
+% hold on;
+% % plot(t_time./3600,temp_corner_all(:,1),'LineWidth',1)
+% % plot(t_time./3600,temp_edge_all(:,1),'LineWidth',1)
+% plot(t_time./3600,temp_center_all(:,1:3),'LineWidth',1)
+% yline(0,'b--','T$$_{eq}$$','interpreter','latex','FontSize',12)
+% yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
+% %title('(b) Thermally interacting vials: Stochasticity','interpreter','latex','FontSize',14)
+% title('(a) Thermally independent vials: Stochasticity','interpreter','latex','FontSize',14)
+% ylabel('Temperature [$$^{\circ}$$C]','FontSize',14,'interpreter','latex');
+% xlabel('Process time [h]','interpreter','latex','FontSize',14)
+% %legend('Shelf','Corner vial','Edge vial','Center vial')
+% legend('Shelf','First simulation','Second simulation','Third simulation','interpreter','latex')
+% axis([0 5 -55 25])
+% %xticks(linspace(0,16,9))
+% 
+% figure(101)
+% plot(t_time./3600,T_ext,'LineWidth',1)
+% hold on;
 % plot(t_time./3600,temp_corner_all(:,1),'LineWidth',1)
 % plot(t_time./3600,temp_edge_all(:,1),'LineWidth',1)
-plot(t_time./3600,temp_center_all(:,1:3),'LineWidth',1)
-yline(0,'b--','T$$_{eq}$$','interpreter','latex','FontSize',12)
-yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
-%title('(b) Thermally interacting vials: Stochasticity','interpreter','latex','FontSize',14)
-title('(a) Thermally independent vials: Stochasticity','interpreter','latex','FontSize',14)
-ylabel('Temperature [$$^{\circ}$$C]','FontSize',14,'interpreter','latex');
-xlabel('Process time [h]','interpreter','latex','FontSize',14)
-%legend('Shelf','Corner vial','Edge vial','Center vial')
-legend('Shelf','First simulation','Second simulation','Third simulation','interpreter','latex')
-axis([0 5 -55 25])
-%xticks(linspace(0,16,9))
-
-figure(101)
-plot(t_time./3600,T_ext,'LineWidth',1)
-hold on;
-plot(t_time./3600,temp_corner_all(:,1),'LineWidth',1)
-plot(t_time./3600,temp_edge_all(:,1),'LineWidth',1)
-plot(t_time./3600,temp_center_all(:,1),'LineWidth',1)
-yline(0,'b--','T$$_{eq}$$','interpreter','latex','FontSize',12)
-yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
-title('(b) Thermally interacting vials: Position','interpreter','latex','FontSize',14)
-ylabel('Temperature [$$^{\circ}$$C]','FontSize',14,'interpreter','latex');
-xlabel('Process time [h]','interpreter','latex','FontSize',14)
-legend('Shelf','Corner vial','Edge vial','Center vial','interpreter','latex')
-axis([0 15 -55 25])
-xticks(linspace(0,16,9))
-
-
-figure(102)
-t = tiledlayout(1,2,'TileSpacing','Compact');
-%Tile 1: 0
-hn(1) = nexttile();
-plot(t_time./3600,T_ext,'LineWidth',1)
-hold on;
-plot(t_time./3600,temp_center_all(:,8:10),'LineWidth',1)
-yline(0,'b--','T$$_{eq}$$','interpreter','latex','FontSize',12)
-yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
-title('(a)','interpreter','latex','FontSize',14)
-legend('Shelf','First simulation','Second simulation','Third simulation','interpreter','latex')
-axis([0 5 -55 25])
-grid on;
-
-%Tile 2: 10
-hn(2) = nexttile();
-plot(t_time./3600,T_ext,'LineWidth',1)
-hold on;
-plot(t_time./3600,temp_center_all(:,8:10),'LineWidth',1)
-yline(0,'b--','interpreter','latex','FontSize',12)
-yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
-title('(b)','interpreter','latex','FontSize',14)
-legend('Shelf','First simulation','Second simulation','Third simulation','interpreter','latex')
-axis([1.45 3 -15 5])
-grid on;
-
-title(t,'Thermally interacting vials: Stochasticity','interpreter','latex','FontSize',14)
-ylabel(t,'Temperature [$$^{\circ}$$C]','FontSize',14,'interpreter','latex')
-xlabel(t,'Process time [h]','FontSize',14,'interpreter','latex')
-
-figure(103)
-plot(t_time./3600,sigma_center_all(:,10))
-
-temp_diff1 = diff(temp_center_all(:,1));
-temp_diff2 = diff(diff(temp_center_all(:,1)));
-
-figure(104)
-plot(t_time(2:end)./3600,temp_diff1)
-axis([2 2.7 -10e-3 10e-3])
-
-figure(105)
-plot(t_time(2:end-1)./3600,temp_diff2)
-axis([2 2.7 -10e-6 10e-6])
-%%
-figure(106)
-plot(t_time./3600,T_ext,'LineWidth',1)
-hold on;
-plot(t_time./3600,temp_center_all(:,1:3),'LineWidth',1)
-yline(0,'b--','T$$_{eq}$$','interpreter','latex','FontSize',12)
-yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
-title('Controlled Nucleation: Setup I','interpreter','latex','FontSize',14)
-legend('Shelf temperature','First simulation','Second simulation','Third simulation','interpreter','latex','FontSize',12)
-xlabel('Process time [hr]','interpreter','latex','FontSize',14)
-ylabel('Temperature [$$^{\circ}$$C]','interpreter','latex','FontSize',14)
-axis([0 14 -51 21])
-grid on;
-
-figure(107)
-plot(t_time./3600,T_ext,'LineWidth',1)
-hold on;
-plot(t_time./3600,temp_corner_all(:,1),'LineWidth',1)
-plot(t_time./3600,temp_edge_all(:,1),'LineWidth',1)
-plot(t_time./3600,temp_center_all(:,1),'LineWidth',1)
-yline(0,'b--','T$$_{eq}$$','interpreter','latex','FontSize',12)
-yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
-title('Controlled Nucleation: Setup III','interpreter','latex','FontSize',14)
-legend('Shelf temperature','Corner vial','Edge vial','Center vial','interpreter','latex','FontSize',12)
-xlabel('Process time [hr]','interpreter','latex','FontSize',14)
-ylabel('Temperature [$$^{\circ}$$C]','interpreter','latex','FontSize',14)
-axis([0 14 -51 21])
-grid on;
-%% Save variables
-
-% temp_nuc_20022020_c05 = Temp_nuc_all;
-% time_nuc_20022020_c05 = Time_nuc_all;
-% time_solid_20022020_c05 = Time_solid_all;
-% temp_hold_20022020_c05 = hold_final;
-%
-% save('v8_20022020_c05.mat','temp_nuc_20022020_c05',...
-% 'time_nuc_20022020_c05','time_solid_20022020_c05','temp_hold_20022020_c05')
-%
-%
-% temp_nuc_20022000_c05_h1m5 = Temp_nuc_all;
-% time_nuc_20022000_c05_h1m5 = Time_nuc_all;
-% time_solid_20022000_c05_h1m5 = Time_solid_all;
-% temp_hold_20022000_c05_h1m5 = hold_final;
-%
-% save('v8_20022000_c05_h1m5.mat','temp_nuc_20022000_c05_h1m5',...
-% 'time_nuc_20022000_c05_h1m5','time_solid_20022000_c05_h1m5','temp_hold_20022000_c05_h1m5')
-%
-%
-% temp_nuc_20022020_c05_h540m12 = Temp_nuc_all;
-% time_nuc_20022020_c05_h540m12 = Time_nuc_all;
-% time_solid_20022020_c05_h540m12 = Time_solid_all;
-% temp_hold_20022020_c05_h540m12 = hold_final;
-%
-% save('v8e_20022020_c05_h540m12.mat','temp_nuc_20022020_c05_h540m12',...
-% 'time_nuc_20022020_c05_h540m12','time_solid_20022020_c05_h540m12','temp_hold_20022020_c05_h540m12')
-
-%%
-% temp_nuc_20022020_c05_c180m5h360m10 = Temp_nuc_all;
-% time_nuc_20022020_c05_c180m5h360m10 = Time_nuc_all;
-% time_solid_20022020_c05_c180m5h360m10 = Time_solid_all;
-% temp_hold_20022020_c05_c180m5h360m10 = hold_final;
-%
-% save('ssie_20022020_c05_c180m5h360m10.mat','temp_nuc_20022020_c05_c180m5h360m10',...
-% 'time_nuc_20022020_c05_c180m5h360m10','time_solid_20022020_c05_c180m5h360m10','temp_hold_20022020_c05_c180m5h360m10')
-
-% temp_nuc_20020020_c05_c180m5ramp = Temp_nuc_all;
-% time_nuc_20020020_c05_c180m5ramp = Time_nuc_all;
-% time_solid_20020020_c05_c180m5ramp = Time_solid_all;
-% temp_hold_20020020_c05_c180m5ramp = hold_final;
-%
-% save('v8_20020020_c05_c180m5ramp.mat','temp_nuc_20020020_c05_c180m5ramp',...
-% 'time_nuc_20020020_c05_c180m5ramp','time_solid_20020020_c05_c180m5ramp','temp_hold_20020020_c05_c180m5ramp')
-%
-
-% temp_nuc_20022020_c05_h640m12 = Temp_nuc_all;
-% time_nuc_20022020_c05_h640m12 = Time_nuc_all;
-% time_solid_20022020_c05_h640m12 = Time_solid_all;
-% temp_hold_20022020_c05_h640m12 = hold_final;
-%
-% save('ssie_20022020_c05_h640m12.mat','temp_nuc_20022020_c05_h640m12',...
-% 'time_nuc_20022020_c05_h640m12','time_solid_20022020_c05_h640m12','temp_hold_20022020_c05_h640m12')
-%
-% temp_nuc_20003000_c05_low = Temp_nuc_all;
-% time_nuc_20003000_c05_low = Time_nuc_all;
-% time_solid_20003000_c05_low = Time_solid_all;
-% temp_hold_20003000_c05_low = hold_final;
-%
-% save('ssie_20003000_c05_low.mat','temp_nuc_20003000_c05_low',...
-% 'time_nuc_20003000_c05_low','time_solid_20003000_c05_low','temp_hold_20003000_c05_low')
-%
-
-% temp_nuc_20002000_c05_4900s = Temp_nuc_all;
-% time_nuc_20002000_c05_4900s = Time_nuc_all;
-% time_solid_20002000_c05_4900s = Time_solid_all;
-% temp_hold_20002000_c05_4900s = hold_final;
-%
-% save('ssie_20002000_c05_4900s.mat','temp_nuc_20002000_c05_4900s',...
-% 'time_nuc_20002000_c05_4900s','time_solid_20002000_c05_4900s','temp_hold_20002000_c05_4900s')
-%
-% temp_nuc_20000000_c05n_dt100 = Temp_nuc_all;
-% time_nuc_20000000_c05n_dt100 = Time_nuc_all;
-% time_solid_20000000_c05n_dt100 = Time_solid_all;
-% temp_hold_20000000_c05n_dt100 = hold_final;
-%
-% save('ssie_20000000_c05n_dt100.mat','temp_nuc_20000000_c05n_dt100',...
-% 'time_nuc_20000000_c05n_dt100','time_solid_20000000_c05n_dt100','temp_hold_20000000_c05n_dt100')
-
-% temp_profile05 = temp_center_all(:,1);
-% save('tempcurvenonuc05.mat','temp_profile05')
+% plot(t_time./3600,temp_center_all(:,1),'LineWidth',1)
+% yline(0,'b--','T$$_{eq}$$','interpreter','latex','FontSize',12)
+% yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
+% title('(b) Thermally interacting vials: Position','interpreter','latex','FontSize',14)
+% ylabel('Temperature [$$^{\circ}$$C]','FontSize',14,'interpreter','latex');
+% xlabel('Process time [h]','interpreter','latex','FontSize',14)
+% legend('Shelf','Corner vial','Edge vial','Center vial','interpreter','latex')
+% axis([0 15 -55 25])
+% xticks(linspace(0,16,9))
+% 
+% 
+% figure(102)
+% t = tiledlayout(1,2,'TileSpacing','Compact');
+% %Tile 1: 0
+% hn(1) = nexttile();
+% plot(t_time./3600,T_ext,'LineWidth',1)
+% hold on;
+% plot(t_time./3600,temp_center_all(:,8:10),'LineWidth',1)
+% yline(0,'b--','T$$_{eq}$$','interpreter','latex','FontSize',12)
+% yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
+% title('(a)','interpreter','latex','FontSize',14)
+% legend('Shelf','First simulation','Second simulation','Third simulation','interpreter','latex')
+% axis([0 5 -55 25])
+% grid on;
+% 
+% %Tile 2: 10
+% hn(2) = nexttile();
+% plot(t_time./3600,T_ext,'LineWidth',1)
+% hold on;
+% plot(t_time./3600,temp_center_all(:,8:10),'LineWidth',1)
+% yline(0,'b--','interpreter','latex','FontSize',12)
+% yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
+% title('(b)','interpreter','latex','FontSize',14)
+% legend('Shelf','First simulation','Second simulation','Third simulation','interpreter','latex')
+% axis([1.45 3 -15 5])
+% grid on;
+% 
+% title(t,'Thermally interacting vials: Stochasticity','interpreter','latex','FontSize',14)
+% ylabel(t,'Temperature [$$^{\circ}$$C]','FontSize',14,'interpreter','latex')
+% xlabel(t,'Process time [h]','FontSize',14,'interpreter','latex')
+% 
+% figure(103)
+% plot(t_time./3600,sigma_center_all(:,10))
+% 
+% temp_diff1 = diff(temp_center_all(:,1));
+% temp_diff2 = diff(diff(temp_center_all(:,1)));
+% 
+% figure(104)
+% plot(t_time(2:end)./3600,temp_diff1)
+% axis([2 2.7 -10e-3 10e-3])
+% 
+% figure(105)
+% plot(t_time(2:end-1)./3600,temp_diff2)
+% axis([2 2.7 -10e-6 10e-6])
+% %%
+% figure(106)
+% plot(t_time./3600,T_ext,'LineWidth',1)
+% hold on;
+% plot(t_time./3600,temp_center_all(:,1:3),'LineWidth',1)
+% yline(0,'b--','T$$_{eq}$$','interpreter','latex','FontSize',12)
+% yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
+% title('Controlled Nucleation: Setup I','interpreter','latex','FontSize',14)
+% legend('Shelf temperature','First simulation','Second simulation','Third simulation','interpreter','latex','FontSize',12)
+% xlabel('Process time [hr]','interpreter','latex','FontSize',14)
+% ylabel('Temperature [$$^{\circ}$$C]','interpreter','latex','FontSize',14)
+% axis([0 14 -51 21])
+% grid on;
+% 
+% figure(107)
+% plot(t_time./3600,T_ext,'LineWidth',1)
+% hold on;
+% plot(t_time./3600,temp_corner_all(:,1),'LineWidth',1)
+% plot(t_time./3600,temp_edge_all(:,1),'LineWidth',1)
+% plot(t_time./3600,temp_center_all(:,1),'LineWidth',1)
+% yline(0,'b--','T$$_{eq}$$','interpreter','latex','FontSize',12)
+% yline(-9,'r--','K = 1h$$^{-1}$$','interpreter','latex','FontSize',12) % Temperature where we have one nucleation event per hour
+% title('Controlled Nucleation: Setup III','interpreter','latex','FontSize',14)
+% legend('Shelf temperature','Corner vial','Edge vial','Center vial','interpreter','latex','FontSize',12)
+% xlabel('Process time [hr]','interpreter','latex','FontSize',14)
+% ylabel('Temperature [$$^{\circ}$$C]','interpreter','latex','FontSize',14)
+% axis([0 14 -51 21])
+% grid on;
+% %% Save variables
+% 
+% % temp_nuc_20022020_c05 = Temp_nuc_all;
+% % time_nuc_20022020_c05 = Time_nuc_all;
+% % time_solid_20022020_c05 = Time_solid_all;
+% % temp_hold_20022020_c05 = hold_final;
+% %
+% % save('v8_20022020_c05.mat','temp_nuc_20022020_c05',...
+% % 'time_nuc_20022020_c05','time_solid_20022020_c05','temp_hold_20022020_c05')
+% %
+% %
+% % temp_nuc_20022000_c05_h1m5 = Temp_nuc_all;
+% % time_nuc_20022000_c05_h1m5 = Time_nuc_all;
+% % time_solid_20022000_c05_h1m5 = Time_solid_all;
+% % temp_hold_20022000_c05_h1m5 = hold_final;
+% %
+% % save('v8_20022000_c05_h1m5.mat','temp_nuc_20022000_c05_h1m5',...
+% % 'time_nuc_20022000_c05_h1m5','time_solid_20022000_c05_h1m5','temp_hold_20022000_c05_h1m5')
+% %
+% %
+% % temp_nuc_20022020_c05_h540m12 = Temp_nuc_all;
+% % time_nuc_20022020_c05_h540m12 = Time_nuc_all;
+% % time_solid_20022020_c05_h540m12 = Time_solid_all;
+% % temp_hold_20022020_c05_h540m12 = hold_final;
+% %
+% % save('v8e_20022020_c05_h540m12.mat','temp_nuc_20022020_c05_h540m12',...
+% % 'time_nuc_20022020_c05_h540m12','time_solid_20022020_c05_h540m12','temp_hold_20022020_c05_h540m12')
+% 
+% %%
+% % temp_nuc_20022020_c05_c180m5h360m10 = Temp_nuc_all;
+% % time_nuc_20022020_c05_c180m5h360m10 = Time_nuc_all;
+% % time_solid_20022020_c05_c180m5h360m10 = Time_solid_all;
+% % temp_hold_20022020_c05_c180m5h360m10 = hold_final;
+% %
+% % save('ssie_20022020_c05_c180m5h360m10.mat','temp_nuc_20022020_c05_c180m5h360m10',...
+% % 'time_nuc_20022020_c05_c180m5h360m10','time_solid_20022020_c05_c180m5h360m10','temp_hold_20022020_c05_c180m5h360m10')
+% 
+% % temp_nuc_20020020_c05_c180m5ramp = Temp_nuc_all;
+% % time_nuc_20020020_c05_c180m5ramp = Time_nuc_all;
+% % time_solid_20020020_c05_c180m5ramp = Time_solid_all;
+% % temp_hold_20020020_c05_c180m5ramp = hold_final;
+% %
+% % save('v8_20020020_c05_c180m5ramp.mat','temp_nuc_20020020_c05_c180m5ramp',...
+% % 'time_nuc_20020020_c05_c180m5ramp','time_solid_20020020_c05_c180m5ramp','temp_hold_20020020_c05_c180m5ramp')
+% %
+% 
+% % temp_nuc_20022020_c05_h640m12 = Temp_nuc_all;
+% % time_nuc_20022020_c05_h640m12 = Time_nuc_all;
+% % time_solid_20022020_c05_h640m12 = Time_solid_all;
+% % temp_hold_20022020_c05_h640m12 = hold_final;
+% %
+% % save('ssie_20022020_c05_h640m12.mat','temp_nuc_20022020_c05_h640m12',...
+% % 'time_nuc_20022020_c05_h640m12','time_solid_20022020_c05_h640m12','temp_hold_20022020_c05_h640m12')
+% %
+% % temp_nuc_20003000_c05_low = Temp_nuc_all;
+% % time_nuc_20003000_c05_low = Time_nuc_all;
+% % time_solid_20003000_c05_low = Time_solid_all;
+% % temp_hold_20003000_c05_low = hold_final;
+% %
+% % save('ssie_20003000_c05_low.mat','temp_nuc_20003000_c05_low',...
+% % 'time_nuc_20003000_c05_low','time_solid_20003000_c05_low','temp_hold_20003000_c05_low')
+% %
+% 
+% % temp_nuc_20002000_c05_4900s = Temp_nuc_all;
+% % time_nuc_20002000_c05_4900s = Time_nuc_all;
+% % time_solid_20002000_c05_4900s = Time_solid_all;
+% % temp_hold_20002000_c05_4900s = hold_final;
+% %
+% % save('ssie_20002000_c05_4900s.mat','temp_nuc_20002000_c05_4900s',...
+% % 'time_nuc_20002000_c05_4900s','time_solid_20002000_c05_4900s','temp_hold_20002000_c05_4900s')
+% %
+% % temp_nuc_20000000_c05n_dt100 = Temp_nuc_all;
+% % time_nuc_20000000_c05n_dt100 = Time_nuc_all;
+% % time_solid_20000000_c05n_dt100 = Time_solid_all;
+% % temp_hold_20000000_c05n_dt100 = hold_final;
+% %
+% % save('ssie_20000000_c05n_dt100.mat','temp_nuc_20000000_c05n_dt100',...
+% % 'time_nuc_20000000_c05n_dt100','time_solid_20000000_c05n_dt100','temp_hold_20000000_c05n_dt100')
+% 
+% % temp_profile05 = temp_center_all(:,1);
+% % save('tempcurvenonuc05.mat','temp_profile05')
 % % %

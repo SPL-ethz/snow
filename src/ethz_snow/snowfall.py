@@ -44,8 +44,8 @@ class Snowfall():
         self.sf_kwargs = kwargs
 
     @classmethod
-    def uniqueFlake(cls, sf_kwargs, seed, return_dict):
-        S = Snowflake(*sf_kwargs, seed=seed)
+    def uniqueFlake(cls, S, seed, return_dict):
+        S.seed = seed
         S.run()
         return_dict[seed] = S.stats
 
@@ -53,11 +53,12 @@ class Snowfall():
         # run the individual snowflakes in a parallelized manner
         manager = mp.Manager()
         return_dict = manager.dict()
-        with mp.Pool() as p:
+        S = Snowflake(*self.sf_kwargs)
+        with mp.Pool(self.pool_size) as p:
             # starmap is only available since python 3.3
             # it allows passing multiple arguments
             p.starmap(Snowfall.uniqueFlake,
-                      [(self.sf_kwargs, i, return_dict) for i in range(self.Nrep)])
+                      [(S, i, return_dict) for i in range(self.Nrep)])
 
         self.stats = dict(return_dict)
 
