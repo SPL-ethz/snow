@@ -55,10 +55,11 @@ class Snowfall():
         S.run()
         return_dict[seed] = S.stats
 
-    def run(self, how = 'async'):
+    def run(self, how='async'):
         # run the individual snowflakes in a parallelized manner
         self.stats = dict()
         S = Snowflake(*self.sf_kwargs)
+        S._buildHeatflowMatrices()  # pre-build H_int, H_ext, H_shelf
         if how == 'async':
             with mp.Pool(self.pool_size) as p:
                 # starmap is only available since python 3.3

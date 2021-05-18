@@ -47,6 +47,10 @@ class Snowflake:
         else:
             self.k = k
 
+        if isinstance(N_vials, list):
+            # we exepct this to be immutable
+            N_vials = tuple(N_vials)
+
         if N_vials[2] > 1:
             raise NotImplementedError("Only 2D (shelf) models are implemented at this moment.")
         else:
@@ -89,12 +93,37 @@ class Snowflake:
 
         self._simulationStatus = 0
 
+        self._H_int = None
+        self._H_ext = None
+        self._H_shelf = None
+        # remember what N_vials was used to build heat flow matrices
+        # so if it changes we know to rebuild them
+        self._NvialsUsed = self.N_vials
+
     @property
     def simulationStatus(self):
         if (self._simulationStatus == 1) or (self._X is not None):
             self._simulationStatus = 1
 
         return self._simulationStatus
+
+    @property
+    def H_int(self):
+        if (self._H_int is None) or self.N_vials != self._NvialsUsed:
+            self._buildHeatflowMatrices()
+        return self._H_int
+
+    @property
+    def H_ext(self):
+        if (self._H_ext is None) or self.N_vials != self._NvialsUsed:
+            self._buildHeatflowMatrices()
+        return self._H_ext
+
+    @property
+    def H_shelf(self):
+        if (self._H_shelf is None) or self.N_vials != self._NvialsUsed:
+            self._buildHeatflowMatrices()
+        return self._H_shelf
 
     @property
     def N_vials_total(self):
@@ -165,8 +194,6 @@ class Snowflake:
         N_timeSteps = int(np.ceil(self.opcond.t_tot / self.dt))+1  # the total number of timesteps
         # toc1 = time.perf_counter()
         # print(toc1-tic)
-        # 1. build interaction matrices
-        self._buildHeatflowMatrices()
         # toc2 = time.perf_counter()
         # print(f"BuildHeatflow: {toc2-toc1}")
         # 2. Obtain external temperature profile over time
@@ -482,18 +509,20 @@ class Snowflake:
 
     def _buildHeatflowMatrices(self):
 
+        self._NvialsUsed = self.N_vials
+
         interactionMatrix, VIAL_EXT = self._buildInteractionMatrices()
 
-        self.H_int = interactionMatrix * self.k['int'] * A
+        self._H_int = interactionMatrix * self.k['int'] * A
 
-        self.H_ext = VIAL_EXT * self.k['ext'] * A
+        self._H_ext = VIAL_EXT * self.k['ext'] * A
 
         if 's_sigma_rel' in self.k.keys():
             self.k['shelf'] = self.k['s0'] + self._rng.normal(size=self.N_vials_total)
         else:
             self.k['shelf'] = self.k['s0']
 
-        self.H_shelf = self.k['shelf'] * A  # either a scalar or a vector
+        self._H_shelf = self.k['shelf'] * A  # either a scalar or a vector
 
     def toDataframe(self, n_timeSteps=250) -> Tuple[np.ndarray, Optional[np.ndarray]]:
 
@@ -535,12 +564,12 @@ class Snowflake:
 
         return stats_df, traj_df
 
-    # def __repr__(self) -> str:
-    #     """ The string representation of the Snowflake class.
+    def __repr__(self) -> str:
+        """ The string representation of the Snowflake class.
 
-    #     Returns:
-    #         str: The Snowflake class string representation giving some basic info.
-    #     """
+        Returns:
+            str: The Snowflake class string representation giving some basic info.
+        """
 
-    #     return (f"Snowflake([N_vials: {self.N_vials}, "
-    #             + f"dt: {self.dt}, seed: {self.seed}])")
+        return (f"Snowflake([N_vials: {self.N_vials}, "
+                + f"dt: {self.dt}, seed: {self.seed}])")
