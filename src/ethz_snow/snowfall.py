@@ -44,23 +44,41 @@ class Snowfall():
         self.sf_kwargs = kwargs
 
     @classmethod
-    def uniqueFlake(cls, S, seed, return_dict):
+    def uniqueFlake(cls, S, seed):
+        S.seed = seed
+        S.run()
+        return S.stats
+
+    @classmethod
+    def uniqueFlake_sync(cls, S, seed, return_dict):
         S.seed = seed
         S.run()
         return_dict[seed] = S.stats
 
-    def run(self):
+    def run(self, how = 'async'):
         # run the individual snowflakes in a parallelized manner
-        manager = mp.Manager()
-        return_dict = manager.dict()
+        self.stats = dict()
         S = Snowflake(*self.sf_kwargs)
-        with mp.Pool(self.pool_size) as p:
-            # starmap is only available since python 3.3
-            # it allows passing multiple arguments
-            p.starmap(Snowfall.uniqueFlake,
-                      [(S, i, return_dict) for i in range(self.Nrep)])
+        if how == 'async':
+            with mp.Pool(self.pool_size) as p:
+                # starmap is only available since python 3.3
+                # it allows passing multiple arguments
+                res = p.starmap_async(Snowfall.uniqueFlake,
+                        [(S, i) for i in range(self.Nrep)]).get()
 
-        self.stats = dict(return_dict)
+            self.stats = res
+        elif how == 'sync':
+            manager = mp.Manager()
+            return_dict = manager.dict()
+            with mp.Pool(self.pool_size) as p:
+                # starmap is only available since python 3.3
+                # it allows passing multiple arguments
+                p.starmap(Snowfall.uniqueFlake_sync,
+                        [(S, i, return_dict) for i in range(self.Nrep)])
+            self.stats = dict(return_dict)
+        elif how == 'sequential':
+            for i in range(self.Nrep):
+                self.stats[i] = self.uniqueFlake(S, i)
 
     def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all',
                         fromStates: bool = False) -> np.ndarray:
