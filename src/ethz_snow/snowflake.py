@@ -1,3 +1,8 @@
+"""Implement Snowflake class.
+
+This module contains the Snowflake class used to run simulations
+of water nucleation in vials.
+"""
 from ethz_snow.operatingConditions import OperatingConditions
 from ethz_snow.constants import (
     A,
@@ -22,10 +27,10 @@ import pandas as pd
 import re
 import sys
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import seaborn as sns
 
-from scipy.sparse import csr_matrix, lil, lil_matrix
+from scipy.sparse import csr_matrix
 from typing import List, Tuple, Union, Sequence, Optional
 
 import time
@@ -35,6 +40,27 @@ VIAL_GROUPS = ("corner", "edge", "center", "all")
 
 
 class Snowflake:
+    """A class to handle a single Stochastic Nucleation of Water simulation.
+
+    More information regarding the equations and their derivation can be found in
+    XXX, Deck et al. (2021).
+
+    Attributes:
+        H_ext (np.ndarray): External heat transfer vector.
+        H_int (csr_matrix): Internal heat transfer matrix.
+        H_shelf (np.ndarray): Shelf heat transfer vector.
+        N_vials (tuple): Number of vials in each dimension.
+        N_vials_total (int): Total number of vials.
+        X_T (np.ndarray): Temperature state over time.
+        X_sigma (np.ndarray): Sigma state over time.
+        dt (float): Time step.
+        k (dict): Heat transfer coefficients.
+        seed (int): Seed to be used in rng.
+        solidificationThreshold (float): What sigma value constitutes a 'solid'.
+        stats (dict): Run statistics (nucleation time, etc.).
+
+    """
+
     def __init__(
         self,
         k: dict = {"int": 20, "ext": 20, "s0": 20, "s_sigma_rel": 0.1},
@@ -49,7 +75,32 @@ class Snowflake:
         seed: int = 2021,
         opcond: OperatingConditions = OperatingConditions(),
     ):
+        """Construct a Snowflake object.
 
+        Args:
+            k (dict, optional): A dictionary containing the heat transfer coefficients.
+                Must contain keys 'int', 'ext', 's0'.
+                Defaults to {"int": 20, "ext": 20, "s0": 20, "s_sigma_rel": 0.1}.
+            N_vials (Tuple[int, int, int], optional): Number of vials in each dimension.
+                Defaults to ( 7, 7, 1).
+            solidificationThreshold (float, optional): What sigma value is
+                a 'solid'. Defaults to 0.9.
+            dt (float, optional): Time step size. Defaults to 2.
+            seed (int, optional): Seed to use for rng. Defaults to 2021.
+            opcond (OperatingConditions, optional): Operating conditions to apply.
+                Defaults to OperatingConditions().
+
+        Raises:
+            TypeError: If k is not a dict.
+            ValueError: If k does not contain all necessary keys.
+            NotImplementedError: If N_vials[2] is not 1. Only 2D model is implemented.
+            TypeError: If opcond is not of type operatingConditions.
+            ValueError: If storeStates is not meaningful.
+
+        Examples:
+            >>> Sf = Snowflake()
+            >>> Sf = Snowflake(Nvials=(4, 3, 1), dt = 5)
+        """
         if not isinstance(k, dict):
             raise TypeError(f"Input k must be of type dict. Was given {type(k)}.")
         elif not all([key in k.keys() for key in HEATFLOW_REQUIREDKEYS]):
@@ -128,32 +179,53 @@ class Snowflake:
         self._NvialsUsed = self.N_vials
 
     @property
-    def simulationStatus(self):
+    def simulationStatus(self) -> int:
+        """Return simulation status of instance.
+
+        Returns:
+            int: Simulation status. 0 = not run, 1 = run.
+        """
         if (self._simulationStatus == 1) or (self._X is not None):
             self._simulationStatus = 1
 
         return self._simulationStatus
 
     @property
-    def H_int(self):
+    def H_int(self) -> csr_matrix:
+        """Return the internal heat transfer matrix.
+
+        Returns:
+            csr_matrix: The internal heat transfer matrix.
+        """
         if (self._H_int is None) or self.N_vials != self._NvialsUsed:
             self._buildHeatflowMatrices()
         return self._H_int
 
     @property
-    def H_ext(self):
+    def H_ext(self) -> np.ndarray:
+        """Return the external heat transfer vector.
+
+        Returns:
+            np.ndarray: The external heat transfer vector.
+        """
         if (self._H_ext is None) or self.N_vials != self._NvialsUsed:
             self._buildHeatflowMatrices()
         return self._H_ext
 
     @property
-    def H_shelf(self):
+    def H_shelf(self) -> np.ndarray:
+        """Return the shelf heat transfer vector.
+
+        Returns:
+            np.ndarray: The shelf heat transfer vector.
+        """
         if (self._H_shelf is None) or self.N_vials != self._NvialsUsed:
             self._buildHeatflowMatrices()
         return self._H_shelf
 
     @property
-    def N_vials_total(self):
+    def N_vials_total(self) -> int:
+        """Return total number of vials in system."""
         return int(np.prod(self.N_vials))
 
     @property
@@ -196,6 +268,11 @@ class Snowflake:
         self._seed = value
 
     def _interpretStorageString(self, myString):
+        """Interpret the storeState string.
+
+        Returns the interpretation of the storeState string
+        indicating which states should be stored in _X.
+        """
         myString = myString.lower()
         if not any(
             [word in myString for word in list(VIAL_GROUPS) + ["random", "uniform"]]
@@ -234,7 +311,6 @@ class Snowflake:
 
     def run(self):
         """Run the simulation."""
-
         # clean up any potential old simulations
         self._X = None
         self._t = None
@@ -376,7 +452,6 @@ class Snowflake:
         Returns:
             np.ndarray: The nucleation times.
         """
-
         if fromStates:
             I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold=0)
 
@@ -547,7 +622,27 @@ class Snowflake:
         return counter
 
     def getVialGroup(self, group: Union[str, Sequence[str]] = "all") -> np.ndarray:
+        """Return mask for given group.
 
+        mask[i] = True iff vial[i] is in G where G can be a list of groups.
+        Args:
+            group (Union[str, Sequence[str]], optional): Subgroup to return.
+                Defaults to "all".
+
+        Raises:
+            ValueError: Group is not known.
+
+        Returns:
+            np.ndarray: A boolean mask of size (N_vials_tot,).
+
+        Examples:
+            >>> S = Snowflake(N_vials = (2, 2, 1))
+            >>> S.getVialGroup('corner')
+            array([True, True, True, True])
+
+            >>> S.getVialGroup(['edge', 'center'])
+            array([False, False, False, False])
+        """
         if isinstance(group, str):
             group = [group]
 
@@ -571,11 +666,25 @@ class Snowflake:
 
     def plot(
         self,
-        what: str = "temperature",
         kind: str = "trajectories",
+        what: str = "temperature",
         group: Union[str, Sequence[str]] = "all",
     ):
+        """Create plots for Snowflake object.
 
+        Args:
+            kind (str, optional): Type of plot to print. If input is
+                'trajectories' will print temperature or sigma profile.
+                Otherwise will print from stats dict. In that case,
+                any sns.catplot 'kind' input is allowed.
+                Defaults to "trajectories".
+            what (str, optional): What to plot. For trajectories valid inputs are
+                sigma or temperature. Otherwise, it's the keys of the stats dict.
+                I.e., t_nucleation, T_nucleation, t_solidification.
+                Defaults to "temperature".
+            group (Union[str, Sequence[str]], optional): Subgroup to return.
+                Defaults to "all".
+        """
         stats_df, traj_df = self.toDataframe()
         if not kind.lower().startswith("traj"):
             df = stats_df
@@ -588,20 +697,37 @@ class Snowflake:
             df = df[df.group.isin(group)]
 
         if not kind.lower().startswith("traj"):
-            df = df[df.variable.str.str.contains(what)]
+            df = df[df.variable.str.contains(what)]
             sns.catplot(data=df, hue="group", y="value", kind=kind, x="variable")
         else:
-            df = df[df.state.str.str.contains(what)]
+            df = df[df.state.str.contains(what)]
             sns.lineplot(data=df, hue="group", y="value", x="Time")
 
     def _sigmaCrossingIndices(
-        self, threshold: float = 0.9
+        self, threshold: float = None
     ) -> Tuple[np.ndarray, np.ndarray]:
+        """Return indices where sigma crosses threshold.
 
+        A helper function identifying the time (indices) in the state matrix
+        where sigma crosses a certain value.
+        Args:
+            threshold (Optional[float], optional): The threshold to apply.
+                Defaults to self.solidificationThreshold.
+
+        Raises:
+            ValueError: Simulation needs to be run first.
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: Indices where threshold is reached and
+                mask identifying vials that never reach threshold.
+        """
         if self.simulationStatus == 0:
             raise ValueError(
                 "Simulation needs to be run before induction times can be extracted."
             )
+
+        if threshold is None:
+            threshold = self.solidificationThreshold
 
         Indices = np.argmax(self.X_sigma > threshold, axis=1)
         # vials that never exceeded solidification threshold
@@ -610,7 +736,12 @@ class Snowflake:
         return Indices, neverReached
 
     def _buildInteractionMatrices(self) -> Tuple[csr_matrix, np.ndarray]:
+        """Build interaction matrices.
 
+        Returns:
+            Tuple[csr_matrix, np.ndarray]: Internal interaction matrix and external
+                interaction vector.
+        """
         # This is a (n_x*n_y*n_z) x (n_x*n_y*n_z) matrix
         # of interactions between vial pairs
         # Please note that, on any given shelf, we index vials this way:
@@ -669,7 +800,7 @@ class Snowflake:
         return interactionMatrix, VIAL_EXT
 
     def _buildHeatflowMatrices(self):
-
+        """Build heatflow matrices"""
         self._NvialsUsed = self.N_vials
 
         interactionMatrix, VIAL_EXT = self._buildInteractionMatrices()
@@ -688,7 +819,19 @@ class Snowflake:
     def toDataframe(
         self, n_timeSteps: int = 250
     ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+        """Save statistics (and states) as pandas dataframe.
 
+        Args:
+            n_timeSteps (int, optional): For states a reduced representation is stored.
+                This defines the number of subsamples. Defaults to 250.
+
+        Raises:
+            ValueError: Simulation needs to run first.
+
+        Returns:
+            Tuple[np.ndarray, Optional[np.ndarray]]: The statistics and if available
+                the states over time (both in long form).
+        """
         if self.simulationStatus == 0:
             raise ValueError(
                 "Simulation needs to be run before induction times can be extracted."
