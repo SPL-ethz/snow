@@ -235,73 +235,71 @@ class Snowflake:
                 x_k = np.concatenate([T_k, sigma_k])
                 X[:, k] = x_k[np.concatenate([self._storageMask, self._storageMask])]
 
-            # a mask that is True where a vial is still fully liquid
-            liquidMask = (sigma_k == 0)
-            solidMask = ~liquidMask  # for convenience
-            solidifiedMask = ((sigma_k > self.solidificationThreshold)
-                              & np.isnan(stats['t_solidification']))
-            stats['t_solidification'][solidifiedMask] = (t[k]
-                                                         - stats['t_nucleation'][solidifiedMask])
-
-            # toc2_l = time.perf_counter()
-            # print(f"Masks: {toc2_l-toc1_l:4.2e}")
             # calculate heatflows for all vials
             q_k = (H_int @ T_k
                    + H_ext * (T_ext_k - T_k)
                    + H_shelf * (T_shelf_k - T_k))  # [XXX] units? - DRO
-            # toc2b_l = time.perf_counter()
-            # print(f"q: {toc2b_l-toc2_l:4.2e}")
-            # SOLID(IFYING) VIALS
-            # heat capacity of solidifying vials
-            # a vector of cps for all solidifying vials
-            cp_sigma = (solid_fraction * cp_s
-                        + (1-solid_fraction) * (sigma_k[solidMask] * (cp_i - cp_w) + cp_w))
-            beta = depression * mass * cp_sigma
 
-            deltaSigma = q_k[solidMask] / (alpha - beta / (1-sigma_k[solidMask])**2) * self.dt
-            sigma_k[solidMask] = sigma_k[solidMask] + deltaSigma
-            # assumption is that during solidification T = Teq
-            T_k[solidMask] = T_eq - depression * (1/(1-sigma_k[solidMask]))
+            # a mask that is True where a vial is still fully liquid
+            liquidMask = (sigma_k == 0)
+            solidMask = ~liquidMask  # for convenience
+            # SOLID(IFYING) VIALS
+            if any(solidMask):
+                solidifiedMask = ((sigma_k > self.solidificationThreshold)
+                                & np.isnan(stats['t_solidification']))
+                stats['t_solidification'][solidifiedMask] = (t[k]
+                                                            - stats['t_nucleation'][solidifiedMask])
+                # heat capacity of solidifying vials
+                # a vector of cps for all solidifying vials
+                cp_sigma = (solid_fraction * cp_s
+                            + (1-solid_fraction) * (sigma_k[solidMask] * (cp_i - cp_w) + cp_w))
+                beta = depression * mass * cp_sigma
+
+                deltaSigma = q_k[solidMask] / (alpha - beta / (1-sigma_k[solidMask])**2) * self.dt
+                sigma_k[solidMask] = sigma_k[solidMask] + deltaSigma
+                # assumption is that during solidification T = Teq
+                T_k[solidMask] = T_eq - depression * (1/(1-sigma_k[solidMask]))
 
             # LIQUID VIALS
-            # DRO: Leif, I've moved the dt out of the Hs because I associate Q with fluxes
-            T_k[liquidMask] = T_k[liquidMask] + q_k[liquidMask] / hl * self.dt
-            # a mask that is True where the temperature is below the equilibrium temperature
-            superCooledMask = (T_k < T_eq)
-            # a vial that is both liquid and supercooled can nucleate
-            nucleationCandidatesMask = liquidMask & superCooledMask
-            # the total number of nucleation candidates
-            n_nucleationCandidates = np.sum(nucleationCandidatesMask)
-            # toc3_l = time.perf_counter()
-            # print(f"Time steps: {toc3_l-toc2b_l:4.2e}")
+            if any(liquidMask):
+                # DRO: Leif, I've moved the dt out of the Hs because I associate Q with fluxes
+                T_k[liquidMask] = T_k[liquidMask] + q_k[liquidMask] / hl * self.dt
+                # a mask that is True where the temperature is below the equilibrium temperature
+                superCooledMask = (T_k < T_eq)
+                # a vial that is both liquid and supercooled can nucleate
+                nucleationCandidatesMask = liquidMask & superCooledMask
+                # the total number of nucleation candidates
+                n_nucleationCandidates = np.sum(nucleationCandidatesMask)
+                # toc3_l = time.perf_counter()
+                # print(f"Time steps: {toc3_l-toc2b_l:4.2e}")
 
-            # nucleation probabilities for candidates
-            P = np.zeros(N_vials_total)
-            diceRolls = np.zeros(N_vials_total)
+                # nucleation probabilities for candidates
+                P = np.zeros(N_vials_total)
+                diceRolls = np.zeros(N_vials_total)
 
-            P[nucleationCandidatesMask] = (kb * V * (T_eq - T_k[nucleationCandidatesMask])**b
-                                           * self.dt)
-            # toc4_l = time.perf_counter()
-            # print(f"Probabilities: {toc4_l-toc3_l:4.2e}")
-            # when we reach the timepoint of controlled nucleation
-            # all vials (that thermodynamically can) nucleate
-            if k == k_CN:
-                P.fill(1)
-            diceRolls[nucleationCandidatesMask] = self._rng.random(n_nucleationCandidates)
+                P[nucleationCandidatesMask] = (kb * V * (T_eq - T_k[nucleationCandidatesMask])**b
+                                            * self.dt)
+                # toc4_l = time.perf_counter()
+                # print(f"Probabilities: {toc4_l-toc3_l:4.2e}")
+                # when we reach the timepoint of controlled nucleation
+                # all vials (that thermodynamically can) nucleate
+                if k == k_CN:
+                    P.fill(1)
+                diceRolls[nucleationCandidatesMask] = self._rng.random(n_nucleationCandidates)
 
-            # Nucleation
-            nucleatedVialsMask = nucleationCandidatesMask & (diceRolls < P)
+                # Nucleation
+                nucleatedVialsMask = nucleationCandidatesMask & (diceRolls < P)
 
-            stats['t_nucleation'][nucleatedVialsMask] = t[k] + self.dt
-            stats['T_nucleation'][nucleatedVialsMask] = T_k[nucleatedVialsMask]
-            # toc5_l = time.perf_counter()
-            # print(f"Dice rolls: {toc5_l-toc4_l:4.2e}")
+                stats['t_nucleation'][nucleatedVialsMask] = t[k] + self.dt
+                stats['T_nucleation'][nucleatedVialsMask] = T_k[nucleatedVialsMask]
+                # toc5_l = time.perf_counter()
+                # print(f"Dice rolls: {toc5_l-toc4_l:4.2e}")
 
-            q0 = (T_eq - T_k[nucleatedVialsMask]) * cp_solution * mass
+                q0 = (T_eq - T_k[nucleatedVialsMask]) * cp_solution * mass
 
-            sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
-            # assumption is that during solidification T = Teq
-            T_k[nucleatedVialsMask] = T_eq - depression * (1/(1-sigma_k[nucleatedVialsMask]))
+                sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
+                # assumption is that during solidification T = Teq
+                T_k[nucleatedVialsMask] = T_eq - depression * (1/(1-sigma_k[nucleatedVialsMask]))
 
         # toc4 = time.perf_counter()
         # print(f"For loop: {toc4-toc3:4.2e}")
