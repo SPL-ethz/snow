@@ -1,19 +1,33 @@
-'''
+"""
 Created Date: Wednesday May 5th 2021
 Author: David Ochsenbein (DRO) - dochsenb@its.jnj.com
 -----
 Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
-'''
+"""
 
 from ethz_snow.operatingConditions import OperatingConditions
 from ethz_snow.constants import (
-    A, hl, T_eq, kb, V, b, cp_solution,
-    mass, solid_fraction, cp_s, depression,
-    alpha, beta_solution, cp_i, cp_w)
+    A,
+    hl,
+    T_eq,
+    kb,
+    V,
+    b,
+    cp_solution,
+    mass,
+    solid_fraction,
+    cp_s,
+    depression,
+    alpha,
+    beta_solution,
+    cp_i,
+    cp_w,
+)
 
 import numpy as np
 import pandas as pd
-import re, sys
+import re
+import sys
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -23,27 +37,35 @@ from typing import List, Tuple, Union, Sequence, Optional
 
 import time
 
-HEATFLOW_REQUIREDKEYS = ('int', 'ext', 's0')
-VIAL_GROUPS = ('corner', 'edge', 'center', 'all')
+HEATFLOW_REQUIREDKEYS = ("int", "ext", "s0")
+VIAL_GROUPS = ("corner", "edge", "center", "all")
 
 
 class Snowflake:
     def __init__(
         self,
-        k: dict = {'int': 20, 'ext': 20, 's0': 20, 's_sigma_rel': 0.1},
-        N_vials: Tuple[int, int, int] = (7, 7, 1),  # should this be part of operating conditions?
+        k: dict = {"int": 20, "ext": 20, "s0": 20, "s_sigma_rel": 0.1},
+        N_vials: Tuple[int, int, int] = (
+            7,
+            7,
+            1,
+        ),  # should this be part of operating conditions?
         storeStates: Optional[Union[str, Sequence[str], Sequence[int]]] = None,
         solidificationThreshold: float = 0.9,
         dt: float = 2,
         seed: int = 2021,
-        opcond: OperatingConditions = OperatingConditions()
+        opcond: OperatingConditions = OperatingConditions(),
     ):
 
         if not isinstance(k, dict):
             raise TypeError(f"Input k must be of type dict. Was given {type(k)}.")
         elif not all([key in k.keys() for key in HEATFLOW_REQUIREDKEYS]):
-            raise ValueError((f"A required key was missing from dictionary k, specifically "
-                             + f"{set(HEATFLOW_REQUIREDKEYS) - set(k.keys())}."))
+            raise ValueError(
+                (
+                    f"A required key was missing from dictionary k, specifically "
+                    + f"{set(HEATFLOW_REQUIREDKEYS) - set(k.keys())}."
+                )
+            )
         else:
             self.k = k
 
@@ -52,7 +74,9 @@ class Snowflake:
             N_vials = tuple(N_vials)
 
         if N_vials[2] > 1:
-            raise NotImplementedError("Only 2D (shelf) models are implemented at this moment.")
+            raise NotImplementedError(
+                "Only 2D (shelf) models are implemented at this moment."
+            )
         else:
             self.N_vials = N_vials
 
@@ -62,23 +86,32 @@ class Snowflake:
         self.seed = seed
 
         if not isinstance(opcond, OperatingConditions):
-            raise TypeError("Input opcond must be an instance of class OperatingConditions.")
+            raise TypeError(
+                "Input opcond must be an instance of class OperatingConditions."
+            )
         else:
             self.opcond = opcond
 
         if isinstance(storeStates, (list, tuple)):
             if all([isinstance(x, int) for x in storeStates]):
-                if (any(np.array(storeStates) > self.N_vials_total - 1)
-                        or any(np.array(storeStates) < 0)):
-                    raise ValueError(f"Entries in storeStates must be >0 "
-                                     + f"and <{self.N_vials_total - 1}.")
+                if any(np.array(storeStates) > self.N_vials_total - 1) or any(
+                    np.array(storeStates) < 0
+                ):
+                    raise ValueError(
+                        f"Entries in storeStates must be >0 "
+                        + f"and <{self.N_vials_total - 1}."
+                    )
                 storageMask = np.zeros(self.N_vials_total, dtype=bool)
                 storageMask[storeStates] = True
             elif all([isinstance(x, str) for x in storeStates]):
-                storageMasks = list(map(lambda x: self._interpretStorageString(x), storeStates))
+                storageMasks = list(
+                    map(lambda x: self._interpretStorageString(x), storeStates)
+                )
                 storageMask = np.logical_or.reduce(storageMasks)
             else:
-                raise ValueError("storeStates must be a sequence of all int or all str.")
+                raise ValueError(
+                    "storeStates must be a sequence of all int or all str."
+                )
         elif isinstance(storeStates, str):
             storageMask = self._interpretStorageString(storeStates)
         elif storeStates is None:
@@ -131,15 +164,32 @@ class Snowflake:
         return int(np.prod(self.N_vials))
 
     @property
-    def X_T(self):
-        return self._X[:int(np.sum(self._storageMask)), :]
+    def X_T(self) -> np.ndarray:
+        """Get the temperature states.
+
+        Returns:
+            np.ndarray: An array containing the vial temperatures over time. This is just a slice of _X!
+        """
+        return self._X[: int(np.sum(self._storageMask)), :]
 
     @property
-    def X_sigma(self):
-        return self._X[int(np.sum(self._storageMask)):, :]
+    def X_sigma(self) -> np.ndarray:
+        """Get the sigma states.
+
+        Returns:
+            np.ndarray: An array containing the vial sigmas over time. This is just a slice of _X!
+        """
+        return self._X[int(np.sum(self._storageMask)) :, :]
 
     @property
-    def seed(self):
+    def seed(self) -> int:
+        """ Get or set the random seed.
+
+        Setting the seed value will initialize a new rng under the hood.
+
+        Returns:
+            int: The seed of the Snowflake.
+        """
         return self._seed
 
     @seed.setter
@@ -152,32 +202,34 @@ class Snowflake:
 
     def _interpretStorageString(self, myString):
         myString = myString.lower()
-        if not any([word in myString for word in list(VIAL_GROUPS)+['random', 'uniform']]):
+        if not any(
+            [word in myString for word in list(VIAL_GROUPS) + ["random", "uniform"]]
+        ):
             raise ValueError("No valid vial group or key word used in storeStates.")
         elif any([word in myString for word in list(VIAL_GROUPS)]):
             for group in VIAL_GROUPS:
                 if group in myString:
                     storageMask = self.getVialGroup(group)
                     break
-        elif ('random' in myString) or ('uniform' in myString):
+        elif ("random" in myString) or ("uniform" in myString):
             # assume vial group 'all' is implied
             storageMask = np.ones(self.N_vials_total, dtype=bool)
 
-        if ('random' in myString) or ('uniform' in myString):
-            howMany = re.findall(r'\d+', myString)
+        if ("random" in myString) or ("uniform" in myString):
+            howMany = re.findall(r"\d+", myString)
             if len(howMany) == 0:
                 # unclear how many to pick, default is 10%
-                howMany = int(np.ceil(0.1*self.N_vials_total))
+                howMany = int(np.ceil(0.1 * self.N_vials_total))
             elif len(howMany) == 1:
                 howMany = int(howMany[0])
             elif len(howMany) > 1:
                 raise ValueError("storeStates strings must contain one number at most.")
 
             I_candidates = np.where(storageMask)[0]
-            if 'random' in myString:
+            if "random" in myString:
                 I_toStore = self._rng.choice(I_candidates, size=howMany, replace=False)
-            elif 'uniform' in myString:
-                stepSize = int(np.ceil(len(I_candidates)/howMany))
+            elif "uniform" in myString:
+                stepSize = int(np.ceil(len(I_candidates) / howMany))
                 I_fromCandidates = np.arange(0, len(I_candidates), stepSize, dtype=int)
                 I_toStore = I_candidates[I_fromCandidates]
             storageMask = np.zeros(self.N_vials_total, dtype=bool)
@@ -186,45 +238,43 @@ class Snowflake:
         return storageMask
 
     def run(self):
-        # tic = time.perf_counter()
-        
         # clean up any potential old simulations
         self._X = None
         self._t = None
 
-        N_timeSteps = int(np.ceil(self.opcond.t_tot / self.dt))+1  # the total number of timesteps
-        N_vials_total = self.N_vials_total
-        # toc1 = time.perf_counter()
-        # print(toc1-tic)
-        # toc2 = time.perf_counter()
-        # print(f"BuildHeatflow: {toc2-toc1}")
-        # 2. Obtain external temperature profile over time
+        # Obtain external temperature profile over time
         T_shelf = self.opcond.tempProfile(self.dt)
         T_ext = T_shelf  # need to make a switch so that this can be decoupled - DRO XX
 
+        # store stuff in local variables to reduce getter method calls
         H_int = self.H_int
         H_ext = self.H_ext
         H_shelf = self.H_shelf
 
-        # 3. Initial state of the system
+        N_timeSteps = (
+            int(np.ceil(self.opcond.t_tot / self.dt)) + 1
+        )  # the total number of timesteps
+        N_vials_total = self.N_vials_total
+
+        # Initial state of the system
         # initial temperature
-        T_k = np.ones(N_vials_total) * self.opcond.cooling['start']  # [C]
+        T_k = np.ones(N_vials_total) * self.opcond.cooling["start"]  # [C]
         # state of the vials
         sigma_k = np.zeros(N_vials_total)  # (0 = liq, 1 = completely frozen)
 
-        # 4. Pre-allocate memory
+        # Pre-allocate memory
         # our state matrix containing the entire history of the system
-        X = np.zeros((2*np.sum(self._storageMask), N_timeSteps))
+        X = np.zeros((2 * np.sum(self._storageMask), N_timeSteps))
         t = np.arange(0, N_timeSteps * self.dt, self.dt)
         stats = dict(
             t_nucleation=np.full(N_vials_total, np.nan),
             T_nucleation=np.full(N_vials_total, np.nan),
-            t_solidification=np.full(N_vials_total, np.nan))
+            t_solidification=np.full(N_vials_total, np.nan),
+        )
 
         k_CN = np.argmax(t >= self.opcond.cnt)
-        # toc3 = time.perf_counter()
-        # print(f"Tempprofile: {toc3-toc2}")
-        # 5. Iterate over time steps
+
+        # Iterate over time steps
         for k in np.arange(N_timeSteps):
 
             T_shelf_k = T_shelf[k]
@@ -236,36 +286,43 @@ class Snowflake:
                 X[:, k] = x_k[np.concatenate([self._storageMask, self._storageMask])]
 
             # calculate heatflows for all vials
-            q_k = (H_int @ T_k
-                   + H_ext * (T_ext_k - T_k)
-                   + H_shelf * (T_shelf_k - T_k))  # [XXX] units? - DRO
+            q_k = (
+                H_int @ T_k + H_ext * (T_ext_k - T_k) + H_shelf * (T_shelf_k - T_k)
+            )  # [XXX] units? - DRO
 
             # a mask that is True where a vial is still fully liquid
-            liquidMask = (sigma_k == 0)
+            liquidMask = sigma_k == 0
             solidMask = ~liquidMask  # for convenience
             # SOLID(IFYING) VIALS
             if any(solidMask):
-                solidifiedMask = ((sigma_k > self.solidificationThreshold)
-                                & np.isnan(stats['t_solidification']))
-                stats['t_solidification'][solidifiedMask] = (t[k]
-                                                            - stats['t_nucleation'][solidifiedMask])
+                solidifiedMask = (sigma_k > self.solidificationThreshold) & np.isnan(
+                    stats["t_solidification"]
+                )
+                stats["t_solidification"][solidifiedMask] = (
+                    t[k] - stats["t_nucleation"][solidifiedMask]
+                )
                 # heat capacity of solidifying vials
                 # a vector of cps for all solidifying vials
-                cp_sigma = (solid_fraction * cp_s
-                            + (1-solid_fraction) * (sigma_k[solidMask] * (cp_i - cp_w) + cp_w))
+                cp_sigma = solid_fraction * cp_s + (1 - solid_fraction) * (
+                    sigma_k[solidMask] * (cp_i - cp_w) + cp_w
+                )
                 beta = depression * mass * cp_sigma
 
-                deltaSigma = q_k[solidMask] / (alpha - beta / (1-sigma_k[solidMask])**2) * self.dt
+                deltaSigma = (
+                    q_k[solidMask]
+                    / (alpha - beta / (1 - sigma_k[solidMask]) ** 2)
+                    * self.dt
+                )
                 sigma_k[solidMask] = sigma_k[solidMask] + deltaSigma
                 # assumption is that during solidification T = Teq
-                T_k[solidMask] = T_eq - depression * (1/(1-sigma_k[solidMask]))
+                T_k[solidMask] = T_eq - depression * (1 / (1 - sigma_k[solidMask]))
 
             # LIQUID VIALS
             if any(liquidMask):
                 # DRO: Leif, I've moved the dt out of the Hs because I associate Q with fluxes
                 T_k[liquidMask] = T_k[liquidMask] + q_k[liquidMask] / hl * self.dt
                 # a mask that is True where the temperature is below the equilibrium temperature
-                superCooledMask = (T_k < T_eq)
+                superCooledMask = T_k < T_eq
                 # a vial that is both liquid and supercooled can nucleate
                 nucleationCandidatesMask = liquidMask & superCooledMask
                 # the total number of nucleation candidates
@@ -277,38 +334,38 @@ class Snowflake:
                 P = np.zeros(N_vials_total)
                 diceRolls = np.zeros(N_vials_total)
 
-                P[nucleationCandidatesMask] = (kb * V * (T_eq - T_k[nucleationCandidatesMask])**b
-                                            * self.dt)
-                # toc4_l = time.perf_counter()
-                # print(f"Probabilities: {toc4_l-toc3_l:4.2e}")
+                P[nucleationCandidatesMask] = (
+                    kb * V * (T_eq - T_k[nucleationCandidatesMask]) ** b * self.dt
+                )
                 # when we reach the timepoint of controlled nucleation
                 # all vials (that thermodynamically can) nucleate
                 if k == k_CN:
                     P.fill(1)
-                diceRolls[nucleationCandidatesMask] = self._rng.random(n_nucleationCandidates)
+                diceRolls[nucleationCandidatesMask] = self._rng.random(
+                    n_nucleationCandidates
+                )
 
                 # Nucleation
                 nucleatedVialsMask = nucleationCandidatesMask & (diceRolls < P)
 
-                stats['t_nucleation'][nucleatedVialsMask] = t[k] + self.dt
-                stats['T_nucleation'][nucleatedVialsMask] = T_k[nucleatedVialsMask]
-                # toc5_l = time.perf_counter()
-                # print(f"Dice rolls: {toc5_l-toc4_l:4.2e}")
+                stats["t_nucleation"][nucleatedVialsMask] = t[k] + self.dt
+                stats["T_nucleation"][nucleatedVialsMask] = T_k[nucleatedVialsMask]
 
                 q0 = (T_eq - T_k[nucleatedVialsMask]) * cp_solution * mass
 
                 sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
                 # assumption is that during solidification T = Teq
-                T_k[nucleatedVialsMask] = T_eq - depression * (1/(1-sigma_k[nucleatedVialsMask]))
+                T_k[nucleatedVialsMask] = T_eq - depression * (
+                    1 / (1 - sigma_k[nucleatedVialsMask])
+                )
 
-        # toc4 = time.perf_counter()
-        # print(f"For loop: {toc4-toc3:4.2e}")
         self.stats = stats
         self._X = X  # store the state matrix
         self._t = t  # store the time vector
 
-    def nucleationTimes(self, group: Union[str, Sequence[str]] = 'all',
-                        fromStates: bool = False) -> np.ndarray:
+    def nucleationTimes(
+        self, group: Union[str, Sequence[str]] = "all", fromStates: bool = False
+    ) -> np.ndarray:
 
         if fromStates:
             I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold=0)
@@ -323,20 +380,26 @@ class Snowflake:
             t_nucleation = np.full(self.N_vials_total, np.nan)
             t_nucleation[self._storageMask] = t_nucleation_states
         else:
-            t_nucleation = self.stats['t_nucleation']
+            t_nucleation = self.stats["t_nucleation"]
 
         I_groups = self.getVialGroup(group)
 
         return t_nucleation[I_groups]
 
-    def nucleationTemperatures(self, group: Union[str, Sequence[str]] = 'all',
-                               fromStates: bool = False) -> np.ndarray:
+    def nucleationTemperatures(
+        self, group: Union[str, Sequence[str]] = "all", fromStates: bool = False
+    ) -> np.ndarray:
 
         if fromStates:
             I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold=0)
-            T_nucleation_states = (np.array([self.X_T[i, I-1]
-                                   for i, I in zip(range(self.N_vials_total), I_nucleation)])
-                                   .astype(float))  # should always be float, but just to be sure
+            T_nucleation_states = np.array(
+                [
+                    self.X_T[i, I - 1]
+                    for i, I in zip(range(self.N_vials_total), I_nucleation)
+                ]
+            ).astype(
+                float
+            )  # should always be float, but just to be sure
 
             # non-nucleated vials are set to NaN
             T_nucleation_states[lateBloomers] = np.nan
@@ -345,19 +408,25 @@ class Snowflake:
             T_nucleation[self._storageMask] = T_nucleation_states
 
         else:
-            T_nucleation = self.stats['T_nucleation']
+            T_nucleation = self.stats["T_nucleation"]
 
         I_groups = self.getVialGroup(group)
 
         return T_nucleation[I_groups]
 
-    def solidificationTimes(self, group: Union[str, Sequence[str]] = 'all', threshold: float = 0.9,
-                            fromStates: bool = False) -> np.ndarray:
+    def solidificationTimes(
+        self,
+        group: Union[str, Sequence[str]] = "all",
+        threshold: float = 0.9,
+        fromStates: bool = False,
+    ) -> np.ndarray:
 
         if fromStates:
             t_nucleation = self.nucleationTimes(fromStates=fromStates)
 
-            I_solidification, neverGrownUp = self._sigmaCrossingIndices(threshold=threshold)
+            I_solidification, neverGrownUp = self._sigmaCrossingIndices(
+                threshold=threshold
+            )
 
             # nucleation times for all nucleated vials
             # need to make sure this is float so no problems arise later
@@ -374,18 +443,22 @@ class Snowflake:
 
             t_solidification = t_solidification - t_nucleation
         else:
-            t_solidification = self.stats['t_solidification']
+            t_solidification = self.stats["t_solidification"]
 
         I_groups = self.getVialGroup(group)
 
         return t_solidification[I_groups]
 
-    def sigmaCounter(self,
-                     time: Union[Sequence[float], float],
-                     threshold: float = 0.9,
-                     fromStates: bool = False) -> np.ndarray:
+    def sigmaCounter(
+        self,
+        time: Union[Sequence[float], float],
+        threshold: float = 0.9,
+        fromStates: bool = False,
+    ) -> np.ndarray:
         if self.simulationStatus == 0:
-            raise ValueError("Simulation needs to be run before induction times can be extracted.")
+            raise ValueError(
+                "Simulation needs to be run before induction times can be extracted."
+            )
 
         if isinstance(time, (float, int)):
             time = [time]
@@ -397,11 +470,11 @@ class Snowflake:
                 I_time = np.argmax(self._t >= t)
                 counter[i] = np.sum(self.X_sigma[:, I_time] > threshold, axis=0)
             else:
-                counter[i] = np.sum(self.stats['t_solidification'] <= t)
+                counter[i] = np.sum(self.stats["t_solidification"] <= t)
 
         return counter
 
-    def getVialGroup(self, group: Union[str, Sequence[str]] = 'all') -> np.ndarray:
+    def getVialGroup(self, group: Union[str, Sequence[str]] = "all") -> np.ndarray:
 
         if isinstance(group, str):
             group = [group]
@@ -410,13 +483,13 @@ class Snowflake:
 
         myMask = np.zeros(self.N_vials_total, dtype=bool)
         for g in group:
-            if g == 'corner':
+            if g == "corner":
                 myMask = myMask | (VIAL_EXT == 2)
-            elif g == 'edge':
+            elif g == "edge":
                 myMask = myMask | (VIAL_EXT == 1)
-            elif g == 'center':
+            elif g == "center":
                 myMask = myMask | (VIAL_EXT == 0)
-            elif g == 'all':
+            elif g == "all":
                 myMask = np.ones(self.N_vials_total, dtype=bool)
                 break
             else:
@@ -424,32 +497,37 @@ class Snowflake:
 
         return myMask
 
-    def plot(self,
-             what: str = 'temperature', kind: str = 'trajectories',
-             group: Union[str, Sequence[str]] = 'all'):
+    def plot(
+        self,
+        what: str = "temperature",
+        kind: str = "trajectories",
+        group: Union[str, Sequence[str]] = "all",
+    ):
 
         stats_df, traj_df = self.toDataframe()
-        if not kind.lower().startswith('traj'):
+        if not kind.lower().startswith("traj"):
             df = stats_df
         else:
             df = traj_df
 
-        if group != 'all':
+        if group != "all":
             if not isinstance(group, (tuple, list)):
                 group = [group]
             df = df[df.group.isin(group)]
 
-        if not kind.lower().startswith('traj'):
+        if not kind.lower().startswith("traj"):
             df = df[df.variable.str.str.contains(what)]
-            sns.catplot(data=df, hue='group', y='value', kind=kind, x='variable')
+            sns.catplot(data=df, hue="group", y="value", kind=kind, x="variable")
         else:
             df = df[df.state.str.str.contains(what)]
-            sns.lineplot(data=df, hue='group', y='value', x='Time')
+            sns.lineplot(data=df, hue="group", y="value", x="Time")
 
     def _sigmaCrossingIndices(self, threshold=0.9) -> Tuple[np.ndarray, np.ndarray]:
 
         if self.simulationStatus == 0:
-            raise ValueError("Simulation needs to be run before induction times can be extracted.")
+            raise ValueError(
+                "Simulation needs to be run before induction times can be extracted."
+            )
 
         Indices = np.argmax(self.X_sigma > threshold, axis=1)
         # vials that never exceeded solidification threshold
@@ -480,9 +558,9 @@ class Snowflake:
         # pairs (1,2), (2,3), ..., (i,i+1) have horizontal interactions, except where i = n_x!
         # this means that in the IA matrix off-diagonal elements are 1
         # except where i%n_x==0 or j%n_x==0
-        dx_pattern = np.ones((n_x*n_y-1,))
+        dx_pattern = np.ones((n_x * n_y - 1,))
         # the vial at index position i+1 is at the edge -> one neighbor less
-        idx_delete = [i for i in range(n_x*n_y-1) if (i+1) % n_x == 0]
+        idx_delete = [i for i in range(n_x * n_y - 1) if (i + 1) % n_x == 0]
         dx_pattern[idx_delete] = 0
         # we store this as a compressed sparse row (most efficient format?)
         DX = csr_matrix(np.diag(dx_pattern, k=1) + np.diag(dx_pattern, k=-1))
@@ -492,7 +570,7 @@ class Snowflake:
         # pairs (1,n_x+1), (2,n_x+2), ..., (i,n_x+i) have vertical interactions
         # for i in [1, n_x*(n_y-1)]
         # this means that in the IA matrix n_x-removed-off-diagonal elements are 1
-        dy_pattern = np.ones((n_x*n_y - n_x,))
+        dy_pattern = np.ones((n_x * n_y - n_x,))
         DY = csr_matrix(np.diag(dy_pattern, k=n_x) + np.diag(dy_pattern, k=-n_x))
 
         # how many interactions does each vial have with other vials
@@ -506,7 +584,7 @@ class Snowflake:
         # at most, any cubic vial on a 2D shelf can have 4 interactions. 4 - VIAL_INT is the
         # number of external interactions (excl. the shelf)
         # is it worth storing this as a sparse matrix? - DRO XXX
-        VIAL_EXT = 4*np.ones((n_x*n_y,)) - VIAL_INT.diagonal()
+        VIAL_EXT = 4 * np.ones((n_x * n_y,)) - VIAL_INT.diagonal()
 
         return interactionMatrix, VIAL_EXT
 
@@ -516,63 +594,71 @@ class Snowflake:
 
         interactionMatrix, VIAL_EXT = self._buildInteractionMatrices()
 
-        self._H_int = interactionMatrix * self.k['int'] * A
+        self._H_int = interactionMatrix * self.k["int"] * A
 
-        self._H_ext = VIAL_EXT * self.k['ext'] * A
+        self._H_ext = VIAL_EXT * self.k["ext"] * A
 
-        if 's_sigma_rel' in self.k.keys():
-            self.k['shelf'] = self.k['s0'] + self._rng.normal(size=self.N_vials_total)
+        if "s_sigma_rel" in self.k.keys():
+            self.k["shelf"] = self.k["s0"] + self._rng.normal(size=self.N_vials_total)
         else:
-            self.k['shelf'] = self.k['s0']
+            self.k["shelf"] = self.k["s0"]
 
-        self._H_shelf = self.k['shelf'] * A  # either a scalar or a vector
+        self._H_shelf = self.k["shelf"] * A  # either a scalar or a vector
 
     def toDataframe(self, n_timeSteps=250) -> Tuple[np.ndarray, Optional[np.ndarray]]:
 
         if self.simulationStatus == 0:
-            raise ValueError("Simulation needs to be run before induction times can be extracted.")
+            raise ValueError(
+                "Simulation needs to be run before induction times can be extracted."
+            )
 
         df = pd.DataFrame(self.stats)
-        df.index.name = 'vial'
+        df.index.name = "vial"
         df = df.reset_index()
 
         _, VIAL_EXT = self._buildInteractionMatrices()
 
-        df['group'] = VIAL_EXT
-        df.loc[df.group == 2, 'group'] = 'corner'
-        df.loc[df.group == 1, 'group'] = 'edge'
-        df.loc[df.group == 0, 'group'] = 'center'
+        df["group"] = VIAL_EXT
+        df.loc[df.group == 2, "group"] = "corner"
+        df.loc[df.group == 1, "group"] = "edge"
+        df.loc[df.group == 0, "group"] = "center"
 
-        stats_df = df.melt(id_vars=['group', 'vial'])
+        stats_df = df.melt(id_vars=["group", "vial"])
 
         n_storedStates = np.sum(self._storageMask)
         if n_storedStates > 0:
             # to reduce computational cost we limit number of timepoints to n_timeSteps
-            df = pd.DataFrame(self._X[:, ::int(self._X.shape[1]/(n_timeSteps - 1))])
-            df.columns = self._t[::int(self._X.shape[1]/(n_timeSteps - 1))]
-            df.columns.name = 'Time'
+            df = pd.DataFrame(self._X[:, :: int(self._X.shape[1] / (n_timeSteps - 1))])
+            df.columns = self._t[:: int(self._X.shape[1] / (n_timeSteps - 1))]
+            df.columns.name = "Time"
 
-            df['state'] = np.concatenate([np.repeat('temperature', n_storedStates),
-                                          np.repeat('sigma', n_storedStates)])
-            df['vial'] = np.tile(np.where(self._storageMask)[0], 2)
-            df['group'] = np.tile(VIAL_EXT[self._storageMask], 2)
+            df["state"] = np.concatenate(
+                [
+                    np.repeat("temperature", n_storedStates),
+                    np.repeat("sigma", n_storedStates),
+                ]
+            )
+            df["vial"] = np.tile(np.where(self._storageMask)[0], 2)
+            df["group"] = np.tile(VIAL_EXT[self._storageMask], 2)
 
-            df.loc[df.group == 2, 'group'] = 'corner'
-            df.loc[df.group == 1, 'group'] = 'edge'
-            df.loc[df.group == 0, 'group'] = 'center'
+            df.loc[df.group == 2, "group"] = "corner"
+            df.loc[df.group == 1, "group"] = "edge"
+            df.loc[df.group == 0, "group"] = "center"
 
-            traj_df = df.melt(id_vars=['group', 'vial', 'state'])
+            traj_df = df.melt(id_vars=["group", "vial", "state"])
         else:
             traj_df = None
 
         return stats_df, traj_df
 
     def __repr__(self) -> str:
-        """ The string representation of the Snowflake class.
+        """Return string representation of the Snowflake class.
 
+        A simple indicator of the most important properties of the Snowflake.
         Returns:
             str: The Snowflake class string representation giving some basic info.
         """
-
-        return (f"Snowflake([N_vials: {self.N_vials}, "
-                + f"dt: {self.dt}, seed: {self.seed}])")
+        return (
+            f"Snowflake([N_vials: {self.N_vials}, "
+            + f"dt: {self.dt}, seed: {self.seed}])"
+        )
