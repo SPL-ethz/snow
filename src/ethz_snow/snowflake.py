@@ -136,6 +136,7 @@ class Snowflake:
         else:
             self.opcond = opcond
 
+        self._emptyStore = False
         if isinstance(storeStates, (list, tuple)):
             if all([isinstance(x, int) for x in storeStates]):
                 if any(np.array(storeStates) > self.N_vials_total - 1) or any(
