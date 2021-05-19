@@ -801,7 +801,7 @@ class Snowflake:
         return interactionMatrix, VIAL_EXT
 
     def _buildHeatflowMatrices(self):
-        """Build heatflow matrices"""
+        """Build heatflow matrices."""
         self._NvialsUsed = self.N_vials
 
         interactionMatrix, VIAL_EXT = self._buildInteractionMatrices()
