@@ -233,6 +233,8 @@ class Snowflake:
         return storageMask
 
     def run(self):
+        """Run the simulation."""
+
         # clean up any potential old simulations
         self._X = None
         self._t = None
@@ -363,6 +365,17 @@ class Snowflake:
     def nucleationTimes(
         self, group: Union[str, Sequence[str]] = "all", fromStates: bool = False
     ) -> np.ndarray:
+        """Return array of nucleation times.
+
+        Args:
+            group (Union[str, Sequence[str]], optional): Subgroup to return.
+                Defaults to "all".
+            fromStates (bool, optional): Whether or not to calculate from
+                states directly. Defaults to False.
+
+        Returns:
+            np.ndarray: The nucleation times.
+        """
 
         if fromStates:
             I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold=0)
@@ -424,7 +437,7 @@ class Snowflake:
     def solidificationTimes(
         self,
         group: Union[str, Sequence[str]] = "all",
-        threshold: float = 0.9,
+        threshold: Optional[float] = None,
         fromStates: bool = False,
     ) -> np.ndarray:
         """Return array of solidification times.
@@ -432,13 +445,17 @@ class Snowflake:
         Args:
             group (Union[str, Sequence[str]], optional): Subgroup to return.
                 Defaults to "all".
-            threshold (float, optional): The threshold used to define 'solidified'.
+            threshold (Optional[float], optional): The threshold used to
+                define 'solidified'. Defaults to self.solidificationThreshold.
             fromStates (bool, optional): Whether or not to calculate from
                 states directly. Defaults to False.
 
         Returns:
             np.ndarray: The solidification times.
         """
+        if threshold is None:
+            threshold = self.solidificationThreshold
+
         if fromStates:
             t_nucleation = self.nucleationTimes(fromStates=fromStates)
 
@@ -475,15 +492,39 @@ class Snowflake:
     def sigmaCounter(
         self,
         time: Union[Sequence[float], float],
-        threshold: float = 0.9,
+        threshold: Optional[float] = None,
         fromStates: bool = False,
     ) -> np.ndarray:
+        """Return counter of vials satisfying sigma>threshold at time.
+
+        Args:
+            time (Union[Sequence[float], float]): The time(s) for which to
+                return the counter.
+            threshold (Optional[float], optional): The threshold to apply.
+                Defaults to self.solidificationThreshold.
+            fromStates (bool, optional): Whether or not to calculate from
+                states directly. Defaults to False.
+
+        Raises:
+            ValueError: Simulation needs to be run first.
+            ValueError: fromStates is False and threshold is
+                neither 0 or self.solidificationThreshold.
+
+        Returns:
+            np.ndarray: [description]
+        """
         if self.simulationStatus == 0:
             raise ValueError(
                 "Simulation needs to be run before induction times can be extracted."
             )
 
+        if threshold is None:
+            # default is to give solidified vials
+            threshold = self.solidificationThreshold
+
         if isinstance(time, (float, int)):
+            # we iterate over this,
+            # so it must be a list
             time = [time]
 
         counter = np.zeros(len(time))
@@ -493,7 +534,15 @@ class Snowflake:
                 I_time = np.argmax(self._t >= t)
                 counter[i] = np.sum(self.X_sigma[:, I_time] > threshold, axis=0)
             else:
-                counter[i] = np.sum(self.stats["t_solidification"] <= t)
+                if (threshold > 0) and (threshold != self.solidificationThreshold):
+                    raise ValueError(
+                        "Threshold cannot differ from solidificationThreshold when "
+                        + "not calculating from states."
+                    )
+                elif threshold > 0:
+                    counter[i] = np.sum(self.stats["t_solidification"] <= t)
+                elif threshold == 0:
+                    counter[i] = np.sum(self.stats["t_nucleation"] <= t)
 
         return counter
 
