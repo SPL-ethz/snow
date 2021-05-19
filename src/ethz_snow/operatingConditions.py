@@ -108,19 +108,19 @@ class OperatingConditions:
         n = int(np.ceil(self.t_tot / dt)) + 1
 
         if self.holding is not None:
+            T_start = self.cooling["start"]
             T_hold = self.holding["temp"]
+            cr = self.cooling["rate"]
+            t_hold = (T_start - T_hold) / cr
             duration_hold = self.holding["duration"]
 
             # time and number of steps to hold temperature
             T_vec_toHold = self._simpleCool(
-                Tstart=self.cooling["start"],
-                Tend=T_hold,
-                coolingRate=self.cooling["rate"],
-                dt=dt,
+                Tstart=T_start, Tend=T_hold, coolingRate=cr, dt=dt,
             )
 
             # append holding period
-            T_vec_holding = [T_hold] * int(np.ceil(duration_hold / dt))
+            T_vec_holding = [T_hold] * int(np.ceil((duration_hold - t_hold % dt) / dt))
 
             # cool to final temperature
             T_vec_toEnd = self._simpleCool(
@@ -168,9 +168,7 @@ class OperatingConditions:
             np.ndarray: The temperature profile.
         """
         t_end = (Tstart - Tend) / coolingRate
-        n_end = int(np.ceil(t_end / dt))
-
-        t_vec = np.linspace(0, t_end, n_end)
+        t_vec = np.arange(0, t_end, dt)
 
         T_profile = Tstart - t_vec * coolingRate
 
@@ -179,7 +177,7 @@ class OperatingConditions:
                 t_tot >= t_end
             ), "Final temp can't be reached with cooling rate, holding/total time."
 
-            add_n = int(np.ceil((t_tot - t_end) / dt))
+            add_n = int(np.ceil((t_tot - t_vec[-1]) / dt))
 
             T_profile = np.append(T_profile, [Tend] * add_n)
 
