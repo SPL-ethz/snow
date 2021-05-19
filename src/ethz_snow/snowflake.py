@@ -1,10 +1,3 @@
-"""
-Created Date: Wednesday May 5th 2021
-Author: David Ochsenbein (DRO) - dochsenb@its.jnj.com
------
-Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
-"""
-
 from ethz_snow.operatingConditions import OperatingConditions
 from ethz_snow.constants import (
     A,
@@ -168,7 +161,8 @@ class Snowflake:
         """Get the temperature states.
 
         Returns:
-            np.ndarray: An array containing the vial temperatures over time. This is just a slice of _X!
+            np.ndarray: An array containing the vial temperatures over time.
+                This is just a slice of _X!
         """
         return self._X[: int(np.sum(self._storageMask)), :]
 
@@ -177,13 +171,14 @@ class Snowflake:
         """Get the sigma states.
 
         Returns:
-            np.ndarray: An array containing the vial sigmas over time. This is just a slice of _X!
+            np.ndarray: An array containing the vial sigmas over time.
+                This is just a slice of _X!
         """
         return self._X[int(np.sum(self._storageMask)) :, :]
 
     @property
     def seed(self) -> int:
-        """ Get or set the random seed.
+        """Get or set the random seed.
 
         Setting the seed value will initialize a new rng under the hood.
 
@@ -319,9 +314,11 @@ class Snowflake:
 
             # LIQUID VIALS
             if any(liquidMask):
-                # DRO: Leif, I've moved the dt out of the Hs because I associate Q with fluxes
+                # DRO: Leif, I've moved the dt out of the Hs
+                # because I associate Q with fluxes
                 T_k[liquidMask] = T_k[liquidMask] + q_k[liquidMask] / hl * self.dt
-                # a mask that is True where the temperature is below the equilibrium temperature
+                # a mask that is True where the temperature is
+                # below the equilibrium temperature
                 superCooledMask = T_k < T_eq
                 # a vial that is both liquid and supercooled can nucleate
                 nucleationCandidatesMask = liquidMask & superCooledMask
@@ -389,7 +386,17 @@ class Snowflake:
     def nucleationTemperatures(
         self, group: Union[str, Sequence[str]] = "all", fromStates: bool = False
     ) -> np.ndarray:
+        """Return array of nucleation temperatures.
 
+        Args:
+            group (Union[str, Sequence[str]], optional): Subgroup to return.
+                Defaults to "all".
+            fromStates (bool, optional): Whether or not to calculate from
+                states directly. Defaults to False.
+
+        Returns:
+            np.ndarray: The nucleation temperatures.
+        """
         if fromStates:
             I_nucleation, lateBloomers = self._sigmaCrossingIndices(threshold=0)
             T_nucleation_states = np.array(
@@ -420,7 +427,18 @@ class Snowflake:
         threshold: float = 0.9,
         fromStates: bool = False,
     ) -> np.ndarray:
+        """Return array of solidification times.
 
+        Args:
+            group (Union[str, Sequence[str]], optional): Subgroup to return.
+                Defaults to "all".
+            threshold (float, optional): The threshold used to define 'solidified'.
+            fromStates (bool, optional): Whether or not to calculate from
+                states directly. Defaults to False.
+
+        Returns:
+            np.ndarray: The solidification times.
+        """
         if fromStates:
             t_nucleation = self.nucleationTimes(fromStates=fromStates)
 
@@ -443,6 +461,11 @@ class Snowflake:
 
             t_solidification = t_solidification - t_nucleation
         else:
+            if threshold != self.solidificationThreshold:
+                raise ValueError(
+                    "Threshold cannot differ from solidificationThreshold when "
+                    + "not calculating from states."
+                )
             t_solidification = self.stats["t_solidification"]
 
         I_groups = self.getVialGroup(group)
@@ -522,7 +545,9 @@ class Snowflake:
             df = df[df.state.str.str.contains(what)]
             sns.lineplot(data=df, hue="group", y="value", x="Time")
 
-    def _sigmaCrossingIndices(self, threshold=0.9) -> Tuple[np.ndarray, np.ndarray]:
+    def _sigmaCrossingIndices(
+        self, threshold: float = 0.9
+    ) -> Tuple[np.ndarray, np.ndarray]:
 
         if self.simulationStatus == 0:
             raise ValueError(
@@ -537,7 +562,8 @@ class Snowflake:
 
     def _buildInteractionMatrices(self) -> Tuple[csr_matrix, np.ndarray]:
 
-        # This is a (n_x*n_y*n_z) x (n_x*n_y*n_z) matrix of interactions between vial pairs
+        # This is a (n_x*n_y*n_z) x (n_x*n_y*n_z) matrix
+        # of interactions between vial pairs
         # Please note that, on any given shelf, we index vials this way:
         # [[1, 2, 3, 4, ..., n_x],
         # [n_x+1, n_x+2, ..., 2*n_x],
@@ -555,7 +581,8 @@ class Snowflake:
 
         # create interaction matrix for horizontal (x-direction) interactions
         # matrix is 1 where two vials have a horizontal interaction and 0 otherwise
-        # pairs (1,2), (2,3), ..., (i,i+1) have horizontal interactions, except where i = n_x!
+        # pairs (1,2), (2,3), ..., (i,i+1) have horizontal interactions,
+        # except where i = n_x!
         # this means that in the IA matrix off-diagonal elements are 1
         # except where i%n_x==0 or j%n_x==0
         dx_pattern = np.ones((n_x * n_y - 1,))
@@ -573,15 +600,19 @@ class Snowflake:
         dy_pattern = np.ones((n_x * n_y - n_x,))
         DY = csr_matrix(np.diag(dy_pattern, k=n_x) + np.diag(dy_pattern, k=-n_x))
 
-        # how many interactions does each vial have with other vials
-        # diagflat because sum over a sparse matrix returns a np.matrix object, not an ndarray
+        # how many interactions does each vial
+        # have with other vials
+        # diagflat because sum over a sparse matrix
+        # returns a np.matrix object, not an ndarray
         VIAL_INT = csr_matrix(np.diagflat(np.sum(DX + DY, axis=1)))
 
-        # the overall interaction matrix is given by the sum of the interaction matrices DX and DY
+        # the overall interaction matrix is given by the sum
+        # of the interaction matrices DX and DY
         # minus the diagonal containing the sum of all vial-vial interactions
         interactionMatrix = DX + DY - VIAL_INT
 
-        # at most, any cubic vial on a 2D shelf can have 4 interactions. 4 - VIAL_INT is the
+        # at most, any cubic vial on a 2D shelf can have
+        # 4 interactions. 4 - VIAL_INT is the
         # number of external interactions (excl. the shelf)
         # is it worth storing this as a sparse matrix? - DRO XXX
         VIAL_EXT = 4 * np.ones((n_x * n_y,)) - VIAL_INT.diagonal()
@@ -605,7 +636,9 @@ class Snowflake:
 
         self._H_shelf = self.k["shelf"] * A  # either a scalar or a vector
 
-    def toDataframe(self, n_timeSteps=250) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+    def toDataframe(
+        self, n_timeSteps: int = 250
+    ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
 
         if self.simulationStatus == 0:
             raise ValueError(

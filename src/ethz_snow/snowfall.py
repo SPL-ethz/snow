@@ -1,10 +1,3 @@
-"""
-Created Date: Wednesday May 5th 2021
-Author: David Ochsenbein (DRO) - dochsenb@its.jnj.com
------
-Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
-"""
-
 import numpy as np
 import pandas as pd
 import re
@@ -109,12 +102,11 @@ class Snowfall:
         # does it make sense to have this?
 
     def __repr__(self) -> str:
-        """ The string representation of the Snowfall class.
+        """Return string representation of the Snowfall class.
 
         Returns:
             str: The Snowfall class string representation giving some basic info.
         """
-
         return (
             f"Snowfall([{self.Nrep} Snowflake{'s' if self.Nrep > 1 else ''}, "
             + f"pool_size: {self.pool_size}])"
