@@ -95,9 +95,9 @@ def test_getvialgroup(S_331_all):
         S_331_all.getVialGroup("rubbish")
 
 
-def test_toDataframe(fakeS):
+def test_to_frame(fakeS):
 
-    stats_df, traj_df = fakeS.toDataframe(n_timeSteps=4)
+    stats_df, traj_df = fakeS.to_frame(n_timeSteps=4)
 
     assert all(
         [col in stats_df.columns for col in ["group", "vial", "variable", "value"]]

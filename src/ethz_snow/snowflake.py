@@ -46,19 +46,20 @@ class Snowflake:
     XXX, Deck et al. (2021).
 
     Attributes:
+        dt (float): Time step.
         H_ext (np.ndarray): External heat transfer vector.
         H_int (csr_matrix): Internal heat transfer matrix.
         H_shelf (np.ndarray): Shelf heat transfer vector.
+        k (dict): Heat transfer coefficients.
         N_vials (tuple): Number of vials in each dimension.
         N_vials_total (int): Total number of vials.
-        X_T (np.ndarray): Temperature state over time.
-        X_sigma (np.ndarray): Sigma state over time.
-        dt (float): Time step.
-        k (dict): Heat transfer coefficients.
+        opcond (OperatingConditions): Operating conditions of run.
         seed (int): Seed to be used in rng.
         simulationStatus (int): Status of simulation (0 = not run, 1 = run).
         solidificationThreshold (float): What sigma value constitutes a 'solid'.
         stats (dict): Run statistics (nucleation time, etc.).
+        X_sigma (np.ndarray): Sigma state over time.
+        X_T (np.ndarray): Temperature state over time.
     """
 
     def __init__(

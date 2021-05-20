@@ -106,7 +106,7 @@ class Snowfall:
                     Snowfall._uniqueFlake,
                     [(self.Sf_template, i) for i in range(self.Nrep)],
                 ).get()
-            self.stats = res
+            self.stats = {i: r for i, r in enumerate(res)}
 
         elif how == "sync":
             manager = mp.Manager()
@@ -269,6 +269,7 @@ class Snowfall:
             stats_df = pd.DataFrame(
                 columns=["group", "vial", "variable", "value", "seed"]
             )
+            self.Sf_template._simulationStatus = 1
             for i in range(self.Nrep):
                 self.Sf_template.stats = self.stats[i]
                 loc_stats_df, _ = self.Sf_template.to_frame()
@@ -277,6 +278,7 @@ class Snowfall:
 
             # clean up template
             self.Sf_template.stats = dict()
+            self.Sf_template._simulationStatus = 0
 
             self.stats_df = stats_df
 
