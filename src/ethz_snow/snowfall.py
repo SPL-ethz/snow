@@ -24,16 +24,16 @@ class Snowfall:
             del kwargs["seed"]
 
         if ("storeStates" in kwargs.keys()) and (kwargs["storeStates"] is not None):
-            print(
-                "WARNING: We do not recommend storing states for Snowfall simulations."
-            )
-        # self.sf_kwargs = kwargs
+            print("WARNING: States cannot be stored for Snowfall simulations.")
+            del kwargs["storeStates"]
+
         Sf_template = Snowflake(**kwargs)
         Sf_template._buildHeatflowMatrices()  # pre-build H_int, H_ext, H_shelf
 
         self.Sf_template = Sf_template
 
         self.stats = dict()
+        self.stats_df = pd.DataFrame()
 
     @property
     def simulationStatus(self):
@@ -58,6 +58,7 @@ class Snowfall:
 
         # clean up old simulation
         self.stats = dict()
+        self.stats_df = pd.DataFrame()
 
         # run the individual snowflakes in a parallelized manner
         if how == "async":
@@ -87,25 +88,53 @@ class Snowfall:
                 self.stats[i] = self.uniqueFlake(self.Sf_template, i)
 
     def nucleationTimes(
-        self, group: Union[str, Sequence[str]] = "all", fromStates: bool = False
+        self,
+        group: Union[str, Sequence[str]] = "all",
+        seed: Union[int, Sequence[int], None] = None,
     ) -> np.ndarray:
-        pass
-        # XXX
+        return self._returnStats(what="tnuc", group=group, seed=seed)
 
     def nucleationTemperatures(
-        self, group: Union[str, Sequence[str]] = "all", fromStates: bool = False
+        self,
+        group: Union[str, Sequence[str]] = "all",
+        seed: Union[int, Sequence[int], None] = None,
     ) -> np.ndarray:
-        pass
-        # XXX
+        return self._returnStats(what="Tnuc", group=group, seed=seed)
 
     def solidificationTimes(
         self,
         group: Union[str, Sequence[str]] = "all",
-        threshold: Optional[float] = None,
-        fromStates: bool = False,
+        seed: Union[int, Sequence[int], None] = None,
     ) -> np.ndarray:
-        pass
-        # XXX
+
+        return self._returnStats(what="tsol", group=group, seed=seed)
+
+    def _returnStats(
+        self,
+        what: str,
+        group: str = "all",
+        seed: Union[int, Sequence[int], None] = None,
+    ):
+        df = self.to_frame()
+
+        if group != "all":
+            if not isinstance(group, (tuple, list)):
+                group = [group]
+            df = df[df.group.isin(group)]
+
+        if seed is not None:
+            if not isinstance(seed, (tuple, list)):
+                seed = [seed]
+            df = df[df.seed.isin(seed)]
+
+        if what == "tnuc":
+            df = df[df.variable == "t_nucleation"]
+        elif what == "Tnuc":
+            df = df[df.variable == "T_nucleation"]
+        elif what == "tsol":
+            df = df[df.variable == 't"solidification']
+
+        return df["value"].to_numpy()
 
     def plot(
         self,
@@ -129,15 +158,23 @@ class Snowfall:
         df = df[df.variable.str.contains(what)]
         sns.catplot(data=df, hue="group", y="value", kind=kind, x="variable")
 
-    def to_frame(self, n_timeSteps=250) -> pd.DataFrame:
-        stats_df = pd.DataFrame(columns=["group", "vial", "variable", "value", "seed"])
-        for i in range(self.Nrep):
-            self.Sf_template.stats = self.stats[i]
-            loc_stats_df, _ = self.Sf_template.to_frame(n_timeSteps=n_timeSteps)
-            loc_stats_df["seed"] = i
-            stats_df = stats_df.append(loc_stats_df)
+    def to_frame(self) -> pd.DataFrame:
+        if self.simulationStatus == 0:
+            raise ValueError("Simulation needs to be run first.")
+        elif self.stats_df.empty:
+            stats_df = pd.DataFrame(
+                columns=["group", "vial", "variable", "value", "seed"]
+            )
+            for i in range(self.Nrep):
+                self.Sf_template.stats = self.stats[i]
+                loc_stats_df, _ = self.Sf_template.to_frame()
+                loc_stats_df["seed"] = i
+                stats_df = stats_df.append(loc_stats_df)
 
-        self.Sf_template.stats = dict()
+            # clean up template
+            self.Sf_template.stats = dict()
+
+            self.stats_df = stats_df
 
         return stats_df
 
