@@ -1,9 +1,4 @@
-"""
-Created Date: Wednesday May 19th 2021
-Author: David Ochsenbein (DRO) - dochsenb@its.jnj.com
------
-Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
-"""
+"""Implement unit tests for operatingConditions class."""
 from _pytest.assertion import pytest_sessionfinish
 import pytest
 from ethz_snow.operatingConditions import OperatingConditions
@@ -12,6 +7,7 @@ import numpy as np
 
 
 def test_holdingType():
+    """Make sure holding type is checked."""
     with pytest.raises(TypeError):
         OperatingConditions(holding=1)
 
@@ -26,12 +22,14 @@ def test_holdingType():
     ],
 )
 def test_requiredKeys(cooling, holding):
+    """Make sure inputs are tested for required keys."""
     with pytest.raises(ValueError):
         OperatingConditions(holding=holding, cooling=cooling)
 
 
 @pytest.fixture(scope="module")
 def myO():
+    """Fixture to share operatingconditions across tests."""
     myO = OperatingConditions(
         t_tot=100,
         cooling=dict(start=20, end=-20, rate=1),
@@ -42,12 +40,16 @@ def myO():
 
 
 def test_cnt(myO):
+    """Test computation of controlled nuc. time."""
+    # if cn is false, cnt is inf
     assert myO.cnt == np.inf
+
     myO.controlledNucleation = True
     assert myO.cnt == 21
 
 
 def test_tempprofile(myO):
+    """Test that tempprofiles are calculated correctly."""
     T = myO.tempProfile(dt=1)
 
     assert T[0] == 20

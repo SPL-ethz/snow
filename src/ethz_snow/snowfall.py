@@ -73,15 +73,18 @@ class Snowfall:
 
     @classmethod
     def _uniqueFlake(cls, S, seed):
-        """Helper function to run a single Snowflake with a specific seed."""
+        """Run a single Snowflake with a specific seed."""
         S.seed = seed
         S.run()
         return S.stats
 
     @classmethod
     def _uniqueFlake_sync(cls, S, seed, return_dict):
-        """Helper function to run a single Snowflake with a specific seed
-        and write it back into multiprocessing.Manager object for data sharing."""
+        """Run a single Snowflake with a specific seed.
+
+        Run a single Snowflake with a specific seed
+        and write it back into multiprocessing.Manager object for data sharing.
+        """
         S.seed = seed
         S.run()
         return_dict[seed] = S.stats

@@ -1,16 +1,11 @@
-"""
-Created Date: Friday May 14th 2021
-Author: David Ochsenbein (DRO) - dochsenb@its.jnj.com
------
-Copyright (c) 2021 David Ochsenbein, Johnson & Johnson
-"""
-
+"""Implement unit tests for Snowflake class."""
 import pytest
 from ethz_snow.snowflake import Snowflake
 import numpy as np
 
 
 def test_k_must_be_fine():
+    """Test that k is checked properly."""
     with pytest.raises(TypeError):
         S = Snowflake(k=[1, 2, 3])
 
@@ -20,11 +15,13 @@ def test_k_must_be_fine():
 
 
 def test_opcond_must_be_operatingcondition():
+    """Check that opcond type is verified."""
     with pytest.raises(TypeError):
         S = Snowflake(opcond=dict(a=1))
 
 
 def test_only2D_implemented():
+    """Ensure no 3D model is being asked."""
     with pytest.raises(NotImplementedError):
         S = Snowflake(N_vials=(3, 3, 3))
 
@@ -33,6 +30,7 @@ def test_only2D_implemented():
     "input", ["gibberish", "2random3", [1, "asdf"], [0, 9], (-1, 2)]
 )
 def test_storeStatesMeaningless(input):
+    """Ensure invalid storeStates are rejected."""
     with pytest.raises(ValueError):
         S = Snowflake(N_vials=(3, 3, 1), storeStates=input)
 
@@ -52,6 +50,7 @@ def test_storeStatesMeaningless(input):
     ],
 )
 def test_storageMaskFunction(input_result):
+    """Ensure valid storeStates are interpreted correctly."""
     S = Snowflake(N_vials=(3, 3, 1), storeStates=input_result[0])
 
     assert np.sum(S._storageMask) == input_result[1]
@@ -59,6 +58,10 @@ def test_storageMaskFunction(input_result):
 
 @pytest.fixture(scope="module")
 def fakeS():
+    """Fixture to share a fake Snowflake across tests.
+    
+    Fake in that states are manually provided to avoid rng issues.
+    """
     S = Snowflake(N_vials=(2, 2, 1), storeStates="all")
     S._t = np.array([0, 1, 2, 3])
     S._X = np.concatenate(
@@ -78,6 +81,7 @@ def fakeS():
 
 
 def test_sigmaCounter(fakeS):
+    """Test that sigmas are calculated correctly."""
     assert fakeS.sigmaCounter(time=1) == 1
     assert all(fakeS.sigmaCounter(time=[0, 1, 2, 3]) == np.array([0, 1, 1, 3]))
     assert fakeS.sigmaCounter(time=2) == fakeS.sigmaCounter(time=2, fromStates=True)
@@ -85,7 +89,7 @@ def test_sigmaCounter(fakeS):
 
 
 def test_getvialgroup(S_331_all):
-
+    """Test that vialgrouping masks are correctly computed."""
     assert np.where(S_331_all.getVialGroup("center"))[0] == 4
     assert all(
         np.where(S_331_all.getVialGroup(["center", "corner"]))[0] == [0, 2, 4, 6, 8]
@@ -96,7 +100,7 @@ def test_getvialgroup(S_331_all):
 
 
 def test_to_frame(fakeS):
-
+    """Test that conversion to dataframe works as intended."""
     stats_df, traj_df = fakeS.to_frame(n_timeSteps=4)
 
     assert all(
@@ -116,6 +120,7 @@ def test_to_frame(fakeS):
 
 @pytest.fixture(scope="module")
 def S_331_all():
+    """Fixture to share Snowflake across tests."""
     S = Snowflake(N_vials=(3, 3, 1), storeStates="all")
     S.run()
     return S
@@ -123,6 +128,7 @@ def S_331_all():
 
 @pytest.fixture(scope="module")
 def S_331_edge():
+    """Fixture to share Snowflake across tests."""
     S = Snowflake(N_vials=(3, 3, 1), storeStates="edge")
     S.run()
     return S
@@ -133,10 +139,15 @@ def S_331_edge():
     "fun", ("nucleationTimes", "nucleationTemperatures", "solidificationTimes")
 )
 def test_statsConsistency(S_331_all, S_331_edge, fun):
+    """Ensure statistics are calculated correctly.
 
-    # the nucleation Temperatures can actually be a bit different, because the
-    # fromStates method retrieves only the last Temperature before the nucleation
-    # while the default method retrieves the stored, actual T of the vial
+    It should not matter whether we are using fromStates or not and whether we are
+    storing all the states or not. Note that the nucleation Temperatures can 
+    actually vary a bit, because the fromStates method retrieves only the last 
+    temperature before the nucleation while the default method retrieves the stored, 
+    _actual_ T of the vial at the time of nucleation.
+    """
+    #
     assert (
         abs(
             getattr(S_331_all, fun)().mean()
@@ -155,6 +166,7 @@ def test_statsConsistency(S_331_all, S_331_edge, fun):
 
 
 def test_interactionMatrix():
+    """Ensure interaction matrices are computed correctly."""
     S = Snowflake(N_vials=(3, 3, 1))
     mint, mext = S._buildInteractionMatrices()
 
