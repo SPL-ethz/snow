@@ -23,7 +23,24 @@ class Snowfall:
             # seed will be chosen by Snowfall
             del kwargs["seed"]
 
-        self.sf_kwargs = kwargs
+        if ("storeStates" in kwargs.keys()) and (kwargs["storeStates"] is not None):
+            print(
+                "WARNING: We do not recommend storing states for Snowfall simulations."
+            )
+        # self.sf_kwargs = kwargs
+        Sf_template = Snowflake(**kwargs)
+        Sf_template._buildHeatflowMatrices()  # pre-build H_int, H_ext, H_shelf
+
+        self.Sf_template = Sf_template
+
+        self.stats = dict()
+
+    @property
+    def simulationStatus(self):
+        if self.stats:
+            return 1
+        else:
+            return 0
 
     @classmethod
     def uniqueFlake(cls, S, seed):
@@ -38,16 +55,18 @@ class Snowfall:
         return_dict[seed] = S.stats
 
     def run(self, how="async"):
-        # run the individual snowflakes in a parallelized manner
+
+        # clean up old simulation
         self.stats = dict()
-        S = Snowflake(**self.sf_kwargs)
-        S._buildHeatflowMatrices()  # pre-build H_int, H_ext, H_shelf
+
+        # run the individual snowflakes in a parallelized manner
         if how == "async":
             with mp.Pool(self.pool_size) as p:
                 # starmap is only available since python 3.3
                 # it allows passing multiple arguments
                 res = p.starmap_async(
-                    Snowfall.uniqueFlake, [(S, i) for i in range(self.Nrep)]
+                    Snowfall.uniqueFlake,
+                    [(self.Sf_template, i) for i in range(self.Nrep)],
                 ).get()
             self.stats = res
 
@@ -59,13 +78,13 @@ class Snowfall:
                 # it allows passing multiple arguments
                 p.starmap(
                     Snowfall.uniqueFlake_sync,
-                    [(S, i, return_dict) for i in range(self.Nrep)],
+                    [(self.Sf_template, i, return_dict) for i in range(self.Nrep)],
                 )
             self.stats = dict(return_dict)
 
         elif how == "sequential":
             for i in range(self.Nrep):
-                self.stats[i] = self.uniqueFlake(S, i)
+                self.stats[i] = self.uniqueFlake(self.Sf_template, i)
 
     def nucleationTimes(
         self, group: Union[str, Sequence[str]] = "all", fromStates: bool = False
@@ -82,7 +101,7 @@ class Snowfall:
     def solidificationTimes(
         self,
         group: Union[str, Sequence[str]] = "all",
-        threshold: float = 0.9,
+        threshold: Optional[float] = None,
         fromStates: bool = False,
     ) -> np.ndarray:
         pass
@@ -90,16 +109,37 @@ class Snowfall:
 
     def plot(
         self,
-        what: str = "temperature",
-        kind: str = "trajectories",
+        what: str = "t_nucleation",
+        kind: str = "box",
+        seed: Union[int, Sequence[int], None] = None,
         group: Union[str, Sequence[str]] = "all",
     ):
-        pass
-        # XXX
+        df = self.to_frame()
 
-    def toDataframe(self, n_timeSteps=250) -> Tuple[np.ndarray, Optional[np.ndarray]]:
-        pass
-        # does it make sense to have this?
+        if group != "all":
+            if not isinstance(group, (tuple, list)):
+                group = [group]
+            df = df[df.group.isin(group)]
+
+        if seed is not None:
+            if not isinstance(seed, (tuple, list)):
+                seed = [seed]
+            df = df[df.seed.isin(seed)]
+
+        df = df[df.variable.str.contains(what)]
+        sns.catplot(data=df, hue="group", y="value", kind=kind, x="variable")
+
+    def to_frame(self, n_timeSteps=250) -> pd.DataFrame:
+        stats_df = pd.DataFrame(columns=["group", "vial", "variable", "value", "seed"])
+        for i in range(self.Nrep):
+            self.Sf_template.stats = self.stats[i]
+            loc_stats_df, _ = self.Sf_template.to_frame(n_timeSteps=n_timeSteps)
+            loc_stats_df["seed"] = i
+            stats_df = stats_df.append(loc_stats_df)
+
+        self.Sf_template.stats = dict()
+
+        return stats_df
 
     def __repr__(self) -> str:
         """Return string representation of the Snowfall class.

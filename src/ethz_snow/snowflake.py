@@ -69,7 +69,7 @@ class Snowflake:
             7,
             1,
         ),  # should this be part of operating conditions?
-        storeStates: Optional[Union[str, Sequence[str], Sequence[int]]] = None,
+        storeStates: Union[str, Sequence[str], Sequence[int], None] = None,
         solidificationThreshold: float = 0.9,
         dt: float = 2,
         seed: int = 2021,
@@ -83,6 +83,8 @@ class Snowflake:
                 Defaults to {"int": 20, "ext": 20, "s0": 20, "s_sigma_rel": 0.1}.
             N_vials (Tuple[int, int, int], optional): Number of vials in each dimension.
                 Defaults to ( 7, 7, 1).
+            storeStates (Union[str, Sequence[str], Sequence[int], None]):
+                Whether and for which vials to store states (temp, sigma).
             solidificationThreshold (float, optional): What sigma value is
                 a 'solid'. Defaults to 0.9.
             dt (float, optional): Time step size. Defaults to 2.
@@ -100,6 +102,8 @@ class Snowflake:
         Examples:
             >>> Sf = Snowflake()
             >>> Sf = Snowflake(Nvials=(4, 3, 1), dt = 5)
+            >>> Sf = Snowflake(storeStates = ['edge_random_4', 'uniform.center.5'])
+            >>> Sf = Snowflake(storeStates = (0, 4, 10))
         """
         if not isinstance(k, dict):
             raise TypeError(f"Input k must be of type dict. Was given {type(k)}.")
@@ -686,7 +690,7 @@ class Snowflake:
             group (Union[str, Sequence[str]], optional): Subgroup to return.
                 Defaults to "all".
         """
-        stats_df, traj_df = self.toDataframe()
+        stats_df, traj_df = self.to_frame()
         if not kind.lower().startswith("traj"):
             df = stats_df
         else:
@@ -817,9 +821,9 @@ class Snowflake:
 
         self._H_shelf = self.k["shelf"] * A  # either a scalar or a vector
 
-    def toDataframe(
+    def to_frame(
         self, n_timeSteps: int = 250
-    ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+    ) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
         """Save statistics (and states) as pandas dataframe.
 
         Args:
@@ -830,7 +834,7 @@ class Snowflake:
             ValueError: Simulation needs to run first.
 
         Returns:
-            Tuple[np.ndarray, Optional[np.ndarray]]: The statistics and if available
+            Tuple[pd.DataFrame, Optional[pd.DataFrame]]: The statistics and if available
                 the states over time (both in long form).
         """
         if self.simulationStatus == 0:
