@@ -32,13 +32,13 @@ def test_requiredKeys(cooling, holding):
 
 @pytest.fixture(scope="module")
 def myO():
-    O = OperatingConditions(
+    myO = OperatingConditions(
         t_tot=100,
         cooling=dict(start=20, end=-20, rate=1),
         holding=dict(duration=1, temp=0),
         controlledNucleation=False,
     )
-    return O
+    return myO
 
 
 def test_cnt(myO):

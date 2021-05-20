@@ -56,9 +56,9 @@ class Snowflake:
         dt (float): Time step.
         k (dict): Heat transfer coefficients.
         seed (int): Seed to be used in rng.
+        simulationStatus (int): Status of simulation (0 = not run, 1 = run).
         solidificationThreshold (float): What sigma value constitutes a 'solid'.
         stats (dict): Run statistics (nucleation time, etc.).
-
     """
 
     def __init__(
@@ -594,9 +594,7 @@ class Snowflake:
             np.ndarray: [description]
         """
         if self.simulationStatus == 0:
-            raise ValueError(
-                "Simulation needs to be run before induction times can be extracted."
-            )
+            raise ValueError("Simulation needs to be run first.")
 
         if threshold is None:
             # default is to give solidified vials
@@ -727,9 +725,7 @@ class Snowflake:
                 mask identifying vials that never reach threshold.
         """
         if self.simulationStatus == 0:
-            raise ValueError(
-                "Simulation needs to be run before induction times can be extracted."
-            )
+            raise ValueError("Simulation needs to be run first.")
 
         if threshold is None:
             threshold = self.solidificationThreshold
@@ -838,9 +834,7 @@ class Snowflake:
                 the states over time (both in long form).
         """
         if self.simulationStatus == 0:
-            raise ValueError(
-                "Simulation needs to be run before induction times can be extracted."
-            )
+            raise ValueError("Simulation needs to be run first.")
 
         df = pd.DataFrame(self.stats)
         df.index.name = "vial"

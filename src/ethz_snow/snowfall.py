@@ -1,3 +1,9 @@
+"""Implement Snowfall class.
+
+This module contains the Snowfall class used to run repeated (!)
+simulations of water nucleation in vials. It makes use of class
+Snowflake for the individual simulations.
+"""
 import numpy as np
 import pandas as pd
 import re
@@ -12,11 +18,29 @@ from ethz_snow.snowflake import Snowflake
 
 
 class Snowfall:
-    def __init__(self, Nrep: int = 5, pool_size: int = None, **kwargs):
+    """A class to handle multiple Stochastic Nucleation of Water simulation.
 
+    More information regarding the equations and their derivation can be found in
+    XXX, Deck et al. (2021) as well as the Snowflake class documentation.
+
+    Attributes:
+        Nrep (int): Number of repetitions.
+        pool_size (int): Size of worker pool for parallelization.
+        stats (dict): Statistics for each simulation.
+        stats_df (pd.DataFrame): Long-form table of all statistics.
+        simulationStatus (int): Status of simulation (0 = not run, 1 = run).
+    """
+
+    def __init__(self, Nrep: int = 5, pool_size: int = None, **kwargs):
+        """Construct a Snowfall object.
+
+        Args:
+            Nrep (int, optional): Number of repetitions. Defaults to 5.
+            pool_size (int, optional): Size of worker pool for parallelization.
+                Defaults to None (= # of cpu cores).
+        """
         self.pool_size = pool_size
 
-        # self.pool = mp.Pool(self.pool_size)
         self.Nrep = int(Nrep)
 
         if "seed" in kwargs.keys():
@@ -36,37 +60,50 @@ class Snowfall:
         self.stats_df = pd.DataFrame()
 
     @property
-    def simulationStatus(self):
+    def simulationStatus(self) -> int:
+        """Return simulation status of instance.
+
+        Returns:
+            int: Simulation status. 0 = not run, 1 = run.
+        """
         if self.stats:
             return 1
         else:
             return 0
 
     @classmethod
-    def uniqueFlake(cls, S, seed):
+    def _uniqueFlake(cls, S, seed):
+        """Helper function to run a single Snowflake with a specific seed."""
         S.seed = seed
         S.run()
         return S.stats
 
     @classmethod
-    def uniqueFlake_sync(cls, S, seed, return_dict):
+    def _uniqueFlake_sync(cls, S, seed, return_dict):
+        """Helper function to run a single Snowflake with a specific seed
+        and write it back into multiprocessing.Manager object for data sharing."""
         S.seed = seed
         S.run()
         return_dict[seed] = S.stats
 
     def run(self, how="async"):
+        """Run all the Snowflake simulations.
 
+        Args:
+            how (str, optional): How to perform runs. Valid options are
+                'async', 'sync', and 'sequential' (no parallelization).
+                    Defaults to "async".
+        """
         # clean up old simulation
         self.stats = dict()
         self.stats_df = pd.DataFrame()
 
-        # run the individual snowflakes in a parallelized manner
         if how == "async":
             with mp.Pool(self.pool_size) as p:
                 # starmap is only available since python 3.3
                 # it allows passing multiple arguments
                 res = p.starmap_async(
-                    Snowfall.uniqueFlake,
+                    Snowfall._uniqueFlake,
                     [(self.Sf_template, i) for i in range(self.Nrep)],
                 ).get()
             self.stats = res
@@ -78,20 +115,31 @@ class Snowfall:
                 # starmap is only available since python 3.3
                 # it allows passing multiple arguments
                 p.starmap(
-                    Snowfall.uniqueFlake_sync,
+                    Snowfall._uniqueFlake_sync,
                     [(self.Sf_template, i, return_dict) for i in range(self.Nrep)],
                 )
             self.stats = dict(return_dict)
 
         elif how == "sequential":
             for i in range(self.Nrep):
-                self.stats[i] = self.uniqueFlake(self.Sf_template, i)
+                self.stats[i] = self._uniqueFlake(self.Sf_template, i)
 
     def nucleationTimes(
         self,
         group: Union[str, Sequence[str]] = "all",
         seed: Union[int, Sequence[int], None] = None,
     ) -> np.ndarray:
+        """Return nucleation times.
+
+        Args:
+            group (Union[str, Sequence[str]], optional): Subgroup to return.
+                Defaults to "all".
+            seed (Union[int, Sequence[int], None], optional): Seed(s) to return.
+                Defaults to None.
+
+        Returns:
+            np.ndarray: The nucleation times.
+        """
         return self._returnStats(what="tnuc", group=group, seed=seed)
 
     def nucleationTemperatures(
@@ -99,6 +147,17 @@ class Snowfall:
         group: Union[str, Sequence[str]] = "all",
         seed: Union[int, Sequence[int], None] = None,
     ) -> np.ndarray:
+        """Return nucleation temperatures.
+
+        Args:
+            group (Union[str, Sequence[str]], optional): Subgroup to return.
+                Defaults to "all".
+            seed (Union[int, Sequence[int], None], optional): Seed(s) to return.
+                Defaults to None.
+
+        Returns:
+            np.ndarray: The nucleation temperatures.
+        """
         return self._returnStats(what="Tnuc", group=group, seed=seed)
 
     def solidificationTimes(
@@ -106,7 +165,17 @@ class Snowfall:
         group: Union[str, Sequence[str]] = "all",
         seed: Union[int, Sequence[int], None] = None,
     ) -> np.ndarray:
+        """Return solidification times.
 
+        Args:
+            group (Union[str, Sequence[str]], optional): Subgroup to return.
+                Defaults to "all".
+            seed (Union[int, Sequence[int], None], optional): Seed(s) to return.
+                Defaults to None.
+
+        Returns:
+            np.ndarray: The solidification times.
+        """
         return self._returnStats(what="tsol", group=group, seed=seed)
 
     def _returnStats(
@@ -115,6 +184,20 @@ class Snowfall:
         group: str = "all",
         seed: Union[int, Sequence[int], None] = None,
     ):
+        """Return arbitarary statistic.
+
+        Helper function to compute arbitrary statistic for
+        nucleationTimes, solidificationTimes, nucleationTemperatures.
+        Args:
+            what (str): What to return.
+            group (Union[str, Sequence[str]], optional): Subgroup to return.
+                Defaults to "all".
+            seed (Union[int, Sequence[int], None], optional): Seed(s) to return.
+                Defaults to None.
+
+            Returns:
+                np.ndarray: The statistic in question.
+        """
         df = self.to_frame()
 
         if group != "all":
@@ -143,6 +226,19 @@ class Snowfall:
         seed: Union[int, Sequence[int], None] = None,
         group: Union[str, Sequence[str]] = "all",
     ):
+        """Create plots for Snowfall object.
+
+        Args:
+            kind (str, optional): Any sns.catplot 'kind' input is allowed.
+                Defaults to "box".
+            what (str, optional): What to plot, i.e., keys of the stats dict.
+                Valid options are t_nucleation, T_nucleation, t_solidification.
+                Defaults to "t_nucleation".
+            seed (Union[int, Sequence[int], None], optional): Seed(s) to return.
+                Defaults to None.
+            group (Union[str, Sequence[str]], optional): Subgroup to return.
+                Defaults to "all".
+        """
         df = self.to_frame()
 
         if group != "all":
@@ -159,6 +255,14 @@ class Snowfall:
         sns.catplot(data=df, hue="group", y="value", kind=kind, x="variable")
 
     def to_frame(self) -> pd.DataFrame:
+        """Save statistics as pandas dataframe.
+
+        Raises:
+            ValueError: Simulation needs to run first.
+
+        Returns:
+            pd.DataFrame: The statistics in long form.
+        """
         if self.simulationStatus == 0:
             raise ValueError("Simulation needs to be run first.")
         elif self.stats_df.empty:
