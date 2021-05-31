@@ -811,10 +811,20 @@ class Snowflake:
 
         self._H_ext = VIAL_EXT * self.k["ext"] * A
 
-        if "s_sigma_rel" in self.k.keys():
-            self.k["shelf"] = self.k["s0"] + self._rng.normal(size=self.N_vials_total)
+        if ("s_sigma_rel" in self.k.keys()) and (self.k["s_sigma_rel"] > 0):
+            self.k["shelf"] = (
+                self.k["s0"]
+                + self._rng.normal(size=self.N_vials_total)
+                * self.k["s_sigma_rel"]
+                * self.k["s0"]
+            )
         else:
             self.k["shelf"] = self.k["s0"]
+
+        if any(self.k["shelf"] < 0):
+            # k cannot be smaller than 0
+            self.k["shelf"][self.k["shelf"] < 0] = 0
+            print("There were shelf heat transfer coefficients < 0. I set them to 0.")
 
         self._H_shelf = self.k["shelf"] * A  # either a scalar or a vector
 
