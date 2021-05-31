@@ -670,8 +670,8 @@ class Snowflake:
 
     def plot(
         self,
-        kind: str = "trajectories",
-        what: str = "temperature",
+        kind: str = "box",
+        what: str = "t_nucleation",
         group: Union[str, Sequence[str]] = "all",
     ):
         """Create plots for Snowflake object.
@@ -681,7 +681,7 @@ class Snowflake:
                 'trajectories' will print temperature or sigma profile.
                 Otherwise will print from stats dict. In that case,
                 any sns.catplot 'kind' input is allowed.
-                Defaults to "trajectories".
+                Defaults to "box".
             what (str, optional): What to plot. For trajectories valid inputs are
                 sigma or temperature. Otherwise, it's the keys of the stats dict.
                 I.e., t_nucleation, T_nucleation, t_solidification.
@@ -690,22 +690,24 @@ class Snowflake:
                 Defaults to "all".
         """
         stats_df, traj_df = self.to_frame()
-        if not kind.lower().startswith("traj"):
-            df = stats_df
-        else:
+        if kind.lower().startswith("traj"):
+            if self._emptyStore:
+                raise ValueError("No trajectories have been stored. Cannot plot.")
             df = traj_df
+        else:
+            df = stats_df
 
         if group != "all":
             if not isinstance(group, (tuple, list)):
                 group = [group]
             df = df[df.group.isin(group)]
 
-        if not kind.lower().startswith("traj"):
-            df = df[df.variable.str.contains(what)]
-            sns.catplot(data=df, hue="group", y="value", kind=kind, x="variable")
-        else:
+        if kind.lower().startswith("traj"):
             df = df[df.state.str.contains(what)]
             sns.lineplot(data=df, hue="group", y="value", x="Time")
+        else:
+            df = df[df.variable.str.contains(what)]
+            sns.catplot(data=df, hue="group", y="value", kind=kind, x="variable")
 
     def _sigmaCrossingIndices(
         self, threshold: float = None
