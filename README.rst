@@ -21,15 +21,19 @@ Features currently supported:
 - Arbitrary cooling protocols (i.e., user may choose cooling rate, integrate holding steps and controlled nucleation)
 
 - Tracking of nucleation times, temperatures and solidification times for all vials
+
 - Stochastic nucleation in the form of a Monte Carlo approach as well as controlled nucleation in the form of forced initiation of nucleation at a certain point in time
 
 - Cubic geometry of vial and rectangular arrangement on the shelf
 
 Features in preparation:
+
 - Hexagonal arrangement of vials on the shelf
+
 - Flexible vial geometry
 
 Bug reports:
+
 Please submit bugs to deckl@ethz.ch
 including a screenshot that illustrates the problem.
 
