@@ -15,10 +15,14 @@ In addition to the simulation of the thermal evolution of vials during freezing,
 A more detailed description of the modeling framework will be presented in a scientific publication that is currently in preparation. 
 
 Features currently supported:
+
 - Simulation of the thermal evolution and ice formation for a batch with arbitrary number of vials
+
 - Arbitrary cooling protocols (i.e., user may choose cooling rate, integrate holding steps and controlled nucleation)
+
 - Tracking of nucleation times, temperatures and solidification times for all vials
 - Stochastic nucleation in the form of a Monte Carlo approach as well as controlled nucleation in the form of forced initiation of nucleation at a certain point in time
+
 - Cubic geometry of vial and rectangular arrangement on the shelf
 
 Features in preparation:
