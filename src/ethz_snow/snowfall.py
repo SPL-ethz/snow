@@ -284,6 +284,9 @@ class Snowfall:
             self.Sf_template._simulationStatus = 0
 
             self.stats_df = stats_df
+        elif not self.stats_df.empty:
+            # do not recalculate, but load from memory
+            stats_df = self.stats_df
 
         return stats_df
 
