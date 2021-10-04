@@ -823,7 +823,7 @@ class Snowflake:
         else:
             self.k["shelf"] = self.k["s0"]
 
-        if any(self.k["shelf"] < 0):
+        if np.any(self.k["shelf"] < 0):
             # k cannot be smaller than 0
             self.k["shelf"][self.k["shelf"] < 0] = 0
             print("There were shelf heat transfer coefficients < 0. I set them to 0.")

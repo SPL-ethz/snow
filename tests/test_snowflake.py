@@ -14,6 +14,19 @@ def test_k_must_be_fine():
         S = Snowflake(k={"int": 1, "ext": 1, "s0f": 1})
 
 
+def test_Constant_kShelf_fine():
+    """Check that constant kshelf is respected."""
+    d = {"int": 20, "ext": 20, "s0": 20, "s_sigma_rel": 0}
+    S = Snowflake(storeStates="all", N_vials=(7, 7, 1), k=d)
+    S._buildHeatflowMatrices()
+
+    k_shelf = S.k["shelf"]
+
+    assert isinstance(k_shelf, (int, float))
+
+    assert k_shelf == 20
+
+
 def test_opcond_must_be_operatingcondition():
     """Check that opcond type is verified."""
     with pytest.raises(TypeError):
