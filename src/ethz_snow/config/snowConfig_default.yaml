@@ -1,0 +1,40 @@
+vial:
+  # W/[mK] thermal conductivity of glass / times 0.1 to take into
+  # account that the actual contact area is smaller
+  # 0.08 * 0.05 = 0.04
+  mylambda: 0.04
+  # [m] thickness of glass (2 mm, usually 2 layers of 1 mm)
+  thickness: 2e-3
+  geometry:
+    # base shape of vial (currently only cube is accepted)
+    shape: cube
+    # length [m]
+    a: 0.01
+    # width [m]
+    b: 0.01
+    # height [m]
+    c: 0.01
+water:
+  # J/[Kkg] heat capacity liquid water
+  cp_w: 4187
+  # J/[Kkg] heat capacity ice 0°C
+  cp_i: 2108
+  # J/kg heat of fusion water
+  Dh: 333550
+solution:
+  # kg/m^3 density of water / assumed constant for all phases
+  rho_l: 1000
+  # K kg / mol cryoscopic constant
+  k_f: 1.853
+  # J/Kkg, heat capacity sucrose
+  cp_s: 1240
+  # molar mass sucrose [kg/mol]
+  M_s: 0.3423
+  # mass fraction of solute in solution
+  solid_fraction: 0.05
+  # °C equilibrium freezing temperature
+  T_eq: 0
+kinetics:
+  # m−3 s−1 K−b value reduced compared to Braatz paper (he had a value of 10)
+  kb: 1e-9
+  b: 12
