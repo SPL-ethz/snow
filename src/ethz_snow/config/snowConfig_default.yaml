@@ -1,19 +1,13 @@
 vial:
-  # W/[mK] thermal conductivity of glass / times 0.1 to take into
-  # account that the actual contact area is smaller
-  # 0.08 * 0.05 = 0.04
-  mylambda: 0.04
-  # [m] thickness of glass (2 mm, usually 2 layers of 1 mm)
-  thickness: 2e-3
   geometry:
     # base shape of vial (currently only cube is accepted)
     shape: cube
     # length [m]
-    a: 0.01
+    length: 0.01
     # width [m]
-    b: 0.01
+    width: 0.01
     # height [m]
-    c: 0.01
+    height: 0.01
 water:
   # J/[Kkg] heat capacity liquid water
   cp_w: 4187

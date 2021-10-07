@@ -6,25 +6,30 @@ import yaml
 
 from collections.abc import Mapping
 
-from typing import Optional
+from typing import Optional, List, Any
 
 # TODO:
-# - config overwrite warning if key does not exist in default
-# - type hints
 # - doc strings
-# - unit testing
-# - ensure that this works in new installation
+# - unit testing for this capability
+# - ensure that this works in a from-scratch installation
+# - documentation for users on which config options exist and how to do
 
 
-def _getAllKeys(dl, keys_list):
+def __getAllKeys_gen(dl: Any) -> list:
     if isinstance(dl, dict):
-        keys_list += dl.keys()
-        map(lambda x: _getAllKeys(x, keys_list), dl.values())
-    elif isinstance(dl, list):
-        map(lambda x: _getAllKeys(x, keys_list), dl)
+        for val in dl.values():
+            yield from __getAllKeys_gen(val)
+
+        yield list(dl.keys())
 
 
-def _nestedDictUpdate(d, u):
+def _getAllKeys(dl: dict) -> List[str]:
+    keys_list = list(__getAllKeys_gen(dl))
+
+    return [key for subl in keys_list for key in subl]
+
+
+def _nestedDictUpdate(d: dict, u: dict) -> dict:
     # courtesy of stackoverflow (Alex Martelli)
     for k, v in u.items():
         if isinstance(v, Mapping):
@@ -43,20 +48,46 @@ def _loadConfig(fpath: Optional[str] = None) -> dict:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     if fpath is not None:
+
         with open(fpath) as f:
             customConfig = yaml.load(f, Loader=yaml.FullLoader)
+
+        # ensure that custom updates are
+        # subset of the valid set of keys
+        # (there is an edge case where the user
+        # uses a valid key nested in the wrong place
+        # we currently do not control for that)
+        validKeys = _getAllKeys(config)
+        newKeys = _getAllKeys(customConfig)
+
+        diffSet = set(newKeys) - set(validKeys)
+        if len(diffSet) > 0:
+            print(
+                (
+                    f"WARNING: Custom config key{'s'*(len(diffSet) > 1)} {diffSet} "
+                    + f"{'is' if (len(diffSet) == 1) else 'are'} not valid "
+                    + "and will be ignored."
+                )
+            )
+
         config = _nestedDictUpdate(config, customConfig)
 
     return config
 
 
-def calculateDerived(fpath: Optional[str] = None):
+def calculateDerived(fpath: Optional[str] = None) -> dict:
     # the below code uses somewhat clunky casting
     # it's needed because pyyaml parses certain numbers
     # in scienfitic notation as strings (YAML 1.1 vs 1.2 I suppose)
     # I'm too lazy to write something more sophisticated.
 
     config = _loadConfig(fpath)
+
+    const = dict()
+    # copy directly from yaml
+    T_eq = float(config["solution"]["T_eq"])
+    kb = float(config["kinetics"]["kb"])
+    b = float(config["kinetics"]["b"])
 
     # derived properties of vial
     if not config["vial"]["geometry"]["shape"].startswith("cub"):
@@ -66,8 +97,10 @@ def calculateDerived(fpath: Optional[str] = None):
                 + "Only cubic shape is supported at this moment."
             )
         )
-    A = float(config["vial"]["geometry"]["a"]) * float(config["vial"]["geometry"]["b"])
-    V = A * float(config["vial"]["geometry"]["c"])
+    A = float(config["vial"]["geometry"]["length"]) * float(
+        config["vial"]["geometry"]["width"]
+    )
+    V = A * float(config["vial"]["geometry"]["height"])
 
     # derived properties of solution
     cp_s = float(config["solution"]["cp_s"])
@@ -94,4 +127,27 @@ def calculateDerived(fpath: Optional[str] = None):
     )  # used for sigma time step
     beta_solution = depression * mass * cp_solution
 
-    return beta_solution
+    # bundle things into a dict now
+    # don't do it earlier for readability
+    constVars = [
+        "T_eq",
+        "kb",
+        "b",
+        "A",
+        "V",
+        "cp_s",
+        "solid_fraction",
+        "cp_w",
+        "cp_i",
+        "cp_solution",
+        "mass",
+        "hl",
+        "depression",
+        "alpha",
+        "beta_solution",
+    ]
+
+    for myvar in constVars:
+        const[myvar] = locals()[myvar]
+
+    return const

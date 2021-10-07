@@ -1,3 +1,5 @@
 vial:
   geometry:
-    shape: cylinder
+    randomKey: cylinder
+    anotherOne: 2
+    length: 1
