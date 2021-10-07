@@ -218,7 +218,7 @@ class Snowfall:
         elif what == "Tnuc":
             df = df[df.variable == "T_nucleation"]
         elif what == "tsol":
-            df = df[df.variable == 't"solidification']
+            df = df[df.variable == "t_solidification"]
 
         return df["value"].to_numpy()
 
