@@ -79,6 +79,8 @@ def _loadConfig(fpath: Optional[str] = None) -> dict:
     Returns:
         dict: The loaded config as dict.
     """
+    # the default config is listed as part of the package data
+    # therefore we can access it with pkg_resources
     defaultConfig_fpath = pkg_resources.resource_filename(
         "ethz_snow", "config/snowConfig_default.yaml"
     )
