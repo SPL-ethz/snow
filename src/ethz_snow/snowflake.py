@@ -131,9 +131,6 @@ class Snowflake:
 
         self.dt = dt
 
-        # store the seed to look it up if need be
-        self.seed = seed
-
         if not isinstance(opcond, OperatingConditions):
             raise TypeError(
                 "Input opcond must be an instance of class OperatingConditions."
@@ -180,6 +177,10 @@ class Snowflake:
         self._H_int = None
         self._H_ext = None
         self._H_shelf = None
+
+        # store the seed to look it up if need be
+        self.seed = seed
+
         # remember what N_vials was used to build heat flow matrices
         # so if it changes we know to rebuild them
         self._NvialsUsed = self.N_vials
@@ -225,8 +226,12 @@ class Snowflake:
         Returns:
             np.ndarray: The shelf heat transfer vector.
         """
-        if (self._H_shelf is None) or self.N_vials != self._NvialsUsed:
-            self._buildHeatflowMatrices()
+        if (
+            (self._H_shelf is None)
+            or (self.N_vials != self._NvialsUsed)
+            or (self.seed != self._seedUsed)
+        ):
+            self._buildShelfHeatFlow()
         return self._H_shelf
 
     @property
@@ -272,6 +277,9 @@ class Snowflake:
         self._rng = np.random.default_rng(value)
         # store the seed to look it up if need be
         self._seed = value
+
+        # let H_shelf figure out whether it needs to be updated
+        _ = self.H_shelf
 
     def _interpretStorageString(self, myString):
         """Interpret the storeState string.
@@ -326,6 +334,8 @@ class Snowflake:
         T_ext = T_shelf  # need to make a switch so that this can be decoupled - DRO XX
 
         # store stuff in local variables to reduce getter method calls
+        # note that getter method handles the construction of the matrices
+        # in case they haven't been initialized yet
         H_int = self.H_int
         H_ext = self.H_ext
         H_shelf = self.H_shelf
@@ -823,15 +833,17 @@ class Snowflake:
 
         return interactionMatrix, VIAL_EXT
 
-    def _buildHeatflowMatrices(self):
-        """Build heatflow matrices."""
-        self._NvialsUsed = self.N_vials
+    def _buildShelfHeatFlow(self):
+        """Build the shelf heat flow array.
 
-        interactionMatrix, VIAL_EXT = self._buildInteractionMatrices()
-
-        self._H_int = interactionMatrix * self.k["int"] * A
-
-        self._H_ext = VIAL_EXT * self.k["ext"] * A
+        Because the shelf heat flow may be dependent on the rng if
+        s_sigma_rel > 0 we need to separate this process out so we
+        can reinitialize this particular array for Snowfall.
+        """
+        # store which seed was used to compute this
+        # (getter method will know to recall this function
+        # if the value changes)
+        self._seedUsed = self.seed
 
         if ("s_sigma_rel" in self.k.keys()) and (self.k["s_sigma_rel"] > 0):
             self.k["shelf"] = (
@@ -849,6 +861,24 @@ class Snowflake:
             print("There were shelf heat transfer coefficients < 0. I set them to 0.")
 
         self._H_shelf = self.k["shelf"] * A  # either a scalar or a vector
+
+    def _buildHeatflowMatrices(self):
+        """Build heatflow matrices."""
+        # store which N_vials was used to compute this
+        # (getter method will know to recall this function
+        # if the value changes)
+        self._NvialsUsed = self.N_vials
+
+        interactionMatrix, VIAL_EXT = self._buildInteractionMatrices()
+
+        # compute H_int
+        self._H_int = interactionMatrix * self.k["int"] * A
+
+        # compute H_ext
+        self._H_ext = VIAL_EXT * self.k["ext"] * A
+
+        # compute H_shelf (potentially depends on rng/seed)
+        self._buildShelfHeatFlow()
 
     def to_frame(
         self, n_timeSteps: int = 250

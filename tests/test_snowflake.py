@@ -72,7 +72,7 @@ def test_storageMaskFunction(input_result):
 @pytest.fixture(scope="module")
 def fakeS():
     """Fixture to share a fake Snowflake across tests.
-    
+
     Fake in that states are manually provided to avoid rng issues.
     """
     S = Snowflake(N_vials=(2, 2, 1), storeStates="all")
@@ -155,9 +155,9 @@ def test_statsConsistency(S_331_all, S_331_edge, fun):
     """Ensure statistics are calculated correctly.
 
     It should not matter whether we are using fromStates or not and whether we are
-    storing all the states or not. Note that the nucleation Temperatures can 
-    actually vary a bit, because the fromStates method retrieves only the last 
-    temperature before the nucleation while the default method retrieves the stored, 
+    storing all the states or not. Note that the nucleation Temperatures can
+    actually vary a bit, because the fromStates method retrieves only the last
+    temperature before the nucleation while the default method retrieves the stored,
     _actual_ T of the vial at the time of nucleation.
     """
     #
