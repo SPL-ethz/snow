@@ -9,13 +9,23 @@ from collections.abc import Mapping
 from typing import Optional, List, Any
 
 # TODO:
-# - doc strings
 # - unit testing for this capability
 # - ensure that this works in a from-scratch installation
 # - documentation for users on which config options exist and how to do
 
 
 def __getAllKeys_gen(dl: Any) -> list:
+    """Help recursive key search with generator.
+
+    Args:
+        dl (Any): Some dictionary or dict value.
+
+    Returns:
+        list: The list of keys in dl.
+
+    Yields:
+        Iterator[list]: A generator of keys.
+    """
     if isinstance(dl, dict):
         for val in dl.values():
             yield from __getAllKeys_gen(val)
@@ -24,12 +34,32 @@ def __getAllKeys_gen(dl: Any) -> list:
 
 
 def _getAllKeys(dl: dict) -> List[str]:
+    """Return all keys in a potentially nested dict.
+
+    Args:
+        dl (dict): A dictionary of dictionaries of arbitrary depth.
+
+    Returns:
+        List[str]: All keys.
+    """
     keys_list = list(__getAllKeys_gen(dl))
 
     return [key for subl in keys_list for key in subl]
 
 
 def _nestedDictUpdate(d: dict, u: dict) -> dict:
+    """Update a nested dictionary with another.
+
+    Both dictionaries come from the config yaml.
+    We only want to update the entries in the custom
+    config (u) that are different from the default (d).
+    Args:
+        d (dict): The reference nested dictionary.
+        u (dict): The nested dictionary containing the updates.
+
+    Returns:
+        dict: The updated nested dictionary.
+    """
     # courtesy of stackoverflow (Alex Martelli)
     for k, v in u.items():
         if isinstance(v, Mapping):
@@ -40,6 +70,15 @@ def _nestedDictUpdate(d: dict, u: dict) -> dict:
 
 
 def _loadConfig(fpath: Optional[str] = None) -> dict:
+    """Load the default config file and the custom one.
+
+    Args:
+        fpath (Optional[str], optional): The filepath of the custom
+            config file. Defaults to None.
+
+    Returns:
+        dict: The loaded config as dict.
+    """
     defaultConfig_fpath = pkg_resources.resource_filename(
         "ethz_snow", "config/snowConfig_default.yaml"
     )
@@ -76,6 +115,18 @@ def _loadConfig(fpath: Optional[str] = None) -> dict:
 
 
 def calculateDerived(fpath: Optional[str] = None) -> dict:
+    """Compute the constants needed for Snowflake. Derive where needed.
+
+    Args:
+        fpath (Optional[str], optional): The filepath of the custom
+            config file. Defaults to None.
+
+    Raises:
+        NotImplementedError: Vial geometry is not cubic.
+
+    Returns:
+        dict: A dictionary of constants.
+    """
     # the below code uses somewhat clunky casting
     # it's needed because pyyaml parses certain numbers
     # in scienfitic notation as strings (YAML 1.1 vs 1.2 I suppose)
