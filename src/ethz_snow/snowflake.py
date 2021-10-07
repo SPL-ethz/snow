@@ -673,6 +673,7 @@ class Snowflake:
         kind: str = "box",
         what: str = "t_nucleation",
         group: Union[str, Sequence[str]] = "all",
+        context: bool = True,
     ):
         """Create plots for Snowflake object.
 
@@ -688,6 +689,8 @@ class Snowflake:
                 Defaults to "temperature".
             group (Union[str, Sequence[str]], optional): Subgroup to return.
                 Defaults to "all".
+            context (bool, optional): Whether or not to print additional context
+                in the figure. Mainly used to add shelf temperature.
         """
         stats_df, traj_df = self.to_frame()
         if kind.lower().startswith("traj"):
@@ -704,7 +707,24 @@ class Snowflake:
 
         if kind.lower().startswith("traj"):
             df = df[df.state.str.contains(what)]
-            sns.lineplot(data=df, hue="group", y="value", x="Time")
+            ax = sns.lineplot(data=df, hue="group", y="value", x="Time")
+
+            if (what == "temperature") and context:
+                N_timeSteps = (
+                    int(np.ceil(self.opcond.t_tot / self.dt)) + 1
+                )  # the total number of timesteps
+                t = np.arange(0, N_timeSteps * self.dt, self.dt)
+                T_shelf = self.opcond.tempProfile(self.dt)
+                sns.lineplot(
+                    x=t,
+                    y=T_shelf,
+                    ax=ax,
+                    linestyle="dashed",
+                    linewidth=0.75,
+                    color="black",
+                    label="Shelf Temperature",
+                )
+
         else:
             df = df[df.variable.str.contains(what)]
             sns.catplot(data=df, hue="group", y="value", kind=kind, x="variable")
