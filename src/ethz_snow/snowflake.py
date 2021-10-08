@@ -4,36 +4,17 @@ This module contains the Snowflake class used to run simulations
 of water nucleation in vials.
 """
 from ethz_snow.operatingConditions import OperatingConditions
-from ethz_snow.constants import (
-    A,
-    hl,
-    T_eq,
-    kb,
-    V,
-    b,
-    cp_solution,
-    mass,
-    solid_fraction,
-    cp_s,
-    depression,
-    alpha,
-    beta_solution,
-    cp_i,
-    cp_w,
-)
+from ethz_snow.constants import calculateDerived
 
 import numpy as np
 import pandas as pd
 import re
-import sys
 
 # import matplotlib.pyplot as plt
 import seaborn as sns
 
 from scipy.sparse import csr_matrix
 from typing import List, Tuple, Union, Sequence, Optional
-
-import time
 
 HEATFLOW_REQUIREDKEYS = ("int", "ext", "s0")
 VIAL_GROUPS = ("corner", "edge", "center", "all")
@@ -46,6 +27,8 @@ class Snowflake:
     XXX, Deck et al. (2021).
 
     Attributes:
+        configPath (Optional[str]): The path of the (optional) custom config yaml.
+        const (dict): A dictionary of constants to be used.
         dt (float): Time step.
         H_ext (np.ndarray): External heat transfer vector.
         H_int (csr_matrix): Internal heat transfer matrix.
@@ -75,6 +58,7 @@ class Snowflake:
         dt: float = 2,
         seed: int = 2021,
         opcond: OperatingConditions = OperatingConditions(),
+        configPath: Optional[str] = None,
     ):
         """Construct a Snowflake object.
 
@@ -92,6 +76,8 @@ class Snowflake:
             seed (int, optional): Seed to use for rng. Defaults to 2021.
             opcond (OperatingConditions, optional): Operating conditions to apply.
                 Defaults to OperatingConditions().
+            configPath (Optional[str], optional): The location of a custom configuration
+                file (in yaml format), used to update/overwrite the default settings.
 
         Raises:
             TypeError: If k is not a dict.
@@ -138,6 +124,26 @@ class Snowflake:
         else:
             self.opcond = opcond
 
+        self.solidificationThreshold = solidificationThreshold
+        self._X = None
+        self._t = None
+        self.stats = dict()
+
+        self._simulationStatus = 0
+
+        self._H_int = None
+        self._H_ext = None
+        self._H_shelf = None
+
+        self.configPath = configPath
+
+        # store the seed to look it up if need be
+        self.seed = seed
+
+        # remember what N_vials was used to build heat flow matrices
+        # so if it changes we know to rebuild them
+        self._NvialsUsed = self.N_vials
+
         self._emptyStore = False
         if isinstance(storeStates, (list, tuple)):
             if all([isinstance(x, int) for x in storeStates]):
@@ -166,24 +172,6 @@ class Snowflake:
             self._emptyStore = True
 
         self._storageMask = storageMask
-
-        self.solidificationThreshold = solidificationThreshold
-        self._X = None
-        self._t = None
-        self.stats = dict()
-
-        self._simulationStatus = 0
-
-        self._H_int = None
-        self._H_ext = None
-        self._H_shelf = None
-
-        # store the seed to look it up if need be
-        self.seed = seed
-
-        # remember what N_vials was used to build heat flow matrices
-        # so if it changes we know to rebuild them
-        self._NvialsUsed = self.N_vials
 
     @property
     def simulationStatus(self) -> int:
@@ -281,6 +269,15 @@ class Snowflake:
         # let H_shelf figure out whether it needs to be updated
         _ = self.H_shelf
 
+    @property
+    def configPath(self) -> Optional[str]:
+        return self._configPath
+
+    @configPath.setter
+    def configPath(self, value):
+        self.const = calculateDerived(value)
+        self._configPath = value
+
     def _interpretStorageString(self, myString):
         """Interpret the storeState string.
 
@@ -339,6 +336,22 @@ class Snowflake:
         H_int = self.H_int
         H_ext = self.H_ext
         H_shelf = self.H_shelf
+
+        # constants
+        solid_fraction = self.const["solid_fraction"]
+        cp_s = self.const["cp_s"]
+        cp_w = self.const["cp_w"]
+        cp_i = self.const["cp_i"]
+        cp_solution = self.const["cp_solution"]
+        depression = self.const["depression"]
+        mass = self.const["mass"]
+        alpha = self.const["alpha"]
+        beta_solution = self.const["beta_solution"]
+        T_eq = self.const["T_eq"]
+        hl = self.const["hl"]
+        kb = self.const["kb"]
+        b = self.const["b"]
+        V = self.const["V"]
 
         N_timeSteps = (
             int(np.ceil(self.opcond.t_tot / self.dt)) + 1
@@ -860,7 +873,7 @@ class Snowflake:
             self.k["shelf"][self.k["shelf"] < 0] = 0
             print("There were shelf heat transfer coefficients < 0. I set them to 0.")
 
-        self._H_shelf = self.k["shelf"] * A  # either a scalar or a vector
+        self._H_shelf = self.k["shelf"] * self.const["A"]  # either a scalar or a vector
 
     def _buildHeatflowMatrices(self):
         """Build heatflow matrices."""
@@ -868,6 +881,8 @@ class Snowflake:
         # (getter method will know to recall this function
         # if the value changes)
         self._NvialsUsed = self.N_vials
+
+        A = self.const["A"]
 
         interactionMatrix, VIAL_EXT = self._buildInteractionMatrices()
 
