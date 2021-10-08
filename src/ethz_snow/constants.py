@@ -9,9 +9,7 @@ from collections.abc import Mapping
 from typing import Optional, List, Any
 
 # TODO:
-# - unit testing for this capability
 # - ensure that this works in a from-scratch installation
-# - documentation for users on which config options exist and how to do
 
 
 def __getAllKeys_gen(dl: Any) -> list:
