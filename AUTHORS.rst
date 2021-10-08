@@ -3,4 +3,4 @@ Contributors
 ============
 
 * Leif-Thore Deck <deckl@ipe.mavt.ethz.ch>
-* David Ochsenbein <dochsenb@its.jnj.com>
+* Dr. David R. Ochsenbein <david.ochsenbein@novartis.com>
