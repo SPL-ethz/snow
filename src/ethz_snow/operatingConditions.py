@@ -116,7 +116,10 @@ class OperatingConditions:
 
             # time and number of steps to hold temperature
             T_vec_toHold = self._simpleCool(
-                Tstart=T_start, Tend=T_hold, coolingRate=cr, dt=dt,
+                Tstart=T_start,
+                Tend=T_hold,
+                coolingRate=cr,
+                dt=dt,
             )
 
             # append holding period
@@ -193,7 +196,7 @@ class OperatingConditions:
         return (
             f"OperatingConditions([t_tot: {self.t_tot}, "
             + f"Cooling: {self.cooling['start']} to {self.cooling['end']} "
-            + f"with {self.cooling['rate']}, "
+            + f"with rate {self.cooling['rate']:4.2f}, "
             + f"Hold: {self.holding['duration']} @ {self.holding['temp']}, "
             + f"Controlled Nucleation: {'ON' if self.controlledNucleation else 'OFF'}"
         )
