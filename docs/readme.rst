@@ -1,2 +1,2 @@
 .. _readme:
-.. include:: ../README.rst
+.. include:: ../readme_link.rst
