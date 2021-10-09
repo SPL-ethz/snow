@@ -28,7 +28,7 @@ class OperatingConditions:
         t_tot: float = 2e4,
         cooling: dict = {"rate": 0.5 / 60, "start": 20, "end": -50},
         holding: Optional[Union[Iterable[dict], dict]] = {"duration": 600, "temp": -12},
-        controlledNucleation: bool = False,
+        controlledNucleation: int = None,
     ):
         """Construct an OperatingConditions object.
 
@@ -39,26 +39,17 @@ class OperatingConditions:
             holding (Optional[Union[Iterable[dict], dict]], optional):
                 A dictionary or list of dictionaries describing
                 the holding step(s). Defaults to {"duration": 600, "temp": -12}.
-            controlledNucleation (bool, optional): Whether or not controlled
-                nucleation is applied. Defaults to False.
-
-        Raises:
-            ValueError: If cooling dict does not contain all necessary keys.
-            ValueError: If holding dict does not contain all necessary keys.
-            TypeError: If holding is of invalid type (not None or dict).
+            controlledNucleation (int, optional): When controlled
+                nucleation is triggered. Given as index of (sorted!) holding dict
+                list;  nucleation triggers at the end of the holding step.
+                0 refers to the first holding step, 1 to the second, etc.
+                Defaults to None, meaning no controlled nucleation.
         """
         self.t_tot = t_tot
         if not all([key in cooling.keys() for key in ["rate", "start", "end"]]):
             raise ValueError("Cooling dictionary does not contain all required keys.")
         self.cooling = cooling
 
-        if isinstance(holding, dict):
-            if not all([key in holding.keys() for key in ["duration", "temp"]]):
-                raise ValueError(
-                    "Holding dictionary does not contain all required keys."
-                )
-        elif holding is not None:
-            raise TypeError("Input holding is neither dict nor None.")
         self.holding = holding
 
         self.controlledNucleation = controlledNucleation
@@ -78,6 +69,12 @@ class OperatingConditions:
             pass
         else:
             raise TypeError("holding must be a dict or Iterable of dict.")
+
+        for val in value:
+            if not all([key in val.keys() for key in ["duration", "temp"]]):
+                raise ValueError(
+                    "Holding dictionary does not contain all required keys."
+                )
 
         self._holding = value
 
@@ -100,17 +97,19 @@ class OperatingConditions:
                 + "Cannot calculate controlled nucleation time."
             )
 
-        if self.controlledNucleation:
-            DT_cool = (self.cooling["start"] - self.holding["temp"]) / self.cooling[
-                "rate"
-            ]
-            DT_holding = self.holding["duration"]
+        if self.controlledNucleation is not None:
+            T_vec = self.tempProfile(1)
+            t_vec = np.arange(0, len(T_vec))
 
-            DT = DT_cool + DT_holding
+            T_cnt = self.holding[self.controlledNucleation]["temp"]
+
+            I_endHold = np.argmax(T_vec[::-1] == T_cnt)
+            t_endHold = t_vec[::-1][I_endHold]
+
         else:
-            DT = np.inf
+            t_endHold = np.inf
 
-        return DT
+        return t_endHold
 
     def tempProfile(self, dt: float) -> np.ndarray:
         """Return temperature profile.
@@ -136,7 +135,6 @@ class OperatingConditions:
         for hdict in hdicts:
 
             T_hold = hdict["temp"]
-            print(T_hold)
             t_hold = (T_start - T_hold) / cr
             duration_hold = hdict["duration"]
 
@@ -207,6 +205,6 @@ class OperatingConditions:
             f"OperatingConditions([t_tot: {self.t_tot}, "
             + f"Cooling: {self.cooling['start']} to {self.cooling['end']} "
             + f"with rate {self.cooling['rate']:4.2f}, "
-            + f"Hold: {self.holding['duration']} @ {self.holding['temp']}, "
+            + f"Hold: {self.holding[0]['duration']} @ {self.holding[0]['temp']}, "
             + f"Controlled Nucleation: {'ON' if self.controlledNucleation else 'OFF'}"
         )
