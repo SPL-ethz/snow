@@ -6,7 +6,7 @@ in freezing processes.
 """
 import numpy as np
 
-from typing import Optional
+from typing import Optional, Iterable, Union
 
 
 class OperatingConditions:
@@ -27,7 +27,7 @@ class OperatingConditions:
         self,
         t_tot: float = 2e4,
         cooling: dict = {"rate": 0.5 / 60, "start": 20, "end": -50},
-        holding: Optional[dict] = {"duration": 10, "temp": -12},
+        holding: Optional[Union[Iterable[dict], dict]] = {"duration": 10, "temp": -12},
         controlledNucleation: bool = False,
     ):
         """Construct an OperatingConditions object.
@@ -36,8 +36,9 @@ class OperatingConditions:
             t_tot (float, optional): The total process time. Defaults to 2e4.
             cooling (dict, optional): A dictionary describing the cooling profile.
                 Defaults to {"rate": 0.5 / 60, "start": 20, "end": -50}.
-            holding (Optional[dict], optional): A dictionary describing
-                the holding step. Defaults to {"duration": 10, "temp": -12}.
+            holding (Optional[Union[Iterable[dict], dict]], optional):
+                A dictionary or list of dictionaries describing
+                the holding step(s). Defaults to {"duration": 10, "temp": -12}.
             controlledNucleation (bool, optional): Whether or not controlled
                 nucleation is applied. Defaults to False.
 
@@ -61,6 +62,20 @@ class OperatingConditions:
         self.holding = holding
 
         self.controlledNucleation = controlledNucleation
+
+    @property
+    def holding(self) -> Union[Iterable[dict], dict]:
+        return self._holding
+
+    @holding.setter
+    def holding(self, value):
+        if not isinstance(value, ((list, tuple))):
+            value = [value]
+        else:
+            # bring holding steps into right order (descending)
+            value = sorted(value, key=lambda hdict: hdict["temp"], reverse=True)
+
+        self._holding = value
 
     @property
     def cnt(self) -> float:
@@ -107,10 +122,11 @@ class OperatingConditions:
         # total number of steps
         n = int(np.ceil(self.t_tot / dt)) + 1
 
+        T_start = self.cooling["start"]
+        cr = self.cooling["rate"]
+
         if self.holding is not None:
-            T_start = self.cooling["start"]
             T_hold = self.holding["temp"]
-            cr = self.cooling["rate"]
             t_hold = (T_start - T_hold) / cr
             duration_hold = self.holding["duration"]
 
@@ -140,9 +156,9 @@ class OperatingConditions:
         else:
 
             T_vec = self._simpleCool(
-                Tstart=self.cooling["start"],
+                Tstart=T_start,
                 Tend=self.cooling["end"],
-                coolingRate=self.cooling["rate"],
+                coolingRate=cr,
                 dt=dt,
                 t_tot=self.t_tot,
             )
