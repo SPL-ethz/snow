@@ -27,7 +27,7 @@ class OperatingConditions:
         self,
         t_tot: float = 2e4,
         cooling: dict = {"rate": 0.5 / 60, "start": 20, "end": -50},
-        holding: Optional[Union[Iterable[dict], dict]] = {"duration": 10, "temp": -12},
+        holding: Optional[Union[Iterable[dict], dict]] = {"duration": 600, "temp": -12},
         controlledNucleation: bool = False,
     ):
         """Construct an OperatingConditions object.
@@ -38,7 +38,7 @@ class OperatingConditions:
                 Defaults to {"rate": 0.5 / 60, "start": 20, "end": -50}.
             holding (Optional[Union[Iterable[dict], dict]], optional):
                 A dictionary or list of dictionaries describing
-                the holding step(s). Defaults to {"duration": 10, "temp": -12}.
+                the holding step(s). Defaults to {"duration": 600, "temp": -12}.
             controlledNucleation (bool, optional): Whether or not controlled
                 nucleation is applied. Defaults to False.
 
@@ -64,16 +64,20 @@ class OperatingConditions:
         self.controlledNucleation = controlledNucleation
 
     @property
-    def holding(self) -> Union[Iterable[dict], dict]:
+    def holding(self) -> Iterable[dict]:
         return self._holding
 
     @holding.setter
-    def holding(self, value):
-        if not isinstance(value, ((list, tuple))):
+    def holding(self, value: Union[dict, list, tuple]):
+        if isinstance(value, dict):
             value = [value]
-        else:
+        elif isinstance(value, (list, tuple)):
             # bring holding steps into right order (descending)
             value = sorted(value, key=lambda hdict: hdict["temp"], reverse=True)
+        elif value is None:
+            pass
+        else:
+            raise TypeError("holding must be a dict or Iterable of dict.")
 
         self._holding = value
 
@@ -125,12 +129,18 @@ class OperatingConditions:
         T_start = self.cooling["start"]
         cr = self.cooling["rate"]
 
-        if self.holding is not None:
-            T_hold = self.holding["temp"]
-            t_hold = (T_start - T_hold) / cr
-            duration_hold = self.holding["duration"]
+        hdicts = self.holding + [{"temp": self.cooling["end"], "duration": self.t_tot}]
 
-            # time and number of steps to hold temperature
+        T_vec = np.array([])
+
+        for hdict in hdicts:
+
+            T_hold = hdict["temp"]
+            print(T_hold)
+            t_hold = (T_start - T_hold) / cr
+            duration_hold = hdict["duration"]
+
+            # ramp from start to hold temp
             T_vec_toHold = self._simpleCool(
                 Tstart=T_start,
                 Tend=T_hold,
@@ -141,27 +151,11 @@ class OperatingConditions:
             # append holding period
             T_vec_holding = [T_hold] * int(np.ceil((duration_hold - t_hold % dt) / dt))
 
-            # cool to final temperature
-            T_vec_toEnd = self._simpleCool(
-                Tstart=T_hold,
-                Tend=self.cooling["end"],
-                coolingRate=self.cooling["rate"],
-                dt=dt,
-                t_tot=self.t_tot,
-            )
+            T_start = T_hold
 
-            T_vec = np.concatenate([T_vec_toHold, T_vec_holding, T_vec_toEnd])
+            T_vec = np.concatenate([T_vec, T_vec_toHold, T_vec_holding])
 
-            T_vec = T_vec[:n]
-        else:
-
-            T_vec = self._simpleCool(
-                Tstart=T_start,
-                Tend=self.cooling["end"],
-                coolingRate=cr,
-                dt=dt,
-                t_tot=self.t_tot,
-            )
+        T_vec = T_vec[:n]
 
         return T_vec
 
