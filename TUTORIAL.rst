@@ -51,7 +51,7 @@ Finally, we may define the snowfall class. We set the pool_size parameter to the
 
 S = Snowfall(pool_size=8,k=d,Nrep=50,N_vials=(7,7,1),opcond=op)
 
-We then start the simulation via S.run()
+We then start the simulation via S.run() and may check whether it completed via S.simulationStatus().
 
 ========
 First steps: Simulation output
@@ -59,6 +59,10 @@ First steps: Simulation output
 
 After running the simulation, several information are stored that characterize the freezing process. Importantly, these are the solidificationTimes(), nucleationTimes(), and nucleationTemperatures(). These are also grouped based on position, allowing to understand potential differences among center, edge and corner vials. 
 
-We may use S.plot(what="T_nucleation") to immediately get an understanding of the nucleation temperatures, and similarly for the other quantities. 
+We may use S.plot(what="T_nucleation") to immediately get an understanding of the nucleation temperatures, and similarly for the other quantities. The plot function is also capable of showing trajectories, in case snowflake is used instead of snowfall. In this case, 
+
+S.plot(what="T_nucleation")
+
+will show the evolution of the temperatures as well as the shelf, which is a very useful first information for understanding the freezing process as well as a sanity check of the simulation outcome. 
 
 
