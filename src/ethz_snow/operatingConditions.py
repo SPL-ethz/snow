@@ -204,8 +204,8 @@ class OperatingConditions:
                 giving some basic info.
         """
         holdPluralBool = (self.holding is not None) and (len(self.holding) > 1)
-        holdPlural = f"Hold{'s:' if (holdPluralBool) else ''}:"
-        holdStr = holdPlural + ",".join(
+        holdPlural = f"Hold{'s' if (holdPluralBool) else ''}: "
+        holdStr = holdPlural + " AND ".join(
             [f"{hdict['duration']} @ {hdict['temp']}" for hdict in self.holding]
         )
 
@@ -214,6 +214,6 @@ class OperatingConditions:
             + f"Cooling: {self.cooling['start']} to {self.cooling['end']} "
             + f"with rate {self.cooling['rate']:4.2f}, "
             + holdStr
-            + ","
+            + ", "
             + f"Controlled Nucleation: {'ON' if self.cnTemp else 'OFF'}"
         )
