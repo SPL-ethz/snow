@@ -18,7 +18,7 @@ The package contains several files, two of which enable the simulation of freezi
 
 Both models require a number of operatingConditions and constants as input parameters, which may be adjusted by the user. We define operating conditions as those input parameters, that are related to the numerics of the model (e.g. time step, number of repetitions) or to technical aspects (e.g. heat transfer parameters, cooling protocol). Constants, on the other hand, refer to formulation specific parameters, such as the volume of a vial, its composition and the required individual physicochemical parameters of the individual components (including ice nucleation kinetics). 
 
-Operating conditions are to be provided directly when calling the snowflake / snowfall functions, while we specify the constants separately in a .yaml file. If no values are specified, the default configurations are used; these are stored in the operatingConditions.py and the snowConfig_default.yaml.
+Operating conditions are to be provided directly when calling the **snowflake** / **snowfall** functions, while we specify the constants separately in a .yaml file. If no values are specified, the default configurations are used; these are stored in the **operatingConditions.py** and the **snowConfig_default.yaml**.
 
 ========
 Example
