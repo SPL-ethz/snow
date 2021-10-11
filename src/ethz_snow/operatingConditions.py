@@ -28,7 +28,7 @@ class OperatingConditions:
         t_tot: float = 2e4,
         cooling: dict = {"rate": 0.5 / 60, "start": 20, "end": -50},
         holding: Optional[Union[Iterable[dict], dict]] = {"duration": 600, "temp": -12},
-        controlledNucleation: int = None,
+        cnTemp: Union[float, int] = None,
     ):
         """Construct an OperatingConditions object.
 
@@ -39,11 +39,10 @@ class OperatingConditions:
             holding (Optional[Union[Iterable[dict], dict]], optional):
                 A dictionary or list of dictionaries describing
                 the holding step(s). Defaults to {"duration": 600, "temp": -12}.
-            controlledNucleation (int, optional): When controlled
-                nucleation is triggered. Given as index of (sorted!) holding dict
-                list;  nucleation triggers at the end of the holding step.
-                0 refers to the first holding step, 1 to the second, etc.
-                Defaults to None, meaning no controlled nucleation.
+            cnTemp (Union[float, int], optional): At what temperature controlled
+                nucleation is triggered. Nucleation triggers when
+                temp<=cnTemp. If that occurs during a holding
+                phase nucleation will trigger _at the end_ of the phase.
         """
         self.t_tot = t_tot
         if not all([key in cooling.keys() for key in ["rate", "start", "end"]]):
@@ -52,14 +51,16 @@ class OperatingConditions:
 
         self.holding = holding
 
-        self.controlledNucleation = controlledNucleation
+        self.cnTemp = cnTemp
 
     @property
     def holding(self) -> Iterable[dict]:
+        """Get holding property."""
         return self._holding
 
     @holding.setter
     def holding(self, value: Union[dict, list, tuple]):
+        """Set holding property."""
         if isinstance(value, dict):
             value = [value]
         elif isinstance(value, (list, tuple)):
@@ -70,11 +71,12 @@ class OperatingConditions:
         else:
             raise TypeError("holding must be a dict or Iterable of dict.")
 
-        for val in value:
-            if not all([key in val.keys() for key in ["duration", "temp"]]):
-                raise ValueError(
-                    "Holding dictionary does not contain all required keys."
-                )
+        if value is not None:
+            for val in value:
+                if not all([key in val.keys() for key in ["duration", "temp"]]):
+                    raise ValueError(
+                        "Holding dictionary does not contain all required keys."
+                    )
 
         self._holding = value
 
@@ -97,13 +99,11 @@ class OperatingConditions:
                 + "Cannot calculate controlled nucleation time."
             )
 
-        if self.controlledNucleation is not None:
+        if self.cnTemp is not None:
             T_vec = self.tempProfile(1)
             t_vec = np.arange(0, len(T_vec))
 
-            T_cnt = self.holding[self.controlledNucleation]["temp"]
-
-            I_endHold = np.argmax(T_vec[::-1] == T_cnt)
+            I_endHold = np.argmax(T_vec[::-1] >= self.cnTemp)
             t_endHold = t_vec[::-1][I_endHold]
 
         else:
@@ -128,7 +128,12 @@ class OperatingConditions:
         T_start = self.cooling["start"]
         cr = self.cooling["rate"]
 
-        hdicts = self.holding + [{"temp": self.cooling["end"], "duration": self.t_tot}]
+        if self.holding is not None:
+            hdicts = self.holding + [
+                {"temp": self.cooling["end"], "duration": self.t_tot}
+            ]
+        else:
+            hdicts = [{"temp": self.cooling["end"], "duration": self.t_tot}]
 
         T_vec = np.array([])
 
@@ -140,10 +145,7 @@ class OperatingConditions:
 
             # ramp from start to hold temp
             T_vec_toHold = self._simpleCool(
-                Tstart=T_start,
-                Tend=T_hold,
-                coolingRate=cr,
-                dt=dt,
+                Tstart=T_start, Tend=T_hold, coolingRate=cr, dt=dt,
             )
 
             # append holding period
@@ -201,10 +203,17 @@ class OperatingConditions:
             str: The OperatingConditions class string representation
                 giving some basic info.
         """
+        holdPluralBool = (self.holding is not None) and (len(self.holding) > 1)
+        holdPlural = f"Hold{'s:' if (holdPluralBool) else ''}:"
+        holdStr = holdPlural + ",".join(
+            [f"{hdict['duration']} @ {hdict['temp']}" for hdict in self.holding]
+        )
+
         return (
             f"OperatingConditions([t_tot: {self.t_tot}, "
             + f"Cooling: {self.cooling['start']} to {self.cooling['end']} "
             + f"with rate {self.cooling['rate']:4.2f}, "
-            + f"Hold: {self.holding[0]['duration']} @ {self.holding[0]['temp']}, "
-            + f"Controlled Nucleation: {'ON' if self.controlledNucleation else 'OFF'}"
+            + holdStr
+            + ","
+            + f"Controlled Nucleation: {'ON' if self.cnTemp else 'OFF'}"
         )
