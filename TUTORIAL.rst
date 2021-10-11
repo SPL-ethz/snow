@@ -39,13 +39,19 @@ Next, we define the cooling protocol. Note that holding steps are defined separa
 
 ``c = {"rate": 0.5 / 60, "start": 20, "end": -50}``
 
-For the holding steps, we need to define duration and temperature of each step separately. Let us say, that both steps at -5°C and at -10°C take 90 min. Again, it is important that the time is based in s, thus we need to multiply with 60.
+For the holding steps, we need to define duration and temperature of each step separately. Let us say, that both steps at -5°C and at -10°C take 90 min. Again, it is important that the time is based in s, thus we need to multiply with 60. Also, the program automatically adjusts the sequence of the holding steps in the way that they are in the order of decreasing holding temperatures.
 
 ``h = [dict(duration=90*60, temp=-5), dict(duration=90*60, temp=-10)]``
 
 Next, let us think about the total time of the simulation that is required; this depends on the cooling and holding parameters as well as on heat transfer and on some of the formulation constants. It is thus not automatically calculated, but needs to be set. We recommend to provide at least one hour more than is required for the shelf to reach the final temperature. One may use the snowflake simulation to test if the set time is sufficient. Here, let us set t_tot = 3e4:
 
 ``op = OperatingConditions(t_tot=3e4,cooling= c,holding = h )``
+
+In case, we are interested in controlled nucleation, we can add the argument cnTemp to trigger nucleation at the end of a holding step. By defining
+
+``op = OperatingConditions(t_tot=3e4,cooling= c,holding = h, cnTemp = -5 )``
+
+we trigger nucleation at the end of the holding step at -5°C. Note that in the current version, controlled nucleation may only be defined at the end of a holding step.
 
 Finally, we may define the snowfall class. We set the pool_size parameter to the number of cores of the processor and the Nrep to a statistically relevant number. To fully capture the effects of the stochasticity of ice nucleation in a quantitative manner, we recommend Nrep > 1000. For a qualitative view, we set Nrep = 50:
 
