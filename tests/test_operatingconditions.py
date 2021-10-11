@@ -19,6 +19,7 @@ def test_holdingType():
         ({"start": 10, "end": 1, "rate": 1}, dict()),
         ({"start": 10, "end": 1, "rate": 1}, {"duration": 10}),
         ({"start": 10, "end": 1}, {"duration": 10, "temp": 0}),
+        ({"start": 10, "end": 1}, [{"duration": 10, "temp": 0}, {"duration": 3}]),
     ],
 )
 def test_requiredKeys(cooling, holding):
@@ -34,18 +35,33 @@ def myO():
         t_tot=100,
         cooling=dict(start=20, end=-20, rate=1),
         holding=dict(duration=1, temp=0),
-        controlledNucleation=False,
+        cnTemp=None,
     )
     return myO
 
 
-def test_cnt(myO):
+@pytest.fixture(scope="module")
+def myO_mh():
+    """Fixture to share multihold operatingconditions across tests."""
+    myO_mh = OperatingConditions(
+        t_tot=500,
+        cooling=dict(start=20, end=-20, rate=1),
+        holding=[dict(duration=69, temp=-10), dict(duration=1, temp=0)],
+        cnTemp=-10,
+    )
+    # cnt should be at 30 (time to cool down) +1 (first hold)+69 (second hold)=100
+    return myO_mh
+
+
+def test_cnt(myO, myO_mh):
     """Test computation of controlled nuc. time."""
     # if cn is false, cnt is inf
     assert myO.cnt == np.inf
 
-    myO.controlledNucleation = True
+    myO.cnTemp = myO.holding[0]["temp"]
     assert myO.cnt == 21
+
+    assert myO_mh.cnt == 100
 
 
 def test_tempprofile(myO):
@@ -59,7 +75,7 @@ def test_tempprofile(myO):
     assert all(np.diff(T[:20]) == -1)
     assert all(T[41:] == -20)
 
-    myO.holding["duration"] = 10
+    myO.holding[0]["duration"] = 10
     T = myO.tempProfile(dt=3)
     assert all(T[7:11] == 0)
     assert T[11] != 0

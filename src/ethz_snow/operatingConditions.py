@@ -6,7 +6,7 @@ in freezing processes.
 """
 import numpy as np
 
-from typing import Optional
+from typing import Optional, Iterable, Union
 
 
 class OperatingConditions:
@@ -27,8 +27,8 @@ class OperatingConditions:
         self,
         t_tot: float = 2e4,
         cooling: dict = {"rate": 0.5 / 60, "start": 20, "end": -50},
-        holding: Optional[dict] = {"duration": 10, "temp": -12},
-        controlledNucleation: bool = False,
+        holding: Optional[Union[Iterable[dict], dict]] = {"duration": 600, "temp": -12},
+        cnTemp: Union[float, int] = None,
     ):
         """Construct an OperatingConditions object.
 
@@ -36,31 +36,49 @@ class OperatingConditions:
             t_tot (float, optional): The total process time. Defaults to 2e4.
             cooling (dict, optional): A dictionary describing the cooling profile.
                 Defaults to {"rate": 0.5 / 60, "start": 20, "end": -50}.
-            holding (Optional[dict], optional): A dictionary describing
-                the holding step. Defaults to {"duration": 10, "temp": -12}.
-            controlledNucleation (bool, optional): Whether or not controlled
-                nucleation is applied. Defaults to False.
-
-        Raises:
-            ValueError: If cooling dict does not contain all necessary keys.
-            ValueError: If holding dict does not contain all necessary keys.
-            TypeError: If holding is of invalid type (not None or dict).
+            holding (Optional[Union[Iterable[dict], dict]], optional):
+                A dictionary or list of dictionaries describing
+                the holding step(s). Defaults to {"duration": 600, "temp": -12}.
+            cnTemp (Union[float, int], optional): At what temperature controlled
+                nucleation is triggered. Nucleation triggers when
+                temp<=cnTemp. If that occurs during a holding
+                phase nucleation will trigger _at the end_ of the phase.
         """
         self.t_tot = t_tot
         if not all([key in cooling.keys() for key in ["rate", "start", "end"]]):
             raise ValueError("Cooling dictionary does not contain all required keys.")
         self.cooling = cooling
 
-        if isinstance(holding, dict):
-            if not all([key in holding.keys() for key in ["duration", "temp"]]):
-                raise ValueError(
-                    "Holding dictionary does not contain all required keys."
-                )
-        elif holding is not None:
-            raise TypeError("Input holding is neither dict nor None.")
         self.holding = holding
 
-        self.controlledNucleation = controlledNucleation
+        self.cnTemp = cnTemp
+
+    @property
+    def holding(self) -> Iterable[dict]:
+        """Get holding property."""
+        return self._holding
+
+    @holding.setter
+    def holding(self, value: Union[dict, list, tuple]):
+        """Set holding property."""
+        if isinstance(value, dict):
+            value = [value]
+        elif isinstance(value, (list, tuple)):
+            # bring holding steps into right order (descending)
+            value = sorted(value, key=lambda hdict: hdict["temp"], reverse=True)
+        elif value is None:
+            pass
+        else:
+            raise TypeError("holding must be a dict or Iterable of dict.")
+
+        if value is not None:
+            for val in value:
+                if not all([key in val.keys() for key in ["duration", "temp"]]):
+                    raise ValueError(
+                        "Holding dictionary does not contain all required keys."
+                    )
+
+        self._holding = value
 
     @property
     def cnt(self) -> float:
@@ -81,17 +99,17 @@ class OperatingConditions:
                 + "Cannot calculate controlled nucleation time."
             )
 
-        if self.controlledNucleation:
-            DT_cool = (self.cooling["start"] - self.holding["temp"]) / self.cooling[
-                "rate"
-            ]
-            DT_holding = self.holding["duration"]
+        if self.cnTemp is not None:
+            T_vec = self.tempProfile(1)
+            t_vec = np.arange(0, len(T_vec))
 
-            DT = DT_cool + DT_holding
+            I_endHold = np.argmax(T_vec[::-1] >= self.cnTemp)
+            t_endHold = t_vec[::-1][I_endHold]
+
         else:
-            DT = np.inf
+            t_endHold = np.inf
 
-        return DT
+        return t_endHold
 
     def tempProfile(self, dt: float) -> np.ndarray:
         """Return temperature profile.
@@ -107,45 +125,37 @@ class OperatingConditions:
         # total number of steps
         n = int(np.ceil(self.t_tot / dt)) + 1
 
-        if self.holding is not None:
-            T_start = self.cooling["start"]
-            T_hold = self.holding["temp"]
-            cr = self.cooling["rate"]
-            t_hold = (T_start - T_hold) / cr
-            duration_hold = self.holding["duration"]
+        T_start = self.cooling["start"]
+        cr = self.cooling["rate"]
 
-            # time and number of steps to hold temperature
+        if self.holding is not None:
+            hdicts = self.holding + [
+                {"temp": self.cooling["end"], "duration": self.t_tot}
+            ]
+        else:
+            hdicts = [{"temp": self.cooling["end"], "duration": self.t_tot}]
+
+        T_vec = np.array([])
+
+        for hdict in hdicts:
+
+            T_hold = hdict["temp"]
+            t_hold = (T_start - T_hold) / cr
+            duration_hold = hdict["duration"]
+
+            # ramp from start to hold temp
             T_vec_toHold = self._simpleCool(
-                Tstart=T_start,
-                Tend=T_hold,
-                coolingRate=cr,
-                dt=dt,
+                Tstart=T_start, Tend=T_hold, coolingRate=cr, dt=dt,
             )
 
             # append holding period
             T_vec_holding = [T_hold] * int(np.ceil((duration_hold - t_hold % dt) / dt))
 
-            # cool to final temperature
-            T_vec_toEnd = self._simpleCool(
-                Tstart=T_hold,
-                Tend=self.cooling["end"],
-                coolingRate=self.cooling["rate"],
-                dt=dt,
-                t_tot=self.t_tot,
-            )
+            T_start = T_hold
 
-            T_vec = np.concatenate([T_vec_toHold, T_vec_holding, T_vec_toEnd])
+            T_vec = np.concatenate([T_vec, T_vec_toHold, T_vec_holding])
 
-            T_vec = T_vec[:n]
-        else:
-
-            T_vec = self._simpleCool(
-                Tstart=self.cooling["start"],
-                Tend=self.cooling["end"],
-                coolingRate=self.cooling["rate"],
-                dt=dt,
-                t_tot=self.t_tot,
-            )
+        T_vec = T_vec[:n]
 
         return T_vec
 
@@ -193,10 +203,17 @@ class OperatingConditions:
             str: The OperatingConditions class string representation
                 giving some basic info.
         """
+        holdPluralBool = (self.holding is not None) and (len(self.holding) > 1)
+        holdPlural = f"Hold{'s' if (holdPluralBool) else ''}: "
+        holdStr = holdPlural + " AND ".join(
+            [f"{hdict['duration']} @ {hdict['temp']}" for hdict in self.holding]
+        )
+
         return (
             f"OperatingConditions([t_tot: {self.t_tot}, "
             + f"Cooling: {self.cooling['start']} to {self.cooling['end']} "
             + f"with rate {self.cooling['rate']:4.2f}, "
-            + f"Hold: {self.holding['duration']} @ {self.holding['temp']}, "
-            + f"Controlled Nucleation: {'ON' if self.controlledNucleation else 'OFF'}"
+            + holdStr
+            + ", "
+            + f"Controlled Nucleation: {'ON' if self.cnTemp else 'OFF'}"
         )
