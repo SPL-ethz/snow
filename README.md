@@ -22,7 +22,7 @@ A more detailed description of the modeling framework will be presented in a sci
 - Flexible vial geometry
 
 ## Bug reports
-Please report bugs as [Github issues](https://github.com/SPL-ethz/snow/issues/new?assignees=ltdeck&labels=bug) or as via [Email](mailto:deckl@ethz.ch), preferably
+Please report bugs as [Github issues](https://github.com/SPL-ethz/snow/issues/new?assignees=ltdeck&labels=bug) or via [Email](mailto:deckl@ethz.ch), preferably
 including a screenshot that illustrates the problem.
 
 Copyright (c) 2021 Leif-Thore Deck, David Ochsenbein
