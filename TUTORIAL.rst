@@ -8,20 +8,20 @@ This tutorial provides some basic explanations to help users getting started wit
 Installation
 ========
 
-After downloading the package, you need to install it. The requirements for the python version and dependent packages are listed in the setup.cfg file. You may install the package via pip install -e .
+After downloading the package, you need to install it. The requirements for the python version and dependent packages are listed in the setup.cfg file. You may install the package via ``pip install -e .``
 
 ========
 First steps: General information 
 ========
 
-The package contains several files, two of which enable the simulation of freezing processes. snowflake.py is the basis version of the model, capable of simulating the freezing process of a shelf comprising an arbitrary number of vials exactly once. snowfall.py is setup to run such simulation repetitively, namely for Nrep times. 
+The package contains several files, two of which enable the simulation of freezing processes. **snowflake.py** is the basis version of the model, capable of simulating the freezing process of a shelf comprising an arbitrary number of vials exactly once. **snowfall.py** is setup to run such simulation repetitively, namely for **Nrep* times. The idea behind the naming, of course, is that snowfall in reality comprises a large number of snowflakes, all of which are unique. In the same way, every simulation of the freezing process will be unique as a consequence of the stochasticity of primary ice nucleation. 
 
-Both models require a number of operatingConditions and constants as input parameters, which may be adjusted by the user. We define operating conditions as those input parameters, that relate to the numerics of the model (e.g. time step, number of repetitions) or to technical aspects (e.g. heat transfer parameters, cooling protocol). Constants, on the other hand, refer to formulation specific parameters, such as the volume of a vial, its composition and the individual physicochemical parameters of the individual components. 
+Both models require a number of operatingConditions and constants as input parameters, which may be adjusted by the user. We define operating conditions as those input parameters, that are related to the numerics of the model (e.g. time step, number of repetitions) or to technical aspects (e.g. heat transfer parameters, cooling protocol). Constants, on the other hand, refer to formulation specific parameters, such as the volume of a vial, its composition and the required individual physicochemical parameters of the individual components (including ice nucleation kinetics). 
 
 Operating conditions are to be provided directly when calling the snowflake / snowfall functions, while we specify the constants separately in a .yaml file. If no values are specified, the default configurations are used; these are stored in the operatingConditions.py and the snowConfig_default.yaml.
 
 ========
-First steps: Example
+Example
 ========
 
 Let us consider we would like to run a simulation following the default parameters in the snowConfig_default.yaml, however with a specific set of operating conditions. Indeed, we want to study the freezing of a system with a slow, but variable shelf-to-vial heat transfer, 7 times 7 vials on the shelf, a cooling rate of 1 K/min and two holding steps at -5°C and -10°C. This relates to typical conditions for freezing in a lab freeze-dryer. 
@@ -60,10 +60,10 @@ Finally, we may define the snowfall class. We set the pool_size parameter to the
 We then start the simulation via ``S.run()`` and may check whether it completed via ``S.simulationStatus()``. In case we are only interested in a single repetition, the **snowflake** class may be used instead. Compared to **snowfall**, **snowflake** does not require Nrep or pool_size as input. However, it is able to store information on the thermal evolution of all vials, which is a feature that was removed for **snowfall** to increase computational performance. 
 
 ========
-First steps: Simulation output
+Simulation output
 ========
 
-After running the simulation, several information are stored that characterize the freezing process. Importantly, these are the solidificationTimes(), nucleationTimes(), and nucleationTemperatures(). These are also grouped based on position, allowing to understand potential differences among center, edge and corner vials. 
+After running the simulation, several information are stored that characterize the freezing process. Importantly, these are the **solidificationTimes()*, **nucleationTimes()*, and **nucleationTemperatures()*. These are also grouped based on position, allowing to understand potential differences among center, edge and corner vials. 
 
 We may use ``S.plot(what="T_nucleation")`` to immediately get an understanding of the nucleation temperatures, and similarly for the other quantities. The plot function is also capable of showing trajectories, in case **snowflake** is used instead of **snowfall**. In this case, 
 
