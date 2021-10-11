@@ -31,7 +31,7 @@ We first import both Snowfall and the OperatingConditions:
 ``from ethz_snow.snowfall import Snowfall``
 ``from ethz_snow.operatingConditions import OperatingConditions``
 
-Then, we define the values of the four heat transfer coefficients: "int" refers to thermal interaction among vials, "ext" to thermal interaction of the edge vials with the environment. We neglect both effects and set the values to zero. "s0" refers to the mean shelf-to-vial heat transfer coefficient, "s_sigma_rel" refers to its relative variability. We assume a rather low value of 20 for "s0" and 0.1 for its variability. Note that the pre-defined unit of the heat transfer coefficients is W/m^2K.
+Then, we define the values of the four heat transfer coefficients: "int" refers to thermal interaction among vials, "ext" to thermal interaction of the edge vials with the environment. We neglect both effects and set the values to zero. "s0" refers to the mean shelf-to-vial heat transfer coefficient, "s_sigma_rel" refers to its relative variability. We assume a rather low value of 20 for "s0" and 0.1 for its variability. Note that the pre-defined unit of the heat transfer coefficients is W/m^2K and that there is currently no feature to change that unit.
 
 ``d = {"int": 20, "ext": 0, "s0": 20, "s_sigma_rel": 0.1}``
 
