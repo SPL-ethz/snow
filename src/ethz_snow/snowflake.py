@@ -431,8 +431,6 @@ class Snowflake:
                 nucleationCandidatesMask = liquidMask & superCooledMask
                 # the total number of nucleation candidates
                 n_nucleationCandidates = np.sum(nucleationCandidatesMask)
-                # toc3_l = time.perf_counter()
-                # print(f"Time steps: {toc3_l-toc2b_l:4.2e}")
 
                 # nucleation probabilities for candidates
                 P = np.zeros(N_vials_total)
@@ -445,6 +443,16 @@ class Snowflake:
                 # all vials (that thermodynamically can) nucleate
                 if k == k_CN:
                     P.fill(1)
+                    frac_justCant = 1 - np.sum(nucleationCandidatesMask) / N_vials_total
+                    if frac_justCant >= 0.1:
+                        print(
+                            (
+                                f"WARNING: A significant number of vials "
+                                + f"({frac_justCant * 100:4.1f}%) "
+                                + "were not supercooled when controlled "
+                                + "nucleation triggered."
+                            )
+                        )
                 diceRolls[nucleationCandidatesMask] = self._rng.random(
                     n_nucleationCandidates
                 )
