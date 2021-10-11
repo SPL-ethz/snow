@@ -1,0 +1,5 @@
+vial:
+  geometry:
+    randomKey: cylinder
+    anotherOne: 2
+    length: 1
