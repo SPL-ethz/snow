@@ -2,11 +2,18 @@
 ethz_snow
 =========
 
-This is the documentation of **ethz_snow**.
+This is the documentation of **ethz_snow**. A package for the simulation of stochastic nucleation of water in small vials.
+Please have a look at the :ref:`readme` for a high-level description of what this package does, or check out the :ref:`Tutorial`.
 
 Getting Started
 ===============
-XX Please add description of how to install me. (pypi?)
+This package can be installed via pip. Simply use
+
+.. code-block:: python
+
+   pip install ethz_snow
+
+or see the :ref:`Tutorial` for more details.
 
 Contents
 ========

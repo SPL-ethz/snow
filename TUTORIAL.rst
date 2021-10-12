@@ -4,9 +4,9 @@ Tutorial
 
 This tutorial provides some basic explanations to help users getting started with the ethz_snow package. 
 
-========
+============
 Installation
-========
+============
 
 After downloading the package, you need to install it. (The requirements for the python version and dependent packages are listed in the setup.cfg file and will be read automatically by pip.)
 
@@ -18,11 +18,11 @@ Or install the latest release version via ``pip install ethz_snow``.
 First steps: General information 
 ================================
 
-The package contains several files, two of which enable the simulation of freezing processes. **snowflake.py** is the basis version of the model, capable of simulating the freezing process of a shelf comprising an arbitrary number of vials exactly once. **snowfall.py** is setup to run such simulation repetitively, namely for **Nrep** times. The idea behind the naming, of course, is that snowfall in reality comprises a large number of snowflakes, all of which are unique. In the same way, every freezing process will be unique as a consequence of the stochasticity of primary ice nucleation. 
+The package contains several files, two of which enable the simulation of freezing processes. **snowflake.py** is the basis version of the model, capable of simulating the freezing process of a shelf comprising an arbitrary number of vials exactly once. **snowfall.py** is setup to run such simulation repetitively, namely for **Nrep** times. The idea behind the naming, of course, is that Snowfall in reality comprises a large number of Snowflakes, all of which are unique. In the same way, every freezing process will be unique as a consequence of the stochasticity of primary ice nucleation. 
 
 Both models require a number of operatingConditions and constants as input parameters, which may be adjusted by the user. We define operating conditions as those input parameters, that are related to the numerics of the model (e.g. time step, number of repetitions) or to technical aspects (e.g. heat transfer parameters, cooling protocol). Constants, on the other hand, refer to formulation specific parameters, such as the volume of a vial, its composition and the required individual physicochemical parameters of the individual components (including ice nucleation kinetics). 
 
-Operating conditions are to be provided directly when calling the **snowflake** / **snowfall** functions, while we specify the constants separately in a .yaml file. If no values are specified, the default configurations are used; these are stored in the **operatingConditions.py** and the **snowConfig_default.yaml** (see the next subsection for more details on the latter).
+Operating conditions are to be provided directly when calling the **snowflake** / **Snowfall** functions, while we specify the constants separately in a .yaml file. If no values are specified, the default configurations are used; these are stored in the **operatingConditions.py** and the **snowConfig_default.yaml** (see the next subsection for more details on the latter).
 
 ---------
 Constants
@@ -99,7 +99,7 @@ For the holding steps, we need to define duration and temperature of each step s
 
     h = [dict(duration=90*60, temp=-10), dict(duration=90*60, temp=-5)]
 
-Next, let us think about the total time of the simulation that is required; this depends on the cooling and holding parameters as well as on heat transfer and on some of the formulation constants. It is thus not automatically calculated, but needs to be set. We recommend to provide at least one hour more than is required for the shelf to reach the final temperature. One may use the snowflake simulation to test if the set time is sufficient. Here, let us set t_tot = 3e4:
+Next, let us think about the total time of the simulation that is required; this depends on the cooling and holding parameters as well as on heat transfer and on some of the formulation constants. It is thus not automatically calculated, but needs to be set. We recommend to provide at least one hour more than is required for the shelf to reach the final temperature. One may use the Snowflake simulation to test if the set time is sufficient. Here, let us set t_tot = 3e4:
 
 .. code-block:: python
 
@@ -113,13 +113,13 @@ In case, we are interested in controlled nucleation, we can add the argument cnT
 
 we trigger nucleation at the end of the holding step at -5°C. Note that in the current version, controlled nucleation may only be defined at the end of a holding step.
 
-Finally, we may define the snowfall class. We set the pool_size parameter to the number of cores of the processor and the Nrep to a statistically relevant number. To fully capture the effects of the stochasticity of ice nucleation in a quantitative manner, we recommend Nrep > 1000. For a qualitative view, we set Nrep = 50:
+Finally, we may define the Snowfall class. We set the pool_size parameter to the number of cores of the processor and the Nrep to a statistically relevant number. To fully capture the effects of the stochasticity of ice nucleation in a quantitative manner, we recommend Nrep > 1000. For a qualitative view, we set Nrep = 50:
 
 .. code-block:: python
 
     S = Snowfall(pool_size=8, k=d, Nrep=50, N_vials=(7,7,1), opcond=op)
 
-We then start the simulation via ``S.run()`` and may check whether it completed via ``S.simulationStatus()``. In case we are only interested in a single repetition, the **snowflake** class may be used instead. Compared to **Snowfall**, **Snowflake** does not require Nrep or pool_size as input. However, it is able to store information on the thermal evolution of all vials, which is a feature that was removed for **Snowfall** to increase computational performance. 
+We then start the simulation via ``S.run()`` and may check whether it completed via ``S.simulationStatus()``. In case we are only interested in a single repetition, the **Snowflake** class may be used instead. Compared to **Snowfall**, **Snowflake** does not require Nrep or pool_size as input. However, it is able to store information on the thermal evolution of all vials, which is a feature that was removed for **Snowfall** to increase computational performance. 
 
 =================
 Simulation output
@@ -131,7 +131,7 @@ We may use ``S.plot(what="T_nucleation")`` to immediately get an understanding o
 
 .. code-block:: python
 
-    S.plot(what="T_nucleation")``
+    S.plot(what="T_nucleation")
 
 will show the evolution of the temperatures as well as the shelf, which is a very useful first information for understanding the freezing process as well as a sanity check of the simulation outcome. Note that the plotting of trajectories is slow at the moment because of the way seaborn calculates the shaded area (representing all the trajectories).
 
