@@ -173,6 +173,46 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Tutorial
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installation">
+   Installation
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#first-steps-general-information">
+   First steps: General information
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#constants">
+     Constants
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example">
+   Example
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#simulation-output">
+   Simulation output
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -183,7 +223,105 @@
                 
   <div class="section" id="tutorial">
 <span id="id1"></span><h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
-<p>This is a basic text that needs to be expanded.</p>
+<p>This tutorial provides some basic explanations to help users getting started with the ethz_snow package.</p>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>After downloading the package, you need to install it. (The requirements for the python version and dependent packages are listed in the setup.cfg file and will be read automatically by pip.)</p>
+<p>Either, download/clone any stable or unstable version from <cite>GitHub &lt;https://github.com/SPL-ethz/snow/&gt;</cite> Then navigate to the folder and install the package via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code></p>
+<p>Or install the latest release version via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ethz_snow</span></code>.</p>
+</div>
+<div class="section" id="first-steps-general-information">
+<h1>First steps: General information<a class="headerlink" href="#first-steps-general-information" title="Permalink to this headline">¶</a></h1>
+<p>The package contains several files, two of which enable the simulation of freezing processes. <strong>snowflake.py</strong> is the basis version of the model, capable of simulating the freezing process of a shelf comprising an arbitrary number of vials exactly once. <strong>snowfall.py</strong> is setup to run such simulation repetitively, namely for <strong>Nrep</strong> times. The idea behind the naming, of course, is that snowfall in reality comprises a large number of snowflakes, all of which are unique. In the same way, every freezing process will be unique as a consequence of the stochasticity of primary ice nucleation.</p>
+<p>Both models require a number of operatingConditions and constants as input parameters, which may be adjusted by the user. We define operating conditions as those input parameters, that are related to the numerics of the model (e.g. time step, number of repetitions) or to technical aspects (e.g. heat transfer parameters, cooling protocol). Constants, on the other hand, refer to formulation specific parameters, such as the volume of a vial, its composition and the required individual physicochemical parameters of the individual components (including ice nucleation kinetics).</p>
+<p>Operating conditions are to be provided directly when calling the <strong>snowflake</strong> / <strong>snowfall</strong> functions, while we specify the constants separately in a .yaml file. If no values are specified, the default configurations are used; these are stored in the <strong>operatingConditions.py</strong> and the <strong>snowConfig_default.yaml</strong> (see the next subsection for more details on the latter).</p>
+<div class="section" id="constants">
+<h2>Constants<a class="headerlink" href="#constants" title="Permalink to this headline">¶</a></h2>
+<p>Below is a copy of the yaml file used to configure the constants used in Snowflake/Snowfall.
+If you wish to modify any (subset) of these constants, simply create a new yaml that follows the same schema in an arbitrary location and link to it via the <strong>configPath</strong> input of Snowflake.
+A partial config is allowed (e.g., one only containing a new water:cp_w entry). The remaining keys will be taken from the default.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">vial</span><span class="p">:</span>
+  <span class="nt">geometry</span><span class="p">:</span>
+    <span class="c1"># base shape of vial (currently only cube is accepted)</span>
+    <span class="nt">shape</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cube</span>
+    <span class="c1"># length [m]</span>
+    <span class="nt">length</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+    <span class="c1"># width [m]</span>
+    <span class="nt">width</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+    <span class="c1"># height [m]</span>
+    <span class="nt">height</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="nt">water</span><span class="p">:</span>
+  <span class="c1"># J/[Kkg] heat capacity liquid water</span>
+  <span class="nt">cp_w</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">4187</span>
+  <span class="c1"># J/[Kkg] heat capacity ice 0°C</span>
+  <span class="nt">cp_i</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2108</span>
+  <span class="c1"># J/kg heat of fusion water</span>
+  <span class="nt">Dh</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">333550</span>
+<span class="nt">solution</span><span class="p">:</span>
+  <span class="c1"># kg/m^3 density of water / assumed constant for all phases</span>
+  <span class="nt">rho_l</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1000</span>
+  <span class="c1"># K kg / mol cryoscopic constant</span>
+  <span class="nt">k_f</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.853</span>
+  <span class="c1"># J/Kkg, heat capacity sucrose</span>
+  <span class="nt">cp_s</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1240</span>
+  <span class="c1"># molar mass sucrose [kg/mol]</span>
+  <span class="nt">M_s</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.3423</span>
+  <span class="c1"># mass fraction of solute in solution</span>
+  <span class="nt">solid_fraction</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
+  <span class="c1"># °C equilibrium freezing temperature</span>
+  <span class="nt">T_eq</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="nt">kinetics</span><span class="p">:</span>
+  <span class="c1"># m−3 s−1 K−b value reduced compared to Braatz paper (he had a value of 10)</span>
+  <span class="nt">kb</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1e-9</span>
+  <span class="nt">b</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">12</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="example">
+<h1>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h1>
+<p>Let us consider we would like to run a simulation following the default parameters in the snowConfig_default.yaml, however with a specific set of operating conditions. Indeed, we want to study the freezing of a system with a slow, but variable shelf-to-vial heat transfer, 7 times 7 vials on the shelf, a cooling rate of 1 K/min and two holding steps at -5°C and -10°C. This relates to typical conditions for freezing in a lab freeze-dryer.</p>
+<p>We first import both Snowfall and the OperatingConditions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ethz_snow.snowfall</span> <span class="kn">import</span> <span class="n">Snowfall</span>
+<span class="kn">from</span> <span class="nn">ethz_snow.operatingConditions</span> <span class="kn">import</span> <span class="n">OperatingConditions</span>
+</pre></div>
+</div>
+<p>Then, we define the values of the four heat transfer coefficients: “int” refers to thermal interaction among vials, “ext” to thermal interaction of the edge vials with the environment. We neglect both effects and set the values to zero. “s0” refers to the mean shelf-to-vial heat transfer coefficient, “s_sigma_rel” refers to its relative variability. We assume a rather low value of 20 for “s0” and 0.1 for its variability. Note that the pre-defined unit of the heat transfer coefficients is W/m^2K and that there is currently no feature to change that unit.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;int&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;ext&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;s0&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;s_sigma_rel&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Next, we define the cooling protocol. Note that holding steps are defined separately. In terms of cooling, we set the cooling rate, the start temperature and the end temperature as follows. Here, the temperatures are defined in °C and the cooling rate in K/s. Typical values are in the range between 0.1 - 1.0 K/min. The start temperature typically is set to ambient temperature, while the final temperature may depend on the technical capabilities of the freezing device.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="mi">60</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">50</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>For the holding steps, we need to define duration and temperature of each step separately. Let us say, that both steps at -5°C and at -10°C take 90 min. Again, it is important that the time is based in s, thus we need to multiply with 60. Note that the program will automatically adjust the sequence of the holding steps in the way that they are in the order of decreasing holding temperatures.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">h</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="mi">90</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="n">temp</span><span class="o">=-</span><span class="mi">10</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="mi">90</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="n">temp</span><span class="o">=-</span><span class="mi">5</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Next, let us think about the total time of the simulation that is required; this depends on the cooling and holding parameters as well as on heat transfer and on some of the formulation constants. It is thus not automatically calculated, but needs to be set. We recommend to provide at least one hour more than is required for the shelf to reach the final temperature. One may use the snowflake simulation to test if the set time is sufficient. Here, let us set t_tot = 3e4:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">OperatingConditions</span><span class="p">(</span><span class="n">t_tot</span><span class="o">=</span><span class="mf">3e4</span><span class="p">,</span> <span class="n">cooling</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">holding</span><span class="o">=</span><span class="n">h</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In case, we are interested in controlled nucleation, we can add the argument cnTemp to trigger nucleation at the end of a holding step. By defining</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">OperatingConditions</span><span class="p">(</span><span class="n">t_tot</span><span class="o">=</span><span class="mf">3e4</span><span class="p">,</span> <span class="n">cooling</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">holding</span> <span class="o">=</span> <span class="n">h</span><span class="p">,</span> <span class="n">cnTemp</span> <span class="o">=</span> <span class="o">-</span><span class="mi">5</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>we trigger nucleation at the end of the holding step at -5°C. Note that in the current version, controlled nucleation may only be defined at the end of a holding step.</p>
+<p>Finally, we may define the snowfall class. We set the pool_size parameter to the number of cores of the processor and the Nrep to a statistically relevant number. To fully capture the effects of the stochasticity of ice nucleation in a quantitative manner, we recommend Nrep &gt; 1000. For a qualitative view, we set Nrep = 50:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">=</span> <span class="n">Snowfall</span><span class="p">(</span><span class="n">pool_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">Nrep</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">N_vials</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">opcond</span><span class="o">=</span><span class="n">op</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We then start the simulation via <code class="docutils literal notranslate"><span class="pre">S.run()</span></code> and may check whether it completed via <code class="docutils literal notranslate"><span class="pre">S.simulationStatus()</span></code>. In case we are only interested in a single repetition, the <strong>snowflake</strong> class may be used instead. Compared to <strong>Snowfall</strong>, <strong>Snowflake</strong> does not require Nrep or pool_size as input. However, it is able to store information on the thermal evolution of all vials, which is a feature that was removed for <strong>Snowfall</strong> to increase computational performance.</p>
+</div>
+<div class="section" id="simulation-output">
+<h1>Simulation output<a class="headerlink" href="#simulation-output" title="Permalink to this headline">¶</a></h1>
+<p>After running the simulation, several information are stored that characterize the freezing process. Importantly, these are the <strong>solidificationTimes()</strong>, <strong>nucleationTimes()</strong>, and <strong>nucleationTemperatures()</strong>. These are also grouped based on position, allowing to understand potential differences among center, edge and corner vials.</p>
+<p>We may use <code class="docutils literal notranslate"><span class="pre">S.plot(what=&quot;T_nucleation&quot;)</span></code> to immediately get an understanding of the nucleation temperatures, and similarly for the other quantities. The plot function is also capable of showing trajectories, in case <strong>Snowflake</strong> is used instead of <strong>Snowfall</strong>. In this case,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>S.plot(what=&quot;T_nucleation&quot;)``
+</pre></div>
+</div>
+<p>will show the evolution of the temperatures as well as the shelf, which is a very useful first information for understanding the freezing process as well as a sanity check of the simulation outcome. Note that the plotting of trajectories is slow at the moment because of the way seaborn calculates the shaded area (representing all the trajectories).</p>
 </div>
 
 

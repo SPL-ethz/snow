@@ -23,7 +23,7 @@ class Snowfall:
     More information regarding the equations and their derivation can be found in
     XXX, Deck et al. (2021) as well as the Snowflake class documentation.
 
-    Attributes:
+    Parameters:
         Nrep (int): Number of repetitions.
         pool_size (int): Size of worker pool for parallelization.
         stats (dict): Statistics for each simulation.
@@ -95,7 +95,7 @@ class Snowfall:
         Args:
             how (str, optional): How to perform runs. Valid options are
                 'async', 'sync', and 'sequential' (no parallelization).
-                    Defaults to "async".
+                Defaults to "async".
         """
         # clean up old simulation
         self.stats = dict()

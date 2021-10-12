@@ -64,7 +64,7 @@ def test_cnt(myO, myO_mh):
     assert myO_mh.cnt == 100
 
 
-def test_tempprofile(myO):
+def test_tempprofile(myO, myO_mh):
     """Test that tempprofiles are calculated correctly."""
     T = myO.tempProfile(dt=1)
 
@@ -92,3 +92,9 @@ def test_tempprofile(myO):
     T = myO.tempProfile(dt=1)
     assert len(T) == 41
     assert T[-1] == -20
+
+    T_mh = myO_mh.tempProfile(1)
+
+    assert len(T_mh) == 501
+    assert all(T_mh[20:22] == 0)
+    assert all(T_mh[31:101] == -10)

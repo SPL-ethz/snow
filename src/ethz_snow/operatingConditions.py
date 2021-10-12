@@ -15,7 +15,7 @@ class OperatingConditions:
     More information regarding the equations and their derivation can be found in
     XXX, Deck et al. (2021).
 
-    Attributes:
+    Parameters:
         cnt (float): Controlled nucleation time.
         controlledNucleation (bool): Controlled nucleation on/off.
         cooling (dict): A dictionary describing the cooling profile.
@@ -27,7 +27,7 @@ class OperatingConditions:
         self,
         t_tot: float = 2e4,
         cooling: dict = {"rate": 0.5 / 60, "start": 20, "end": -50},
-        holding: Optional[Union[Iterable[dict], dict]] = {"duration": 600, "temp": -12},
+        holding: Optional[Union[Iterable[dict], dict]] = None,
         cnTemp: Union[float, int] = None,
     ):
         """Construct an OperatingConditions object.
@@ -38,7 +38,7 @@ class OperatingConditions:
                 Defaults to {"rate": 0.5 / 60, "start": 20, "end": -50}.
             holding (Optional[Union[Iterable[dict], dict]], optional):
                 A dictionary or list of dictionaries describing
-                the holding step(s). Defaults to {"duration": 600, "temp": -12}.
+                the holding step(s). Defaults to None (no holding).
             cnTemp (Union[float, int], optional): At what temperature controlled
                 nucleation is triggered. Nucleation triggers when
                 temp<=cnTemp. If that occurs during a holding

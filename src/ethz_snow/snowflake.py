@@ -26,7 +26,7 @@ class Snowflake:
     More information regarding the equations and their derivation can be found in
     XXX, Deck et al. (2021).
 
-    Attributes:
+    Parameters:
         configPath (Optional[str]): The path of the (optional) custom config yaml.
         const (dict): A dictionary of constants to be used.
         dt (float): Time step.
@@ -271,10 +271,12 @@ class Snowflake:
 
     @property
     def configPath(self) -> Optional[str]:
+        """Get configPath property."""
         return self._configPath
 
     @configPath.setter
     def configPath(self, value):
+        """Set configPath property."""
         self.const = calculateDerived(value)
         self._configPath = value
 
@@ -660,6 +662,7 @@ class Snowflake:
         """Return mask for given group.
 
         mask[i] = True iff vial[i] is in G where G can be a list of groups.
+
         Args:
             group (Union[str, Sequence[str]], optional): Subgroup to return.
                 Defaults to "all".

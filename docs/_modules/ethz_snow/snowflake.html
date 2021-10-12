@@ -169,36 +169,17 @@
 <span class="sd">of water nucleation in vials.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">ethz_snow.operatingConditions</span> <span class="kn">import</span> <span class="n">OperatingConditions</span>
-<span class="kn">from</span> <span class="nn">ethz_snow.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">A</span><span class="p">,</span>
-    <span class="n">hl</span><span class="p">,</span>
-    <span class="n">T_eq</span><span class="p">,</span>
-    <span class="n">kb</span><span class="p">,</span>
-    <span class="n">V</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">,</span>
-    <span class="n">cp_solution</span><span class="p">,</span>
-    <span class="n">mass</span><span class="p">,</span>
-    <span class="n">solid_fraction</span><span class="p">,</span>
-    <span class="n">cp_s</span><span class="p">,</span>
-    <span class="n">depression</span><span class="p">,</span>
-    <span class="n">alpha</span><span class="p">,</span>
-    <span class="n">beta_solution</span><span class="p">,</span>
-    <span class="n">cp_i</span><span class="p">,</span>
-    <span class="n">cp_w</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">ethz_snow.constants</span> <span class="kn">import</span> <span class="n">calculateDerived</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="c1"># import matplotlib.pyplot as plt</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">csr_matrix</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Optional</span>
-
-<span class="kn">import</span> <span class="nn">time</span>
 
 <span class="n">HEATFLOW_REQUIREDKEYS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;ext&quot;</span><span class="p">,</span> <span class="s2">&quot;s0&quot;</span><span class="p">)</span>
 <span class="n">VIAL_GROUPS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;corner&quot;</span><span class="p">,</span> <span class="s2">&quot;edge&quot;</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span>
@@ -210,7 +191,9 @@
 <span class="sd">    More information regarding the equations and their derivation can be found in</span>
 <span class="sd">    XXX, Deck et al. (2021).</span>
 
-<span class="sd">    Attributes:</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        configPath (Optional[str]): The path of the (optional) custom config yaml.</span>
+<span class="sd">        const (dict): A dictionary of constants to be used.</span>
 <span class="sd">        dt (float): Time step.</span>
 <span class="sd">        H_ext (np.ndarray): External heat transfer vector.</span>
 <span class="sd">        H_int (csr_matrix): Internal heat transfer matrix.</span>
@@ -240,6 +223,7 @@
         <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2021</span><span class="p">,</span>
         <span class="n">opcond</span><span class="p">:</span> <span class="n">OperatingConditions</span> <span class="o">=</span> <span class="n">OperatingConditions</span><span class="p">(),</span>
+        <span class="n">configPath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Construct a Snowflake object.</span>
 
@@ -257,6 +241,8 @@
 <span class="sd">            seed (int, optional): Seed to use for rng. Defaults to 2021.</span>
 <span class="sd">            opcond (OperatingConditions, optional): Operating conditions to apply.</span>
 <span class="sd">                Defaults to OperatingConditions().</span>
+<span class="sd">            configPath (Optional[str], optional): The location of a custom configuration</span>
+<span class="sd">                file (in yaml format), used to update/overwrite the default settings.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            TypeError: If k is not a dict.</span>
@@ -303,6 +289,26 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">opcond</span> <span class="o">=</span> <span class="n">opcond</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">solidificationThreshold</span> <span class="o">=</span> <span class="n">solidificationThreshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_X</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_t</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_simulationStatus</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_H_int</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_H_ext</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_H_shelf</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">configPath</span> <span class="o">=</span> <span class="n">configPath</span>
+
+        <span class="c1"># store the seed to look it up if need be</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+
+        <span class="c1"># remember what N_vials was used to build heat flow matrices</span>
+        <span class="c1"># so if it changes we know to rebuild them</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_NvialsUsed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_vials</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_emptyStore</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">storeStates</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
             <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">storeStates</span><span class="p">]):</span>
@@ -331,24 +337,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_emptyStore</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_storageMask</span> <span class="o">=</span> <span class="n">storageMask</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">solidificationThreshold</span> <span class="o">=</span> <span class="n">solidificationThreshold</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_X</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_t</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_simulationStatus</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_H_int</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_H_ext</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_H_shelf</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="c1"># store the seed to look it up if need be</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
-
-        <span class="c1"># remember what N_vials was used to build heat flow matrices</span>
-        <span class="c1"># so if it changes we know to rebuild them</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_NvialsUsed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_vials</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">simulationStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -446,6 +434,17 @@
         <span class="c1"># let H_shelf figure out whether it needs to be updated</span>
         <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">H_shelf</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">configPath</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get configPath property.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configPath</span>
+
+    <span class="nd">@configPath</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">configPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set configPath property.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">const</span> <span class="o">=</span> <span class="n">calculateDerived</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_configPath</span> <span class="o">=</span> <span class="n">value</span>
+
     <span class="k">def</span> <span class="nf">_interpretStorageString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">myString</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Interpret the storeState string.</span>
 
@@ -504,6 +503,22 @@
         <span class="n">H_int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">H_int</span>
         <span class="n">H_ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">H_ext</span>
         <span class="n">H_shelf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">H_shelf</span>
+
+        <span class="c1"># constants</span>
+        <span class="n">solid_fraction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;solid_fraction&quot;</span><span class="p">]</span>
+        <span class="n">cp_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;cp_s&quot;</span><span class="p">]</span>
+        <span class="n">cp_w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;cp_w&quot;</span><span class="p">]</span>
+        <span class="n">cp_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;cp_i&quot;</span><span class="p">]</span>
+        <span class="n">cp_solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;cp_solution&quot;</span><span class="p">]</span>
+        <span class="n">depression</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;depression&quot;</span><span class="p">]</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;mass&quot;</span><span class="p">]</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">]</span>
+        <span class="n">beta_solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;beta_solution&quot;</span><span class="p">]</span>
+        <span class="n">T_eq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;T_eq&quot;</span><span class="p">]</span>
+        <span class="n">hl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;hl&quot;</span><span class="p">]</span>
+        <span class="n">kb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;kb&quot;</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;V&quot;</span><span class="p">]</span>
 
         <span class="n">N_timeSteps</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opcond</span><span class="o">.</span><span class="n">t_tot</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
@@ -583,8 +598,6 @@
                 <span class="n">nucleationCandidatesMask</span> <span class="o">=</span> <span class="n">liquidMask</span> <span class="o">&amp;</span> <span class="n">superCooledMask</span>
                 <span class="c1"># the total number of nucleation candidates</span>
                 <span class="n">n_nucleationCandidates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nucleationCandidatesMask</span><span class="p">)</span>
-                <span class="c1"># toc3_l = time.perf_counter()</span>
-                <span class="c1"># print(f&quot;Time steps: {toc3_l-toc2b_l:4.2e}&quot;)</span>
 
                 <span class="c1"># nucleation probabilities for candidates</span>
                 <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N_vials_total</span><span class="p">)</span>
@@ -597,6 +610,16 @@
                 <span class="c1"># all vials (that thermodynamically can) nucleate</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">k_CN</span><span class="p">:</span>
                     <span class="n">P</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">frac_justCant</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nucleationCandidatesMask</span><span class="p">)</span> <span class="o">/</span> <span class="n">N_vials_total</span>
+                    <span class="k">if</span> <span class="n">frac_justCant</span> <span class="o">&gt;=</span> <span class="mf">0.1</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;WARNING: A significant number of vials &quot;</span>
+                                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">frac_justCant</span> <span class="o">*</span> <span class="mi">100</span><span class="si">:</span><span class="s2">4.1f</span><span class="si">}</span><span class="s2">%) &quot;</span>
+                                <span class="o">+</span> <span class="s2">&quot;were not supercooled when controlled &quot;</span>
+                                <span class="o">+</span> <span class="s2">&quot;nucleation triggered.&quot;</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
                 <span class="n">diceRolls</span><span class="p">[</span><span class="n">nucleationCandidatesMask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span>
                     <span class="n">n_nucleationCandidates</span>
                 <span class="p">)</span>
@@ -804,6 +827,7 @@
         <span class="sd">&quot;&quot;&quot;Return mask for given group.</span>
 
 <span class="sd">        mask[i] = True iff vial[i] is in G where G can be a list of groups.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            group (Union[str, Sequence[str]], optional): Subgroup to return.</span>
 <span class="sd">                Defaults to &quot;all&quot;.</span>
@@ -1025,7 +1049,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="s2">&quot;shelf&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="s2">&quot;shelf&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There were shelf heat transfer coefficients &lt; 0. I set them to 0.&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_H_shelf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="s2">&quot;shelf&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">A</span>  <span class="c1"># either a scalar or a vector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_H_shelf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="s2">&quot;shelf&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]</span>  <span class="c1"># either a scalar or a vector</span>
 
     <span class="k">def</span> <span class="nf">_buildHeatflowMatrices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Build heatflow matrices.&quot;&quot;&quot;</span>
@@ -1033,6 +1057,8 @@
         <span class="c1"># (getter method will know to recall this function</span>
         <span class="c1"># if the value changes)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_NvialsUsed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_vials</span>
+
+        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]</span>
 
         <span class="n">interactionMatrix</span><span class="p">,</span> <span class="n">VIAL_EXT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buildInteractionMatrices</span><span class="p">()</span>
 
