@@ -27,7 +27,7 @@ Operating conditions are to be provided directly when calling the **snowflake** 
 ---------
 Constants
 ---------
-Below is a copy of the yaml file used to configure the constants used in Snowflake/Snowfall.
+Below is a copy of the yaml file used to configure the constants used in **Snowflake** / **Snowfall**.
 If you wish to modify any (subset) of these constants, simply create a new yaml that follows the same schema in an arbitrary location and link to it via the **configPath** input of Snowflake.
 A partial config is allowed (e.g., one only containing a new water:cp_w entry). The remaining keys will be taken from the default.
 
@@ -113,13 +113,13 @@ In case, we are interested in controlled nucleation, we can add the argument cnT
 
 we trigger nucleation at the end of the holding step at -5°C. Note that in the current version, controlled nucleation may only be defined at the end of a holding step.
 
-Finally, we may define the snowfall class. We set the pool_size parameter to the number of cores of the processor and the Nrep to a statistically relevant number. To fully capture the effects of the stochasticity of ice nucleation in a quantitative manner, we recommend Nrep > 1000. For a qualitative view, we set Nrep = 50:
+Finally, we may define the snowfall class. We set the pool_size parameter to the number of available workers and Nrep to a statistically relevant number. To fully capture the effects of the stochasticity of ice nucleation in a quantitative manner, we recommend Nrep > 1000. For a qualitative view, we set Nrep = 50:
 
 .. code-block:: python
 
     S = Snowfall(pool_size=8, k=d, Nrep=50, N_vials=(7,7,1), opcond=op)
 
-We then start the simulation via ``S.run()`` and may check whether it completed via ``S.simulationStatus()``. In case we are only interested in a single repetition, the **snowflake** class may be used instead. Compared to **Snowfall**, **Snowflake** does not require Nrep or pool_size as input. However, it is able to store information on the thermal evolution of all vials, which is a feature that was removed for **Snowfall** to increase computational performance. 
+We then start the simulation via **S.run()** and may check whether it completed via **S.simulationStatus()**. In case we are only interested in a single repetition, the **snowflake** class may be used instead. Compared to **Snowfall**, **Snowflake** does not require Nrep or pool_size as input. However, it is able to store information on the thermal evolution of all vials, which is a feature that was removed for **Snowfall** to increase computational performance. 
 
 =================
 Simulation output
@@ -127,7 +127,7 @@ Simulation output
 
 After running the simulation, several information are stored that characterize the freezing process. Importantly, these are the **solidificationTimes()**, **nucleationTimes()**, and **nucleationTemperatures()**. These are also grouped based on position, allowing to understand potential differences among center, edge and corner vials. 
 
-We may use ``S.plot(what="T_nucleation")`` to immediately get an understanding of the nucleation temperatures, and similarly for the other quantities. The plot function is also capable of showing trajectories, in case **Snowflake** is used instead of **Snowfall**. In this case, 
+We may use **S.plot(what="T_nucleation")** to immediately get an understanding of the nucleation temperatures, and similarly for the other quantities. The plot function is also capable of showing trajectories, in case **Snowflake** is used instead of **Snowfall**. In this case, 
 
 .. code-block:: python
 
