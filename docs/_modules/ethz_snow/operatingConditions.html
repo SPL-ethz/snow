@@ -1,0 +1,419 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ethz_snow.operatingConditions &#8212; ethz_snow 0.0.0 documentation</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">ethz_snow 0.0.0 documentation</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../readme.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../tutorial.html">
+   Tutorial
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../license.html">
+   License
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../authors.html">
+   Authors
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../changelog.html">
+   Changelog
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../api/modules.html">
+   Module Reference
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../api/ethz_snow.html">
+     ethz_snow package
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <h1>Source code for ethz_snow.operatingConditions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implement OperatingConditions class.</span>
+
+<span class="sd">This module contains the OperatingConditions class used to</span>
+<span class="sd">store information regarding the operating conditions</span>
+<span class="sd">in freezing processes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span>
+
+
+<div class="viewcode-block" id="OperatingConditions"><a class="viewcode-back" href="../../api/ethz_snow.html#ethz_snow.operatingConditions.OperatingConditions">[docs]</a><span class="k">class</span> <span class="nc">OperatingConditions</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A class to handle a single Stochastic Nucleation of Water simulation.</span>
+
+<span class="sd">    More information regarding the equations and their derivation can be found in</span>
+<span class="sd">    XXX, Deck et al. (2021).</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        cnt (float): Controlled nucleation time.</span>
+<span class="sd">        controlledNucleation (bool): Controlled nucleation on/off.</span>
+<span class="sd">        cooling (dict): A dictionary describing the cooling profile.</span>
+<span class="sd">        holding (dict): A dictionary describing the holding step.</span>
+<span class="sd">        t_tot (float): The total process time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">t_tot</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2e4</span><span class="p">,</span>
+        <span class="n">cooling</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="mi">60</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">50</span><span class="p">},</span>
+        <span class="n">holding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cnTemp</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct an OperatingConditions object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t_tot (float, optional): The total process time. Defaults to 2e4.</span>
+<span class="sd">            cooling (dict, optional): A dictionary describing the cooling profile.</span>
+<span class="sd">                Defaults to {&quot;rate&quot;: 0.5 / 60, &quot;start&quot;: 20, &quot;end&quot;: -50}.</span>
+<span class="sd">            holding (Optional[Union[Iterable[dict], dict]], optional):</span>
+<span class="sd">                A dictionary or list of dictionaries describing</span>
+<span class="sd">                the holding step(s). Defaults to None (no holding).</span>
+<span class="sd">            cnTemp (Union[float, int], optional): At what temperature controlled</span>
+<span class="sd">                nucleation is triggered. Nucleation triggers when</span>
+<span class="sd">                temp&lt;=cnTemp. If that occurs during a holding</span>
+<span class="sd">                phase nucleation will trigger _at the end_ of the phase.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_tot</span> <span class="o">=</span> <span class="n">t_tot</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">key</span> <span class="ow">in</span> <span class="n">cooling</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">]]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cooling dictionary does not contain all required keys.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cooling</span> <span class="o">=</span> <span class="n">cooling</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">holding</span> <span class="o">=</span> <span class="n">holding</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cnTemp</span> <span class="o">=</span> <span class="n">cnTemp</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">holding</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get holding property.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_holding</span>
+
+    <span class="nd">@holding</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">holding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Set holding property.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="c1"># bring holding steps into right order (descending)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">hdict</span><span class="p">:</span> <span class="n">hdict</span><span class="p">[</span><span class="s2">&quot;temp&quot;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;holding must be a dict or Iterable of dict.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">key</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;duration&quot;</span><span class="p">,</span> <span class="s2">&quot;temp&quot;</span><span class="p">]]):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Holding dictionary does not contain all required keys.&quot;</span>
+                    <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_holding</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cnt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the time when controlled nucleation should trigger.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: If holding is not defined</span>
+<span class="sd">                don&#39;t know how to calculate cnt.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The time of controlled nucleation</span>
+<span class="sd">                (inf if no controlled nucleation applied).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># time it takes to holding</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">holding</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Holding profile is not defined.&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;Cannot calculate controlled nucleation time.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnTemp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">T_vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tempProfile</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">t_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">T_vec</span><span class="p">))</span>
+
+            <span class="n">I_endHold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">T_vec</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnTemp</span><span class="p">)</span>
+            <span class="n">t_endHold</span> <span class="o">=</span> <span class="n">t_vec</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">I_endHold</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t_endHold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="k">return</span> <span class="n">t_endHold</span>
+
+<div class="viewcode-block" id="OperatingConditions.tempProfile"><a class="viewcode-back" href="../../api/ethz_snow.html#ethz_snow.operatingConditions.OperatingConditions.tempProfile">[docs]</a>    <span class="k">def</span> <span class="nf">tempProfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return temperature profile.</span>
+
+<span class="sd">        Compute temperature profile with or without</span>
+<span class="sd">        holding step.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dt (float): The time step size.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: The temperature profile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># total number of steps</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t_tot</span> <span class="o">/</span> <span class="n">dt</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">T_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cooling</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span>
+        <span class="n">cr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cooling</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">holding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hdicts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">holding</span> <span class="o">+</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;temp&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cooling</span><span class="p">[</span><span class="s2">&quot;end&quot;</span><span class="p">],</span> <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_tot</span><span class="p">}</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hdicts</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;temp&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cooling</span><span class="p">[</span><span class="s2">&quot;end&quot;</span><span class="p">],</span> <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_tot</span><span class="p">}]</span>
+
+        <span class="n">T_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+        <span class="k">for</span> <span class="n">hdict</span> <span class="ow">in</span> <span class="n">hdicts</span><span class="p">:</span>
+
+            <span class="n">T_hold</span> <span class="o">=</span> <span class="n">hdict</span><span class="p">[</span><span class="s2">&quot;temp&quot;</span><span class="p">]</span>
+            <span class="n">t_hold</span> <span class="o">=</span> <span class="p">(</span><span class="n">T_start</span> <span class="o">-</span> <span class="n">T_hold</span><span class="p">)</span> <span class="o">/</span> <span class="n">cr</span>
+            <span class="n">duration_hold</span> <span class="o">=</span> <span class="n">hdict</span><span class="p">[</span><span class="s2">&quot;duration&quot;</span><span class="p">]</span>
+
+            <span class="c1"># ramp from start to hold temp</span>
+            <span class="n">T_vec_toHold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simpleCool</span><span class="p">(</span>
+                <span class="n">Tstart</span><span class="o">=</span><span class="n">T_start</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">T_hold</span><span class="p">,</span> <span class="n">coolingRate</span><span class="o">=</span><span class="n">cr</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># append holding period</span>
+            <span class="n">T_vec_holding</span> <span class="o">=</span> <span class="p">[</span><span class="n">T_hold</span><span class="p">]</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">duration_hold</span> <span class="o">-</span> <span class="n">t_hold</span> <span class="o">%</span> <span class="n">dt</span><span class="p">)</span> <span class="o">/</span> <span class="n">dt</span><span class="p">))</span>
+
+            <span class="n">T_start</span> <span class="o">=</span> <span class="n">T_hold</span>
+
+            <span class="n">T_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">T_vec</span><span class="p">,</span> <span class="n">T_vec_toHold</span><span class="p">,</span> <span class="n">T_vec_holding</span><span class="p">])</span>
+
+        <span class="n">T_vec</span> <span class="o">=</span> <span class="n">T_vec</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">T_vec</span></div>
+
+    <span class="k">def</span> <span class="nf">_simpleCool</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">Tstart</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">Tend</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">coolingRate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">t_tot</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return cooling profile for linear step.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            Tstart (float): Start temperature.</span>
+<span class="sd">            Tend (float): End temperature.</span>
+<span class="sd">            coolingRate (float): Cooling rate.</span>
+<span class="sd">            dt (float): Time step.</span>
+<span class="sd">            t_tot (Optional[float], optional): Total process time.</span>
+<span class="sd">                Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: The temperature profile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_end</span> <span class="o">=</span> <span class="p">(</span><span class="n">Tstart</span> <span class="o">-</span> <span class="n">Tend</span><span class="p">)</span> <span class="o">/</span> <span class="n">coolingRate</span>
+        <span class="n">t_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">t_end</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+        <span class="n">T_profile</span> <span class="o">=</span> <span class="n">Tstart</span> <span class="o">-</span> <span class="n">t_vec</span> <span class="o">*</span> <span class="n">coolingRate</span>
+
+        <span class="k">if</span> <span class="n">t_tot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">t_tot</span> <span class="o">&gt;=</span> <span class="n">t_end</span>
+            <span class="p">),</span> <span class="s2">&quot;Final temp can&#39;t be reached with cooling rate, holding/total time.&quot;</span>
+
+            <span class="n">add_n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">t_tot</span> <span class="o">-</span> <span class="n">t_vec</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">dt</span><span class="p">))</span>
+
+            <span class="n">T_profile</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">T_profile</span><span class="p">,</span> <span class="p">[</span><span class="n">Tend</span><span class="p">]</span> <span class="o">*</span> <span class="n">add_n</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">T_profile</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return string representation of the OperatingConditions class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The OperatingConditions class string representation</span>
+<span class="sd">                giving some basic info.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">holdPluralBool</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">holding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">holding</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">holdPlural</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Hold</span><span class="si">{</span><span class="s1">&#39;s&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">holdPluralBool</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">: &quot;</span>
+        <span class="n">holdStr</span> <span class="o">=</span> <span class="n">holdPlural</span> <span class="o">+</span> <span class="s2">&quot; AND &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hdict</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> @ </span><span class="si">{</span><span class="n">hdict</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">hdict</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">holding</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;OperatingConditions([t_tot: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">t_tot</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Cooling: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cooling</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cooling</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;with rate </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cooling</span><span class="p">[</span><span class="s1">&#39;rate&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">4.2f</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="o">+</span> <span class="n">holdStr</span>
+            <span class="o">+</span> <span class="s2">&quot;, &quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Controlled Nucleation: </span><span class="si">{</span><span class="s1">&#39;ON&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnTemp</span> <span class="k">else</span> <span class="s1">&#39;OFF&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+        
+            
+
+
+
+<div class='prev-next-bottom'>
+    
+
+</div>
+        
+        </div>
+    </div>
+    <footer class="footer">
+    <div class="container">
+      <p>
+        
+            &copy; Copyright 2021, Leif-Thore Deck, David Ochsenbein.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>
