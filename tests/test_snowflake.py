@@ -1,5 +1,6 @@
 """Implement unit tests for Snowflake class."""
 import pytest
+from ethz_snow.operatingConditions import OperatingConditions
 from ethz_snow.snowflake import Snowflake
 import numpy as np
 
@@ -145,6 +146,42 @@ def S_331_edge():
     S = Snowflake(N_vials=(3, 3, 1), storeStates="edge")
     S.run()
     return S
+
+
+@pytest.fixture(scope="module")
+def S_cnt():
+    """Fixture with controlled nucleation that fails if turned on at -5."""
+    d = {"int": 0, "ext": 0, "s0": 20, "s_sigma_rel": 0}
+    S_cnt = Snowflake(
+        storeStates="all",
+        N_vials=(7, 7, 1),
+        k=d,
+        opcond=OperatingConditions(
+            t_tot=4e4,
+            cooling={"rate": 0.5 / 60, "start": 20, "end": -50},
+            holding=[dict(duration=60, temp=-5), dict(duration=90 * 60, temp=-6)],
+            cnTemp=None,
+        ),
+    )
+
+    return S_cnt
+
+
+@pytest.mark.slow
+def test_cntWarning(S_cnt, capsys):
+    """Test that warning appears if cnt fails (and doesn't otherwise)."""
+    S_cnt.run()
+    captured, _ = capsys.readouterr()
+
+    assert "WARNING" not in captured
+
+    # turn on cnt
+    S_cnt.opcond.cnTemp = -5
+    S_cnt.run()
+    captured, _ = capsys.readouterr()
+
+    # there a significant number of vials was not supercooled
+    assert "WARNING" in captured
 
 
 @pytest.mark.slow

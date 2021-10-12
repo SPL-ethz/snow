@@ -376,7 +376,10 @@ class Snowflake:
             t_solidification=np.full(N_vials_total, np.nan),
         )
 
-        k_CN = np.argmax(t >= self.opcond.cnt)
+        if np.any(t >= self.opcond.cnt):
+            k_CN = np.argmax(t >= self.opcond.cnt)
+        else:
+            k_CN = N_timeSteps + 1
 
         # Iterate over time steps
         for k in np.arange(N_timeSteps):

@@ -196,11 +196,14 @@ class OperatingConditions:
             str: The OperatingConditions class string representation
                 giving some basic info.
         """
-        holdPluralBool = (self.holding is not None) and (len(self.holding) > 1)
-        holdPlural = f"Hold{'s' if (holdPluralBool) else ''}: "
-        holdStr = holdPlural + " AND ".join(
-            [f"{hdict['duration']} @ {hdict['temp']}" for hdict in self.holding]
-        )
+        if self.holding is not None:
+            holdPluralBool = len(self.holding) > 1
+            holdPlural = f"Hold{'s' if (holdPluralBool) else ''}: "
+            holdStr = holdPlural + " AND ".join(
+                [f"{hdict['duration']} @ {hdict['temp']}" for hdict in self.holding]
+            )
+        else:
+            holdStr = "No Holds"
 
         return (
             f"OperatingConditions([t_tot: {self.t_tot}, "
