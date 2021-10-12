@@ -92,13 +92,6 @@ class OperatingConditions:
             float: The time of controlled nucleation
                 (inf if no controlled nucleation applied).
         """
-        # time it takes to holding
-        if self.holding is None:
-            raise NotImplementedError(
-                "Holding profile is not defined."
-                + "Cannot calculate controlled nucleation time."
-            )
-
         if self.cnTemp is not None:
             T_vec = self.tempProfile(1)
             t_vec = np.arange(0, len(T_vec))
