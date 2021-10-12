@@ -8,7 +8,11 @@ This tutorial provides some basic explanations to help users getting started wit
 Installation
 ========
 
-After downloading the package, you need to install it. The requirements for the python version and dependent packages are listed in the setup.cfg file. You may install the package via ``pip install -e .``
+After downloading the package, you need to install it. (The requirements for the python version and dependent packages are listed in the setup.cfg file and will be read automatically by pip.)
+
+Either, download/clone any stable or unstable version from `GitHub <https://github.com/SPL-ethz/snow/>` Then navigate to the folder and install the package via ``pip install -e .``
+
+Or install the latest release version via ``pip install ethz_snow``.
 
 ========
 First steps: General information 
@@ -18,7 +22,50 @@ The package contains several files, two of which enable the simulation of freezi
 
 Both models require a number of operatingConditions and constants as input parameters, which may be adjusted by the user. We define operating conditions as those input parameters, that are related to the numerics of the model (e.g. time step, number of repetitions) or to technical aspects (e.g. heat transfer parameters, cooling protocol). Constants, on the other hand, refer to formulation specific parameters, such as the volume of a vial, its composition and the required individual physicochemical parameters of the individual components (including ice nucleation kinetics). 
 
-Operating conditions are to be provided directly when calling the **snowflake** / **snowfall** functions, while we specify the constants separately in a .yaml file. If no values are specified, the default configurations are used; these are stored in the **operatingConditions.py** and the **snowConfig_default.yaml**.
+Operating conditions are to be provided directly when calling the **snowflake** / **snowfall** functions, while we specify the constants separately in a .yaml file. If no values are specified, the default configurations are used; these are stored in the **operatingConditions.py** and the **snowConfig_default.yaml** (see the next subsection for more details on the latter).
+
+--------
+Constants
+--------
+Below is a copy of the yaml file used to configure the constants used in Snowflake/Snowfall.
+If you wish to modify any (subset) of these constants, simply create a new yaml that follows the same schema in an arbitrary location and link to it via the **configPath** input of Snowflake.
+A partial config is allowed (e.g., one only containing a new water:cp_w entry). The remaining keys will be taken from the default.
+
+.. code-block:: yaml
+    vial:
+    geometry:
+        # base shape of vial (currently only cube is accepted)
+        shape: cube
+        # length [m]
+        length: 0.01
+        # width [m]
+        width: 0.01
+        # height [m]
+        height: 0.01
+    water:
+    # J/[Kkg] heat capacity liquid water
+    cp_w: 4187
+    # J/[Kkg] heat capacity ice 0°C
+    cp_i: 2108
+    # J/kg heat of fusion water
+    Dh: 333550
+    solution:
+    # kg/m^3 density of water / assumed constant for all phases
+    rho_l: 1000
+    # K kg / mol cryoscopic constant
+    k_f: 1.853
+    # J/Kkg, heat capacity sucrose
+    cp_s: 1240
+    # molar mass sucrose [kg/mol]
+    M_s: 0.3423
+    # mass fraction of solute in solution
+    solid_fraction: 0.05
+    # °C equilibrium freezing temperature
+    T_eq: 0
+    kinetics:
+    # m−3 s−1 K−b value reduced compared to Braatz paper (he had a value of 10)
+    kb: 1e-9
+    b: 12
 
 ========
 Example
