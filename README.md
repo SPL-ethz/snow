@@ -1,4 +1,4 @@
-<img src="https://github.com/SPL-ethz/snow/blob/feature/logo/docs_src/_media/snowLogo_inv_v1.png" width="400">
+<img src="/docs_src/_media/snowLogo_inv_v1.png" width="400">
 
 # ethz_snow
 
