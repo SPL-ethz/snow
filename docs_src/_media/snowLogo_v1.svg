@@ -1,0 +1,808 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1280"
+   height="720"
+   overflow="hidden"
+   version="1.1"
+   id="svg369"
+   sodipodi:docname="snowLogo_v1.svg"
+   inkscape:export-filename="testLogo_inv.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview371"
+     pagecolor="#00ffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.3254902"
+     inkscape:pagecheckerboard="false"
+     showgrid="false"
+     inkscape:zoom="0.83851944"
+     inkscape:cx="796.04595"
+     inkscape:cy="484.18675"
+     inkscape:window-width="1500"
+     inkscape:window-height="938"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g367"
+     showborder="false" />
+  <defs
+     id="defs261">
+    <clipPath
+       id="clip0">
+      <rect
+         x="0"
+         y="0"
+         width="1280"
+         height="720"
+         id="rect191" />
+    </clipPath>
+    <clipPath
+       id="clip1">
+      <rect
+         x="0"
+         y="0"
+         width="344184"
+         height="344184"
+         id="rect194" />
+    </clipPath>
+    <image
+       width="64"
+       height="64"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFiUExURQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAETQmVcAAAB1dFJOUwABAgQFBgcJCgwNDxMUGhsdHh8hIigpKiwuLzAxMzU2Nzg7PkBETU9TVFVWWFlcYWJja21ub3R1d32Ag4WGh4yNjpSXmJydoaOkpqeqq6ytrrKztLm6u77AxcbHyMnLzM/Q0dTW3eDl5ujs8vT29/n6+/z9/iPSvs4AAAAJcEhZcwAADdcAAA3XAUIom3gAAAIpSURBVFhH7Zf7UxJRHMW/Igj0MNQSrRBNyAealO9IDcvKFKL307SHliW+4Pz/3d09Q+wOw93dZpqp4fPTOffO/Qx7587eRRrRuYsG7HZyWk+GSxxkOK1nAli/62AdmOC0HiUYYKwx4FGQiTtQj+VJ0Ii/K8jddJDzIhgDhhlrDANjjHp6gZ2F+WyIVULZ+YUdoJfVBZvmM8+wyYxZN9ncEF49UCuW2GRJlYPVMJs72mN2Qayd2TUddkEHo2uiSbsgGWV2R7x07NyD41KczQXjh2oFMMUqU2Y9HGfVMnSESiE7mmJVpEazhQqOhlh1bOFkhLGOkRNsMWroB/KMNvJAP2Nz1BMPMtoYrNuVpqiD281oo7vucDdlFuhitNEFzDI2pyX4XwQND5IXQfnzgxvnWGt4ERgcFRwXrBfBxlvjlVLdOM8hE2+bGL5ePAW+XeWYgTeB4tJL4GfSHDLxLJC2xSq+XzCjgXeByCLwsXYh+RG0qUvy9RkWPwKJvAO+XLGyL4GcfQOcProWUNGfQEL5ijoSP17cu33Hn0Ak8dxQmPgTqE/fW4+/Gh8MvgUm0cQfCvxu4m9agpbA4B8STAM9VgqsPE1I7pXBs6T0ANPWuIZJIG2ly+qKuWi+CIAnkgYmrXENsSpKVgo+fJ8K3P9k8CEtJVRj1riOIrAcZK4RXAaKzDpi+8DeGv/ykrU9YN/lDxDpa/zvvY/TLojMbZe5jJS35yKcrEfkF2LwDjn7VycIAAAAAElFTkSuQmCC"
+       preserveAspectRatio="none"
+       id="img2" />
+    <clipPath
+       id="clip3">
+      <path
+         d="M0 1.16415e-10 344184 0.0125803 344184 344184-0.0125803 344184Z"
+         fill-rule="evenodd"
+         clip-rule="evenodd"
+         id="path198" />
+    </clipPath>
+    <clipPath
+       id="clip4">
+      <rect
+         x="758"
+         y="246"
+         width="141"
+         height="141"
+         id="rect201" />
+    </clipPath>
+    <clipPath
+       id="clip5">
+      <rect
+         x="758"
+         y="246"
+         width="141"
+         height="141"
+         id="rect204" />
+    </clipPath>
+    <clipPath
+       id="clip6">
+      <rect
+         x="758"
+         y="246"
+         width="141"
+         height="141"
+         id="rect207" />
+    </clipPath>
+    <clipPath
+       id="clip7">
+      <rect
+         x="0"
+         y="0"
+         width="344751"
+         height="345600"
+         id="rect210" />
+    </clipPath>
+    <image
+       width="64"
+       height="64"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFiUExURQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAETQmVcAAAB1dFJOUwABAgQFBgcJCgwNDxMUGhsdHh8hIigpKiwuLzAxMzU2Nzg7PkBETU9TVFVWWFlcYWJja21ub3R1d32Ag4WGh4yNjpSXmJydoaOkpqeqq6ytrrKztLm6u77AxcbHyMnLzM/Q0dTW3eDl5ujs8vT29/n6+/z9/iPSvs4AAAAJcEhZcwAADdcAAA3XAUIom3gAAAIpSURBVFhH7Zf7UxJRHMW/Igj0MNQSrRBNyAealO9IDcvKFKL307SHliW+4Pz/3d09Q+wOw93dZpqp4fPTOffO/Qx7587eRRrRuYsG7HZyWk+GSxxkOK1nAli/62AdmOC0HiUYYKwx4FGQiTtQj+VJ0Ii/K8jddJDzIhgDhhlrDANjjHp6gZ2F+WyIVULZ+YUdoJfVBZvmM8+wyYxZN9ncEF49UCuW2GRJlYPVMJs72mN2Qayd2TUddkEHo2uiSbsgGWV2R7x07NyD41KczQXjh2oFMMUqU2Y9HGfVMnSESiE7mmJVpEazhQqOhlh1bOFkhLGOkRNsMWroB/KMNvJAP2Nz1BMPMtoYrNuVpqiD281oo7vucDdlFuhitNEFzDI2pyX4XwQND5IXQfnzgxvnWGt4ERgcFRwXrBfBxlvjlVLdOM8hE2+bGL5ePAW+XeWYgTeB4tJL4GfSHDLxLJC2xSq+XzCjgXeByCLwsXYh+RG0qUvy9RkWPwKJvAO+XLGyL4GcfQOcProWUNGfQEL5ijoSP17cu33Hn0Ak8dxQmPgTqE/fW4+/Gh8MvgUm0cQfCvxu4m9agpbA4B8STAM9VgqsPE1I7pXBs6T0ANPWuIZJIG2ly+qKuWi+CIAnkgYmrXENsSpKVgo+fJ8K3P9k8CEtJVRj1riOIrAcZK4RXAaKzDpi+8DeGv/ykrU9YN/lDxDpa/zvvY/TLojMbZe5jJS35yKcrEfkF2LwDjn7VycIAAAAAElFTkSuQmCC"
+       preserveAspectRatio="none"
+       id="img8" />
+    <clipPath
+       id="clip9">
+      <rect
+         x="0"
+         y="0"
+         width="344751"
+         height="344751"
+         id="rect214" />
+    </clipPath>
+    <clipPath
+       id="clip10">
+      <rect
+         x="0"
+         y="0"
+         width="344184"
+         height="344184"
+         id="rect217" />
+    </clipPath>
+    <image
+       width="64"
+       height="64"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFiUExURQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAETQmVcAAAB1dFJOUwABAgQFBgcJCgwNDxMUGhsdHh8hIigpKiwuLzAxMzU2Nzg7PkBETU9TVFVWWFlcYWJja21ub3R1d32Ag4WGh4yNjpSXmJydoaOkpqeqq6ytrrKztLm6u77AxcbHyMnLzM/Q0dTW3eDl5ujs8vT29/n6+/z9/iPSvs4AAAAJcEhZcwAADdcAAA3XAUIom3gAAAIpSURBVFhH7Zf7UxJRHMW/Igj0MNQSrRBNyAealO9IDcvKFKL307SHliW+4Pz/3d09Q+wOw93dZpqp4fPTOffO/Qx7587eRRrRuYsG7HZyWk+GSxxkOK1nAli/62AdmOC0HiUYYKwx4FGQiTtQj+VJ0Ii/K8jddJDzIhgDhhlrDANjjHp6gZ2F+WyIVULZ+YUdoJfVBZvmM8+wyYxZN9ncEF49UCuW2GRJlYPVMJs72mN2Qayd2TUddkEHo2uiSbsgGWV2R7x07NyD41KczQXjh2oFMMUqU2Y9HGfVMnSESiE7mmJVpEazhQqOhlh1bOFkhLGOkRNsMWroB/KMNvJAP2Nz1BMPMtoYrNuVpqiD281oo7vucDdlFuhitNEFzDI2pyX4XwQND5IXQfnzgxvnWGt4ERgcFRwXrBfBxlvjlVLdOM8hE2+bGL5ePAW+XeWYgTeB4tJL4GfSHDLxLJC2xSq+XzCjgXeByCLwsXYh+RG0qUvy9RkWPwKJvAO+XLGyL4GcfQOcProWUNGfQEL5ijoSP17cu33Hn0Ak8dxQmPgTqE/fW4+/Gh8MvgUm0cQfCvxu4m9agpbA4B8STAM9VgqsPE1I7pXBs6T0ANPWuIZJIG2ly+qKuWi+CIAnkgYmrXENsSpKVgo+fJ8K3P9k8CEtJVRj1riOIrAcZK4RXAaKzDpi+8DeGv/ykrU9YN/lDxDpa/zvvY/TLojMbZe5jJS35yKcrEfkF2LwDjn7VycIAAAAAElFTkSuQmCC"
+       preserveAspectRatio="none"
+       id="img11" />
+    <clipPath
+       id="clip12">
+      <path
+         d="M0-4.65661e-10 344184 0.00344493 344184 344184-0.00344494 344184Z"
+         fill-rule="evenodd"
+         clip-rule="evenodd"
+         id="path221" />
+    </clipPath>
+    <clipPath
+       id="clip13">
+      <rect
+         x="0"
+         y="0"
+         width="344184"
+         height="344184"
+         id="rect224" />
+    </clipPath>
+    <image
+       width="64"
+       height="64"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFiUExURQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAETQmVcAAAB1dFJOUwABAgQFBgcJCgwNDxMUGhsdHh8hIigpKiwuLzAxMzU2Nzg7PkBETU9TVFVWWFlcYWJja21ub3R1d32Ag4WGh4yNjpSXmJydoaOkpqeqq6ytrrKztLm6u77AxcbHyMnLzM/Q0dTW3eDl5ujs8vT29/n6+/z9/iPSvs4AAAAJcEhZcwAADdcAAA3XAUIom3gAAAIpSURBVFhH7Zf7UxJRHMW/Igj0MNQSrRBNyAealO9IDcvKFKL307SHliW+4Pz/3d09Q+wOw93dZpqp4fPTOffO/Qx7587eRRrRuYsG7HZyWk+GSxxkOK1nAli/62AdmOC0HiUYYKwx4FGQiTtQj+VJ0Ii/K8jddJDzIhgDhhlrDANjjHp6gZ2F+WyIVULZ+YUdoJfVBZvmM8+wyYxZN9ncEF49UCuW2GRJlYPVMJs72mN2Qayd2TUddkEHo2uiSbsgGWV2R7x07NyD41KczQXjh2oFMMUqU2Y9HGfVMnSESiE7mmJVpEazhQqOhlh1bOFkhLGOkRNsMWroB/KMNvJAP2Nz1BMPMtoYrNuVpqiD281oo7vucDdlFuhitNEFzDI2pyX4XwQND5IXQfnzgxvnWGt4ERgcFRwXrBfBxlvjlVLdOM8hE2+bGL5ePAW+XeWYgTeB4tJL4GfSHDLxLJC2xSq+XzCjgXeByCLwsXYh+RG0qUvy9RkWPwKJvAO+XLGyL4GcfQOcProWUNGfQEL5ijoSP17cu33Hn0Ak8dxQmPgTqE/fW4+/Gh8MvgUm0cQfCvxu4m9agpbA4B8STAM9VgqsPE1I7pXBs6T0ANPWuIZJIG2ly+qKuWi+CIAnkgYmrXENsSpKVgo+fJ8K3P9k8CEtJVRj1riOIrAcZK4RXAaKzDpi+8DeGv/ykrU9YN/lDxDpa/zvvY/TLojMbZe5jJS35yKcrEfkF2LwDjn7VycIAAAAAElFTkSuQmCC"
+       preserveAspectRatio="none"
+       id="img14" />
+    <clipPath
+       id="clip15">
+      <path
+         d="M0 0 344184 0.00857882 344184 344184-0.00857882 344184Z"
+         fill-rule="evenodd"
+         clip-rule="evenodd"
+         id="path228" />
+    </clipPath>
+    <clipPath
+       id="clip16">
+      <rect
+         x="0"
+         y="0"
+         width="344184"
+         height="344184"
+         id="rect231" />
+    </clipPath>
+    <image
+       width="64"
+       height="64"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFiUExURQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAETQmVcAAAB1dFJOUwABAgQFBgcJCgwNDxMUGhsdHh8hIigpKiwuLzAxMzU2Nzg7PkBETU9TVFVWWFlcYWJja21ub3R1d32Ag4WGh4yNjpSXmJydoaOkpqeqq6ytrrKztLm6u77AxcbHyMnLzM/Q0dTW3eDl5ujs8vT29/n6+/z9/iPSvs4AAAAJcEhZcwAADdcAAA3XAUIom3gAAAIpSURBVFhH7Zf7UxJRHMW/Igj0MNQSrRBNyAealO9IDcvKFKL307SHliW+4Pz/3d09Q+wOw93dZpqp4fPTOffO/Qx7587eRRrRuYsG7HZyWk+GSxxkOK1nAli/62AdmOC0HiUYYKwx4FGQiTtQj+VJ0Ii/K8jddJDzIhgDhhlrDANjjHp6gZ2F+WyIVULZ+YUdoJfVBZvmM8+wyYxZN9ncEF49UCuW2GRJlYPVMJs72mN2Qayd2TUddkEHo2uiSbsgGWV2R7x07NyD41KczQXjh2oFMMUqU2Y9HGfVMnSESiE7mmJVpEazhQqOhlh1bOFkhLGOkRNsMWroB/KMNvJAP2Nz1BMPMtoYrNuVpqiD281oo7vucDdlFuhitNEFzDI2pyX4XwQND5IXQfnzgxvnWGt4ERgcFRwXrBfBxlvjlVLdOM8hE2+bGL5ePAW+XeWYgTeB4tJL4GfSHDLxLJC2xSq+XzCjgXeByCLwsXYh+RG0qUvy9RkWPwKJvAO+XLGyL4GcfQOcProWUNGfQEL5ijoSP17cu33Hn0Ak8dxQmPgTqE/fW4+/Gh8MvgUm0cQfCvxu4m9agpbA4B8STAM9VgqsPE1I7pXBs6T0ANPWuIZJIG2ly+qKuWi+CIAnkgYmrXENsSpKVgo+fJ8K3P9k8CEtJVRj1riOIrAcZK4RXAaKzDpi+8DeGv/ykrU9YN/lDxDpa/zvvY/TLojMbZe5jJS35yKcrEfkF2LwDjn7VycIAAAAAElFTkSuQmCC"
+       preserveAspectRatio="none"
+       id="img17" />
+    <clipPath
+       id="clip18">
+      <path
+         d="M0-4.65661e-10 344184-0.00554181 344184 344184 0.00554181 344184Z"
+         fill-rule="evenodd"
+         clip-rule="evenodd"
+         id="path235" />
+    </clipPath>
+    <clipPath
+       id="clip19">
+      <rect
+         x="0"
+         y="0"
+         width="344184"
+         height="344184"
+         id="rect238" />
+    </clipPath>
+    <image
+       width="64"
+       height="64"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFiUExURQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAETQmVcAAAB1dFJOUwABAgQFBgcJCgwNDxMUGhsdHh8hIigpKiwuLzAxMzU2Nzg7PkBETU9TVFVWWFlcYWJja21ub3R1d32Ag4WGh4yNjpSXmJydoaOkpqeqq6ytrrKztLm6u77AxcbHyMnLzM/Q0dTW3eDl5ujs8vT29/n6+/z9/iPSvs4AAAAJcEhZcwAADdcAAA3XAUIom3gAAAIpSURBVFhH7Zf7UxJRHMW/Igj0MNQSrRBNyAealO9IDcvKFKL307SHliW+4Pz/3d09Q+wOw93dZpqp4fPTOffO/Qx7587eRRrRuYsG7HZyWk+GSxxkOK1nAli/62AdmOC0HiUYYKwx4FGQiTtQj+VJ0Ii/K8jddJDzIhgDhhlrDANjjHp6gZ2F+WyIVULZ+YUdoJfVBZvmM8+wyYxZN9ncEF49UCuW2GRJlYPVMJs72mN2Qayd2TUddkEHo2uiSbsgGWV2R7x07NyD41KczQXjh2oFMMUqU2Y9HGfVMnSESiE7mmJVpEazhQqOhlh1bOFkhLGOkRNsMWroB/KMNvJAP2Nz1BMPMtoYrNuVpqiD281oo7vucDdlFuhitNEFzDI2pyX4XwQND5IXQfnzgxvnWGt4ERgcFRwXrBfBxlvjlVLdOM8hE2+bGL5ePAW+XeWYgTeB4tJL4GfSHDLxLJC2xSq+XzCjgXeByCLwsXYh+RG0qUvy9RkWPwKJvAO+XLGyL4GcfQOcProWUNGfQEL5ijoSP17cu33Hn0Ak8dxQmPgTqE/fW4+/Gh8MvgUm0cQfCvxu4m9agpbA4B8STAM9VgqsPE1I7pXBs6T0ANPWuIZJIG2ly+qKuWi+CIAnkgYmrXENsSpKVgo+fJ8K3P9k8CEtJVRj1riOIrAcZK4RXAaKzDpi+8DeGv/ykrU9YN/lDxDpa/zvvY/TLojMbZe5jJS35yKcrEfkF2LwDjn7VycIAAAAAElFTkSuQmCC"
+       preserveAspectRatio="none"
+       id="img20" />
+    <clipPath
+       id="clip21">
+      <path
+         d="M-4.65661e-10 0 344184-0.0128264 344184 344184 0.0128264 344184Z"
+         fill-rule="evenodd"
+         clip-rule="evenodd"
+         id="path242" />
+    </clipPath>
+    <clipPath
+       id="clip22">
+      <rect
+         x="620"
+         y="408"
+         width="113"
+         height="19"
+         id="rect245" />
+    </clipPath>
+    <clipPath
+       id="clip23">
+      <rect
+         x="620"
+         y="408"
+         width="113"
+         height="19"
+         id="rect248" />
+    </clipPath>
+    <clipPath
+       id="clip24">
+      <rect
+         x="620"
+         y="408"
+         width="113"
+         height="19"
+         id="rect251" />
+    </clipPath>
+    <clipPath
+       id="clip25">
+      <rect
+         x="0"
+         y="0"
+         width="344751"
+         height="345600"
+         id="rect254" />
+    </clipPath>
+    <image
+       width="64"
+       height="64"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFiUExURQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAETQmVcAAAB1dFJOUwABAgQFBgcJCgwNDxMUGhsdHh8hIigpKiwuLzAxMzU2Nzg7PkBETU9TVFVWWFlcYWJja21ub3R1d32Ag4WGh4yNjpSXmJydoaOkpqeqq6ytrrKztLm6u77AxcbHyMnLzM/Q0dTW3eDl5ujs8vT29/n6+/z9/iPSvs4AAAAJcEhZcwAADdcAAA3XAUIom3gAAAIpSURBVFhH7Zf7UxJRHMW/Igj0MNQSrRBNyAealO9IDcvKFKL307SHliW+4Pz/3d09Q+wOw93dZpqp4fPTOffO/Qx7587eRRrRuYsG7HZyWk+GSxxkOK1nAli/62AdmOC0HiUYYKwx4FGQiTtQj+VJ0Ii/K8jddJDzIhgDhhlrDANjjHp6gZ2F+WyIVULZ+YUdoJfVBZvmM8+wyYxZN9ncEF49UCuW2GRJlYPVMJs72mN2Qayd2TUddkEHo2uiSbsgGWV2R7x07NyD41KczQXjh2oFMMUqU2Y9HGfVMnSESiE7mmJVpEazhQqOhlh1bOFkhLGOkRNsMWroB/KMNvJAP2Nz1BMPMtoYrNuVpqiD281oo7vucDdlFuhitNEFzDI2pyX4XwQND5IXQfnzgxvnWGt4ERgcFRwXrBfBxlvjlVLdOM8hE2+bGL5ePAW+XeWYgTeB4tJL4GfSHDLxLJC2xSq+XzCjgXeByCLwsXYh+RG0qUvy9RkWPwKJvAO+XLGyL4GcfQOcProWUNGfQEL5ijoSP17cu33Hn0Ak8dxQmPgTqE/fW4+/Gh8MvgUm0cQfCvxu4m9agpbA4B8STAM9VgqsPE1I7pXBs6T0ANPWuIZJIG2ly+qKuWi+CIAnkgYmrXENsSpKVgo+fJ8K3P9k8CEtJVRj1riOIrAcZK4RXAaKzDpi+8DeGv/ykrU9YN/lDxDpa/zvvY/TLojMbZe5jJS35yKcrEfkF2LwDjn7VycIAAAAAElFTkSuQmCC"
+       preserveAspectRatio="none"
+       id="img26" />
+    <clipPath
+       id="clip27">
+      <rect
+         x="0"
+         y="0"
+         width="344751"
+         height="344751"
+         id="rect258" />
+    </clipPath>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2049"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2045" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2047" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2055"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2051" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2053" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2061"
+       x="0"
+       y="0"
+       width="0.99991662"
+       height="1">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2057" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2059" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2067"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2063" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2065" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2073"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2069" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2071" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2079"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2075" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2077" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2085"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2081" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2083" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2091"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2087" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2089" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2097"
+       x="0"
+       y="9.2973436e-14"
+       width="0.99999903"
+       height="0.99999907">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2093" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2095" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2103"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2099" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2101" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2109"
+       x="0"
+       y="2.3434132e-14"
+       width="0.99999905"
+       height="0.99999907">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2105" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2107" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2115"
+       x="0"
+       y="0"
+       width="0.99999907"
+       height="0.99999905">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2111" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2113" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2121"
+       x="0"
+       y="0"
+       width="0.99999907"
+       height="0.99999906">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2117" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2119" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2127"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2123" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2125" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2133"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2129" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2131" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Invert"
+       id="filter2139"
+       x="0"
+       y="0"
+       width="0.99999907"
+       height="0.99999903">
+      <feColorMatrix
+         type="hueRotate"
+         values="180"
+         result="color1"
+         id="feColorMatrix2135" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.21 -0.72 -0.07 1 0 "
+         result="color2"
+         id="feColorMatrix2137" />
+    </filter>
+  </defs>
+  <g
+     clip-path="url(#clip0)"
+     id="g367">
+    <g
+       clip-path="url(#clip1)"
+       transform="matrix(9.09213e-05 5.24934e-05 -5.24934e-05 9.09213e-05 779.516 364.583)"
+       id="g269"
+       style="filter:url(#filter2139)">
+      <g
+         clip-path="url(#clip3)"
+         id="g267">
+        <use
+           width="100%"
+           height="100%"
+           xlink:href="#img2"
+           transform="matrix(5377.88 0.000196567 -0.000196567 5377.88 0 1.16415e-10)"
+           id="use265" />
+      </g>
+    </g>
+    <g
+       clip-path="url(#clip4)"
+       id="g277"
+       style="filter:url(#filter2133)">
+      <g
+         clip-path="url(#clip5)"
+         id="g275">
+        <g
+           clip-path="url(#clip6)"
+           id="g273">
+          <path
+             d="M872.856 316.353C872.416 316.353 871.828 316.353 871.388 316.353 871.388 316.353 871.388 316.353 871.388 316.353 871.388 309.156 867.862 302.547 862.134 298.434 856.259 294.322 848.769 293.294 842.013 295.644 836.431 284.775 824.094 279.194 812.344 281.984 800.594 284.775 792.075 295.35 792.075 307.541 792.075 307.541 792.075 307.688 792.075 307.834 783.997 306.513 775.919 309.891 770.925 316.353 766.078 322.962 765.197 331.628 768.575 338.972 772.1 346.316 779.444 351.163 787.522 351.603L787.522 351.75 872.709 351.75C882.403 351.75 890.334 343.819 890.334 334.125 890.334 324.431 882.55 316.353 872.856 316.353Z"
+             id="path271" />
+        </g>
+      </g>
+    </g>
+    <g
+       clip-path="url(#clip7)"
+       transform="matrix(-0.00010141 2.71726e-05 2.71726e-05 0.00010141 859.05 367.761)"
+       id="g283"
+       style="filter:url(#filter2127)">
+      <g
+         clip-path="url(#clip9)"
+         transform="matrix(1 -3.99494e-08 -1.21073e-09 1.00246 0 0)"
+         id="g281">
+        <use
+           width="100%"
+           height="100%"
+           xlink:href="#img8"
+           transform="scale(5386.73 5386.73)"
+           id="use279" />
+      </g>
+    </g>
+    <g
+       clip-path="url(#clip10)"
+       transform="matrix(7.40167e-05 7.44565e-05 -7.44565e-05 7.40167e-05 808.833 427.385)"
+       id="g289"
+       style="filter:url(#filter2121)">
+      <g
+         clip-path="url(#clip12)"
+         id="g287">
+        <use
+           width="100%"
+           height="100%"
+           xlink:href="#img11"
+           transform="matrix(5377.88 5.38271e-05 -5.38271e-05 5377.88 0 -4.65661e-10)"
+           id="use285" />
+      </g>
+    </g>
+    <g
+       clip-path="url(#clip13)"
+       transform="matrix(7.75325e-05 -7.07881e-05 7.07881e-05 7.75325e-05 796.133 407.885)"
+       id="g295"
+       style="filter:url(#filter2115)">
+      <g
+         clip-path="url(#clip15)"
+         id="g293">
+        <use
+           width="100%"
+           height="100%"
+           xlink:href="#img14"
+           transform="matrix(5377.88 0.000134044 -0.000134044 5377.88 0 0)"
+           id="use291" />
+      </g>
+    </g>
+    <g
+       clip-path="url(#clip16)"
+       transform="matrix(7.86271e-05 6.95703e-05 -6.95703e-05 7.86271e-05 785.81 405.576)"
+       id="g301"
+       style="filter:url(#filter2109)">
+      <g
+         clip-path="url(#clip18)"
+         id="g299">
+        <use
+           width="100%"
+           height="100%"
+           xlink:href="#img17"
+           transform="matrix(5377.88 -8.65909e-05 8.65909e-05 5377.88 0 -4.65661e-10)"
+           id="use297" />
+      </g>
+    </g>
+    <text
+       font-family="Arial,Arial_MSFontService,sans-serif"
+       font-style="italic"
+       font-weight="700"
+       font-size="98"
+       transform="translate(429.995 351)"
+       id="text303"
+       style="filter:url(#filter2103)">SNOW</text>
+    <g
+       clip-path="url(#clip19)"
+       transform="matrix(8.26498e-05 -6.47399e-05 6.47399e-05 8.26498e-05 826.035 453.057)"
+       id="g309"
+       style="filter:url(#filter2097)">
+      <g
+         clip-path="url(#clip21)"
+         id="g307">
+        <use
+           width="100%"
+           height="100%"
+           xlink:href="#img20"
+           transform="matrix(5377.88 -0.000200413 0.000200413 5377.88 -4.65661e-10 0)"
+           id="use305" />
+      </g>
+    </g>
+    <text
+       font-family="Arial,Arial_MSFontService,sans-serif"
+       font-weight="400"
+       font-size="24"
+       transform="translate(407.263 393)"
+       id="text323"
+       style="filter:url(#filter2091)">Stochastic <tspan
+   font-size="24"
+   x="117.333"
+   y="0"
+   id="tspan311">N</tspan><tspan
+   font-size="24"
+   x="134.667"
+   y="0"
+   id="tspan313">ucleation </tspan><tspan
+   font-size="24"
+   x="237.333"
+   y="0"
+   id="tspan315">o</tspan><tspan
+   font-size="24"
+   x="250.667"
+   y="0"
+   id="tspan317">f </tspan><tspan
+   font-size="24"
+   x="264"
+   y="0"
+   id="tspan319">W</tspan><tspan
+   font-size="24"
+   x="285.773"
+   y="0"
+   id="tspan321">ater</tspan></text>
+    <path
+       d="M407.037 396.341 423.037 396.341 423.037 398.341 407.037 398.341Z"
+       fill-rule="evenodd"
+       id="path325"
+       style="filter:url(#filter2085)" />
+    <path
+       d="M525.036 396.341 542.036 396.341 542.036 398.341 525.036 398.341Z"
+       fill-rule="evenodd"
+       id="path327"
+       style="filter:url(#filter2079)" />
+    <path
+       d="M645.036 396.341 658.036 396.341 658.036 398.341 645.036 398.341Z"
+       fill-rule="evenodd"
+       id="path329"
+       style="filter:url(#filter2073)" />
+    <path
+       d="M671.036 396.341 693.036 396.341 693.036 398.341 671.036 398.341Z"
+       fill-rule="evenodd"
+       id="path331"
+       style="filter:url(#filter2067)" />
+    <g
+       clip-path="url(#clip22)"
+       id="g357"
+       style="filter:url(#filter2061)">
+      <g
+         clip-path="url(#clip23)"
+         id="g355">
+        <g
+           clip-path="url(#clip24)"
+           id="g353">
+          <path
+             d="M69.461 13.3568C69.2861 15.2415 67.7263 16.6961 65.8339 16.7391 64.7197 16.8616 63.7173 16.0579 63.5948 14.9437 63.581 14.8182 63.5788 14.6917 63.5886 14.5658 63.5975 14.1796 63.6359 13.7947 63.7037 13.4143L65.2438 5.75723 65.2438 5.75723 63.4303 5.75723 61.8902 13.5871 61.8902 13.7022C61.8067 14.0707 61.7633 14.447 61.7607 14.8249 61.6316 16.6486 63.0052 18.2317 64.829 18.3608 64.9575 18.3699 65.0863 18.3715 65.215 18.3656 66.5756 18.4351 67.8993 17.9099 68.8421 16.9263L68.5974 18.2216 68.5974 18.2216 70.3965 18.2216 72.8289 5.75723 72.8289 5.75723 70.9866 5.75723Z"
+             transform="matrix(1 0 0 1.02178 620 408.117)"
+             id="path333" />
+          <path
+             d="M81.8822 5.55573C80.5432 5.53965 79.2724 6.14577 78.4422 7.19654L78.7157 5.75723 78.7157 5.75723 76.931 5.75723 74.4554 18.2216 74.4554 18.2216 76.2833 18.2216 77.7226 10.5789C77.9798 8.72449 79.5096 7.30907 81.3784 7.19654 82.069 7.1807 82.722 7.50993 83.12 8.07451L83.12 8.07451 84.5593 6.75035 84.5593 6.75035C83.8746 5.9716 82.8752 5.54325 81.839 5.58451"
+             transform="matrix(1 0 0 1.02178 620 408.117)"
+             id="path335" />
+          <path
+             d="M52.0885 5.71405 51.7719 7.29729 51.7719 7.32607 57.9753 7.32607 49.7137 16.6816 49.6993 16.6816 49.397 18.2072 58.2056 18.2072 58.5222 16.5952 51.9302 16.5952 60.235 7.23972 60.235 7.23972 60.5373 5.71405 52.0885 5.71405Z"
+             transform="matrix(1 0 0 1.02178 620 408.117)"
+             id="path337" />
+          <path
+             d="M87.3515 5.71405 84.8472 18.1784 84.8472 18.2072 86.6607 18.2072 89.1507 5.71405 87.3515 5.71405Z"
+             transform="matrix(1 0 0 1.02178 620 408.117)"
+             id="path339" />
+          <path
+             d="M109.531 5.55573C108.19 5.49923 106.889 6.02375 105.962 6.99503L107.401 0.0287861 105.559 0.0287861 101.903 18.2072 103.716 18.2072 105.242 10.5645C105.438 8.68085 107.005 7.23721 108.898 7.19654 110.013 7.082 111.01 7.89299 111.124 9.00793 111.137 9.1282 111.138 9.24933 111.129 9.36989 111.122 9.76171 111.079 10.152 110.999 10.5357L109.459 18.236 111.273 18.236 112.87 10.363C112.951 9.95524 112.995 9.54091 113 9.12521 113.137 7.29409 111.764 5.69856 109.933 5.56147 109.799 5.55147 109.665 5.54955 109.531 5.55573"
+             transform="matrix(1 0 0 1.02178 620 408.117)"
+             id="path341" />
+          <path
+             d="M97.4699 5.55573C94.1595 5.55573 91.8422 7.8874 91.0938 11.9462 90.9808 12.5781 90.9229 13.2186 90.921 13.8605 90.7116 16.1323 92.3834 18.1438 94.6552 18.3532 94.8492 18.371 95.0443 18.3752 95.2389 18.3656 96.8068 18.371 98.309 17.7369 99.3985 16.6096L99.3985 16.6096 98.3479 15.3286 98.3479 15.3286 98.3479 15.3286C97.6183 16.2355 96.5181 16.7645 95.3541 16.7679 93.9244 16.8246 92.7194 15.7115 92.6627 14.2818 92.6576 14.1508 92.6623 14.0196 92.677 13.8893 92.6848 13.2606 92.7523 12.6341 92.8785 12.0182 93.0791 10.7033 93.6367 9.46864 94.4905 8.44873 95.2014 7.65396 96.2165 7.19874 97.2828 7.19654 98.3051 7.16022 99.2549 7.7223 99.7152 8.63584L99.7152 8.63584 101.054 7.49879 101.054 7.49879C100.271 6.28309 98.9 5.57582 97.4555 5.64208"
+             transform="matrix(1 0 0 1.02178 620 408.117)"
+             id="path343" />
+          <path
+             d="M88.4886 0 88.028 2.27411 89.8559 2.27411 90.3021 0 88.4886 0Z"
+             transform="matrix(1 0 0 1.02178 620 408.117)"
+             id="path345" />
+          <path
+             d="M70.7851 0 70.3245 2.27411 72.1525 2.27411 72.5986 0 70.7851 0Z"
+             transform="matrix(1 0 0 1.02178 620 408.117)"
+             id="path347" />
+          <path
+             d="M65.9347 0 65.4741 2.27411 67.2876 2.27411 67.7482 0 65.9347 0Z"
+             transform="matrix(1 0 0 1.02178 620 408.117)"
+             id="path349" />
+          <path
+             d="M42.5747 0 41.1354 7.0526 37.0478 7.0526 38.4871 0 3.65584 0 0 18.2072 13.8893 18.2072 14.7961 13.659 6.59203 13.659 7.09578 11.1546 15.2854 11.1546 16.1202 7.0526 7.91619 7.0526 8.41995 4.54821 21.4025 4.54821 18.6678 18.2072 24.3531 18.2072 27.1022 4.54821 31.8807 4.54821 29.1316 18.2072 34.8312 18.2072 36.2274 11.1546 40.3294 11.1546 38.9189 18.2072 44.6185 18.2072 48.2744 0 42.5747 0Z"
+             transform="matrix(1 0 0 1.02178 620 408.117)"
+             id="path351" />
+        </g>
+      </g>
+    </g>
+    <text
+       font-family="Arial,Arial_MSFontService,sans-serif"
+       font-style="italic"
+       font-weight="400"
+       font-size="24"
+       transform="translate(393.396 426)"
+       id="text359"
+       style="filter:url(#filter2055)">a python package by</text>
+    <g
+       clip-path="url(#clip25)"
+       transform="matrix(-7.08925e-05 -7.74371e-05 -7.74371e-05 7.08925e-05 894.042 419.777)"
+       id="g365"
+       style="filter:url(#filter2049)">
+      <g
+         clip-path="url(#clip27)"
+         transform="matrix(1 -1.10381e-08 -3.03758e-08 1.00246 1.86265e-09 -4.65661e-10)"
+         id="g363">
+        <use
+           width="100%"
+           height="100%"
+           xlink:href="#img26"
+           transform="scale(5386.73 5386.73)"
+           id="use361" />
+      </g>
+    </g>
+  </g>
+</svg>

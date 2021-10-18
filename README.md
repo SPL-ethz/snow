@@ -1,3 +1,5 @@
+<img src="https://github.com/SPL-ethz/snow/blob/feature/logo/docs_src/_media/snowLogo_inv_v1.png" width="400">
+
 # ethz_snow
 
 SNOW (**S**tochastic **N**ucleation **O**f **W**ater) is an open source modeling framework to simulate the freezing process in a large number of vials, tailored towards pharmaceutical freeze-drying processes. SNOW was developed as part of a research collaboration between ETH Zurich's Separation Processes Laboratory and Janssen (pharmaceutical companies of J&J). It is brought to you by Leif-Thore Deck and Dr. David Ochsenbein.  
