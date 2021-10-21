@@ -28,3 +28,5 @@ Please report bugs as [Github issues](https://github.com/SPL-ethz/snow/issues/ne
 including a screenshot that illustrates the problem.
 
 Copyright (c) 2021 Leif-Thore Deck, David Ochsenbein
+
+<sub>The snow package logo has been designed using resources from Flaticon.com.</sub>
