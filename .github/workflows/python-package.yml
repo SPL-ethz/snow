@@ -9,11 +9,21 @@ on:
       - main
       - release/*
       - develop
+    paths-ignore:
+      - docs/**
+      - docs_src/**
+      - '**.md'
+      - '**.rst'
   pull_request:
     branches:
       - main
       - release/*
       - develop
+    paths-ignore:
+      - docs/**
+      - docs_src/**
+      - '**.md'
+      - '**.rst'
 jobs:
   build:
     runs-on: ubuntu-latest
