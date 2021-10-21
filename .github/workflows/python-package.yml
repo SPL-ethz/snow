@@ -9,7 +9,6 @@ on:
       - main
       - release/*
       - develop
-      - feature/coveralls
     paths-ignore:
       - docs/**
       - docs_src/**
