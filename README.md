@@ -1,6 +1,6 @@
 <img src="/docs_src/_media/snowLogo_inv_v1.png" width="400">
 
-![](https://img.shields.io/github/v/tag/SPL-ethz/snow) ![](https://img.shields.io/pypi/v/ethz-snow) ![](https://img.shields.io/github/stars/SPL-ethz/snow?style=social) ![](https://img.shields.io/github/watchers/SPL-ethz/snow?style=social) ![](https://img.shields.io/github/commit-activity/m/SPL-ethz/snow) ![](https://img.shields.io/github/issues-raw/SPL-ethz/snow) ![](https://img.shields.io/pypi/l/ethz-snow) ![](https://img.shields.io/badge/code%20style-black-black)
+![](https://img.shields.io/github/v/tag/SPL-ethz/snow) ![](https://img.shields.io/pypi/v/ethz-snow) ![](https://img.shields.io/github/workflow/status/SPL-ethz/snow/Python%20package) ![](https://img.shields.io/github/stars/SPL-ethz/snow?style=social) ![](https://img.shields.io/github/watchers/SPL-ethz/snow?style=social) ![](https://img.shields.io/github/commit-activity/m/SPL-ethz/snow) ![](https://img.shields.io/github/issues-raw/SPL-ethz/snow) ![](https://img.shields.io/pypi/l/ethz-snow) ![](https://img.shields.io/badge/code%20style-black-black)
 
 SNOW (**S**tochastic **N**ucleation **O**f **W**ater) is an open source modeling framework to simulate the freezing process in a large number of vials, tailored towards pharmaceutical freeze-drying processes. SNOW was developed as part of a research collaboration between ETH Zurich's Separation Processes Laboratory and Janssen (pharmaceutical companies of J&J). It is brought to you by Leif-Thore Deck and Dr. David Ochsenbein.  
 
@@ -28,3 +28,5 @@ Please report bugs as [Github issues](https://github.com/SPL-ethz/snow/issues/ne
 including a screenshot that illustrates the problem.
 
 Copyright (c) 2021 Leif-Thore Deck, David Ochsenbein
+
+<sub>The snow package logo has been designed using resources from Flaticon.com.</sub>
