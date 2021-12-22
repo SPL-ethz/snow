@@ -350,6 +350,7 @@ class Snowflake:
         alpha = self.const["alpha"]
         beta_solution = self.const["beta_solution"]
         T_eq = self.const["T_eq"]
+        T_eq_l = self.const["T_eq_l"]
         hl = self.const["hl"]
         kb = self.const["kb"]
         b = self.const["b"]
@@ -431,7 +432,7 @@ class Snowflake:
                 T_k[liquidMask] = T_k[liquidMask] + q_k[liquidMask] / hl * self.dt
                 # a mask that is True where the temperature is
                 # below the equilibrium temperature
-                superCooledMask = T_k < T_eq
+                superCooledMask = T_k < T_eq_l
                 # a vial that is both liquid and supercooled can nucleate
                 nucleationCandidatesMask = liquidMask & superCooledMask
                 # the total number of nucleation candidates
@@ -442,7 +443,7 @@ class Snowflake:
                 diceRolls = np.zeros(N_vials_total)
 
                 P[nucleationCandidatesMask] = (
-                    kb * V * (T_eq - T_k[nucleationCandidatesMask]) ** b * self.dt
+                    kb * V * (T_eq_l - T_k[nucleationCandidatesMask]) ** b * self.dt
                 )
                 # when we reach the timepoint of controlled nucleation
                 # all vials (that thermodynamically can) nucleate
@@ -468,7 +469,7 @@ class Snowflake:
                 stats["t_nucleation"][nucleatedVialsMask] = t[k] + self.dt
                 stats["T_nucleation"][nucleatedVialsMask] = T_k[nucleatedVialsMask]
 
-                q0 = (T_eq - T_k[nucleatedVialsMask]) * cp_solution * mass
+                q0 = (T_eq_l - T_k[nucleatedVialsMask]) * cp_solution * mass
 
                 sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
                 # assumption is that during solidification T = Teq
