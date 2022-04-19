@@ -108,7 +108,7 @@ class Snowflake:
             # we exepct this to be immutable
             N_vials = tuple(N_vials)
 
-        if N_vials[2] > 1:
+        if N_vials[2] > 100: # @DRO: Should we eliminate this one now?
             raise NotImplementedError(
                 "Only 2D (shelf) models are implemented at this moment."
             )
@@ -842,22 +842,39 @@ class Snowflake:
         dy_pattern = np.ones((n_x * n_y - n_x,))
         DY = csr_matrix(np.diag(dy_pattern, k=n_x) + np.diag(dy_pattern, k=-n_x))
 
+        # create interaction matrix for upwards/downwards direction interactions
+        # matrix is 1 where two vials have an interaction and 0 otherwise
+        # pairs (1,(n_x*n_y)+1), (2,(n_x+n_y)+2), ..., (i,i+(n_x+n_y)) have interactions
+        # for i in [1, n_x*n_y*(n_z-1)]
+        dz_pattern = np.ones((n_x * n_y * ( n_z - 1),))
+        DZ = csr_matrix(np.diag(dy_pattern, k=(n_x*n_y)) + np.diag(dy_pattern, k=(-n_x*n_y)))
+
+
         # how many interactions does each vial
         # have with other vials
         # diagflat because sum over a sparse matrix
         # returns a np.matrix object, not an ndarray
-        VIAL_INT = csr_matrix(np.diagflat(np.sum(DX + DY, axis=1)))
+        VIAL_INT_2D = csr_matrix(np.diagflat(np.sum(DX + DY, axis=1)))
+        VIAL_INT_3D = csr_matrix(np.diagflat(np.sum(DX + DY + DZ, axis=1)))
 
         # the overall interaction matrix is given by the sum
         # of the interaction matrices DX and DY
         # minus the diagonal containing the sum of all vial-vial interactions
-        interactionMatrix = DX + DY - VIAL_INT
+        interactionMatrix_2D = DX + DY - VIAL_INT_2D
+        interactionMatrix_3D = DX + DY + DZ - VIAL_INT_3D
 
         # at most, any cubic vial on a 2D shelf can have
         # 4 interactions. 4 - VIAL_INT is the
         # number of external interactions (excl. the shelf)
-        # is it worth storing this as a sparse matrix? - DRO XXX
-        VIAL_EXT = 4 * np.ones((n_x * n_y,)) - VIAL_INT.diagonal()
+   
+        # @DRO: need to distinguish here among the two models; 3D model has 6 interactions,
+        # this is true even in the case for a single vial, to be consistent
+        
+        VIAL_EXT_2D = 4 * np.ones((n_x * n_y,)) - VIAL_INT_2D.diagonal()
+        VIAL_EXT_3D = 6 * np.ones((n_x * n_y * n_z,)) - VIAL_INT_3D.diagonal()
+
+        VIAL_EXT = VIAL_EXT_3D
+        interactionMatrix = interactionMatrix_3D
 
         return interactionMatrix, VIAL_EXT
 
