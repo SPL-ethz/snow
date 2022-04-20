@@ -24,7 +24,9 @@ class Snowflake:
     """A class to handle a single Stochastic Nucleation of Water simulation.
 
     More information regarding the equations and their derivation can be found in
-    XXX, Deck et al. (2021).
+    "Stochastic shelf-scale modeling framework for the freezing stage in freeze-drying processes",
+     Deck, Ochsenbein and Mazzotti (2022), Int J Pharm, 613, 121276 
+     https://doi.org/10.1016/j.ijpharm.2021.121276
 
     Parameters:
         configPath (Optional[str]): The path of the (optional) custom config yaml.
@@ -363,7 +365,8 @@ class Snowflake:
 
         # Initial state of the system
         # initial temperature
-        T_k = np.ones(N_vials_total) * self.opcond.cooling["start"]  # [C]
+        T_k = np.ones(N_vials_total) * self.opcond.cooling["start"]  # [C] @ DRO: We may need to adjust this, 
+        # the initial temp of the vials is for pallet freezing not necessarily the one of the shelf = cooling chamber, i.e. need one more variable here
         # state of the vials
         sigma_k = np.zeros(N_vials_total)  # (0 = liq, 1 = completely frozen)
 
@@ -662,7 +665,7 @@ class Snowflake:
 
         return counter
 
-    def getVialGroup(self, group: Union[str, Sequence[str]] = "all") -> np.ndarray:
+    def getVialGroup(self, group: Union[str, Sequence[str]] = "all") -> np.ndarray: #@ DRO: Need to adjust definitions for corner, edge, side etc...
         """Return mask for given group.
 
         mask[i] = True iff vial[i] is in G where G can be a list of groups.
@@ -690,7 +693,7 @@ class Snowflake:
 
         _, VIAL_EXT = self._buildInteractionMatrices()
 
-        myMask = np.zeros(self.N_vials_total, dtype=bool)
+        myMask = np.zeros(self.N_vials_total, dtype=bool) # @ DRO: Need to adjust this
         for g in group:
             if g == "corner":
                 myMask = myMask | (VIAL_EXT == 2)
@@ -840,17 +843,20 @@ class Snowflake:
         # pairs (1,n_x+1), (2,n_x+2), ..., (i,n_x+i) have vertical interactions
         # for i in [1, n_x*(n_y-1)]
         # this means that in the IA matrix n_x-removed-off-diagonal elements are 1
-        dy_pattern = np.ones((n_x * (n_y * n_z - 1),)) # @DRO: I added the n_z here, see above
+        dy_pattern = np.ones((n_x * (n_y * n_z - 1) ,)) # @DRO: I added the n_z here, see above
+        idy_delete = [i for i in range(n_x * (n_y * n_z - 1) - 1) if (i + 1) % (n_x*n_y) == 0] 
+        for i in range(n_x): # we need to extract n_x points (i.e. an entire row) every time we have an interaction
+            delete_n_x = [k + i for k in idy_delete] # remove all interactions
+            dy_pattern[delete_n_x] = 0
+
         DY = csr_matrix(np.diag(dy_pattern, k=n_x) + np.diag(dy_pattern, k=-n_x))
-        idy_delete = [i for i in range(n_x * (n_y * n_z - 1)) if (i + 1) % (n_x*n_y) == 0]
-        dy_pattern[idy_delete] = 0
 
         # create interaction matrix for upwards/downwards direction interactions
         # matrix is 1 where two vials have an interaction and 0 otherwise
         # pairs (1,(n_x*n_y)+1), (2,(n_x+n_y)+2), ..., (i,i+(n_x+n_y)) have interactions
         # for i in [1, n_x*n_y*(n_z-1)]
-        dz_pattern = np.ones((n_x * n_y * ( n_z - 1),))
-        DZ = csr_matrix(np.diag(dy_pattern, k=(n_x*n_y)) + np.diag(dy_pattern, k=(-n_x*n_y)))
+        dz_pattern = np.ones((n_x * n_y * ( n_z - 1),)) # @DRO: For n_z = 1, there will be no pattern
+        DZ = csr_matrix(np.diag(dz_pattern, k=(n_x*n_y)) + np.diag(dz_pattern, k=(-n_x*n_y)))
 
 
         # how many interactions does each vial
@@ -873,15 +879,15 @@ class Snowflake:
         # @DRO: need to distinguish here among the two models; 3D model has 6 interactions,
         # this is true even in the case for a single vial, to be consistent
         
-        VIAL_EXT_2D = 4 * np.ones((n_x * n_y,)) - VIAL_INT_2D.diagonal()
-        VIAL_EXT_3D = 6 * np.ones((n_x * n_y * n_z,)) - VIAL_INT_3D.diagonal()
+        VIAL_EXT_2D = 4 * np.ones((n_x * n_y * n_z,)) - VIAL_INT_2D.diagonal() # @DRO: Need to multiply with n_z here to ensure consistent format
+        VIAL_EXT_3D = 6 * np.ones((n_x * n_y * n_z,)) - VIAL_INT_3D.diagonal() # @DRO: The only difference now is the 6 instead of the 4
 
         VIAL_EXT = VIAL_EXT_3D
         interactionMatrix = interactionMatrix_3D
 
         return interactionMatrix, VIAL_EXT
 
-    def _buildShelfHeatFlow(self):
+    def _buildShelfHeatFlow(self): # @DRO: Need to adjust this part, should only be called if s_0 > 0. For now, I comment it out in _buildHeatflowMatrices
         """Build the shelf heat flow array.
 
         Because the shelf heat flow may be dependent on the rng if
@@ -928,7 +934,8 @@ class Snowflake:
         self._H_ext = VIAL_EXT * self.k["ext"] * A
 
         # compute H_shelf (potentially depends on rng/seed)
-        self._buildShelfHeatFlow()
+        # self._buildShelfHeatFlow() # @DRO: not needed, since we do not have a shelf anymore. still may make sense to keep the function, 
+        # it seems a useful feature to define a position-independent heat flow to every vial
 
     def to_frame(
         self, n_timeSteps: int = 250
