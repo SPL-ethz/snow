@@ -827,9 +827,10 @@ class Snowflake:
         # except where i = n_x!
         # this means that in the IA matrix off-diagonal elements are 1
         # except where i%n_x==0 or j%n_x==0
-        dx_pattern = np.ones((n_x * n_y - 1,))
+        dx_pattern = np.ones((n_x * n_y * n_z - 1,)) # @DRO: I added the n_z here, it was missing initially, 
+        # but we did not notice because irrelevant for n_z = 1
         # the vial at index position i+1 is at the edge -> one neighbor less
-        idx_delete = [i for i in range(n_x * n_y - 1) if (i + 1) % n_x == 0]
+        idx_delete = [i for i in range(n_x * n_y * n_z - 1) if (i + 1) % n_x == 0]
         dx_pattern[idx_delete] = 0
         # we store this as a compressed sparse row (most efficient format?)
         DX = csr_matrix(np.diag(dx_pattern, k=1) + np.diag(dx_pattern, k=-1))
@@ -839,8 +840,10 @@ class Snowflake:
         # pairs (1,n_x+1), (2,n_x+2), ..., (i,n_x+i) have vertical interactions
         # for i in [1, n_x*(n_y-1)]
         # this means that in the IA matrix n_x-removed-off-diagonal elements are 1
-        dy_pattern = np.ones((n_x * n_y - n_x,))
+        dy_pattern = np.ones((n_x * (n_y * n_z - 1),)) # @DRO: I added the n_z here, see above
         DY = csr_matrix(np.diag(dy_pattern, k=n_x) + np.diag(dy_pattern, k=-n_x))
+        idy_delete = [i for i in range(n_x * (n_y * n_z - 1)) if (i + 1) % (n_x*n_y) == 0]
+        dy_pattern[idy_delete] = 0
 
         # create interaction matrix for upwards/downwards direction interactions
         # matrix is 1 where two vials have an interaction and 0 otherwise
