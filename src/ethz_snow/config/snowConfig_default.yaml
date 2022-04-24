@@ -26,9 +26,11 @@ solution:
   M_s: 0.3423
   # mass fraction of solute in solution
   solid_fraction: 0.05
-  # °C equilibrium freezing temperature
+  # °C equilibrium freezing temperature pure water
   T_eq: 0
+  # initial temperature of the solution
+  T_init: 20
 kinetics:
-  # m−3 s−1 K−b value reduced compared to Braatz paper (he had a value of 10)
+  # m−3 s−1 K−b
   kb: 1e-9
   b: 12

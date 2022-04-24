@@ -353,6 +353,7 @@ class Snowflake:
         beta_solution = self.const["beta_solution"]
         T_eq = self.const["T_eq"]
         T_eq_l = self.const["T_eq_l"]
+        # T_init = self.const["T_init"]
         hl = self.const["hl"]
         kb = self.const["kb"]
         b = self.const["b"]
@@ -365,7 +366,7 @@ class Snowflake:
 
         # Initial state of the system
         # initial temperature
-        T_k = np.ones(N_vials_total) * self.opcond.cooling["start"]  # [C] @ DRO: We may need to adjust this, 
+        T_k = np.ones(N_vials_total) * 20  # [C] @ DRO: We may need to adjust this, 
         # the initial temp of the vials is for pallet freezing not necessarily the one of the shelf = cooling chamber, i.e. need one more variable here
         # state of the vials
         sigma_k = np.zeros(N_vials_total)  # (0 = liq, 1 = completely frozen)
@@ -432,6 +433,7 @@ class Snowflake:
             if any(liquidMask):
                 # DRO: Leif, I've moved the dt out of the Hs
                 # because I associate Q with fluxes
+                # LTD: OK
                 T_k[liquidMask] = T_k[liquidMask] + q_k[liquidMask] / hl * self.dt
                 # a mask that is True where the temperature is
                 # below the equilibrium temperature
@@ -693,13 +695,15 @@ class Snowflake:
 
         _, VIAL_EXT = self._buildInteractionMatrices()
 
-        myMask = np.zeros(self.N_vials_total, dtype=bool) # @ DRO: Need to adjust this
+        myMask = np.zeros(self.N_vials_total, dtype=bool) # @ DRO: I adjusted this for 3D now
         for g in group:
             if g == "corner":
-                myMask = myMask | (VIAL_EXT == 2)
+                myMask = myMask | (VIAL_EXT == 3)
             elif g == "edge":
+                myMask = myMask | (VIAL_EXT == 2)
+            elif g == "side":
                 myMask = myMask | (VIAL_EXT == 1)
-            elif g == "center":
+            elif g == "core":
                 myMask = myMask | (VIAL_EXT == 0)
             elif g == "all":
                 myMask = np.ones(self.N_vials_total, dtype=bool)
@@ -846,7 +850,7 @@ class Snowflake:
         dy_pattern = np.ones((n_x * (n_y * n_z - 1) ,)) # @DRO: I added the n_z here, see above
         idy_delete = [i for i in range(n_x * (n_y * n_z - 1) - 1) if (i + 1) % (n_x*n_y) == 0] 
         for i in range(n_x): # we need to extract n_x points (i.e. an entire row) every time we have an interaction
-            delete_n_x = [k + i for k in idy_delete] # remove all interactions
+            delete_n_x = [k - i for k in idy_delete] # remove all interactions
             dy_pattern[delete_n_x] = 0
 
         DY = csr_matrix(np.diag(dy_pattern, k=n_x) + np.diag(dy_pattern, k=-n_x))
@@ -962,10 +966,11 @@ class Snowflake:
 
         _, VIAL_EXT = self._buildInteractionMatrices()
 
-        df["group"] = VIAL_EXT
-        df.loc[df.group == 2, "group"] = "corner"
-        df.loc[df.group == 1, "group"] = "edge"
-        df.loc[df.group == 0, "group"] = "center"
+        df["group"] = VIAL_EXT  #LTD: Dave, I also updated the groups here
+        df.loc[df.group == 3, "group"] = "corner"
+        df.loc[df.group == 2, "group"] = "edge"
+        df.loc[df.group == 1, "group"] = "side"
+        df.loc[df.group == 0, "group"] = "core"
 
         stats_df = df.melt(id_vars=["group", "vial"])
 
@@ -983,11 +988,12 @@ class Snowflake:
                 ]
             )
             df["vial"] = np.tile(np.where(self._storageMask)[0], 2)
-            df["group"] = np.tile(VIAL_EXT[self._storageMask], 2)
+            df["group"] = np.tile(VIAL_EXT[self._storageMask], 2) 
 
-            df.loc[df.group == 2, "group"] = "corner"
-            df.loc[df.group == 1, "group"] = "edge"
-            df.loc[df.group == 0, "group"] = "center"
+            df.loc[df.group == 3, "group"] = "corner"
+            df.loc[df.group == 2, "group"] = "edge"
+            df.loc[df.group == 1, "group"] = "site"
+            df.loc[df.group == 0, "group"] = "core"
 
             traj_df = df.melt(id_vars=["group", "vial", "state"])
         else:
