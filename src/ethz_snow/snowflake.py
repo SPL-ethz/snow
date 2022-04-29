@@ -43,6 +43,7 @@ class Snowflake:
         simulationStatus (int): Status of simulation (0 = not run, 1 = run).
         solidificationThreshold (float): What sigma value constitutes a 'solid'.
         stats (dict): Run statistics (nucleation time, etc.).
+        T_k_0 (float): Initial temperature of vials.
         X_sigma (np.ndarray): Sigma state over time.
         X_T (np.ndarray): Temperature state over time.
     """
@@ -55,6 +56,7 @@ class Snowflake:
             7,
             1,
         ),  # should this be part of operating conditions?
+        initialStates: Optional[dict] = {"temp": None, "sigma": None},
         storeStates: Union[str, Sequence[str], Sequence[int], None] = None,
         solidificationThreshold: float = 0.9,
         dt: float = 2,
@@ -70,6 +72,7 @@ class Snowflake:
                 Defaults to {"int": 20, "ext": 20, "s0": 20, "s_sigma_rel": 0.1}.
             N_vials (Tuple[int, int, int], optional): Number of vials in each dimension.
                 Defaults to ( 7, 7, 1).
+            initialStates (dict): Initial states of the vials (temp and sigma).
             storeStates (Union[str, Sequence[str], Sequence[int], None]):
                 Whether and for which vials to store states (temp, sigma).
             solidificationThreshold (float, optional): What sigma value is
@@ -84,8 +87,10 @@ class Snowflake:
         Raises:
             TypeError: If k is not a dict.
             ValueError: If k does not contain all necessary keys.
-            NotImplementedError: If N_vials[2] is not 1. Only 2D model is implemented.
+            ValueERror: If len(N_vials) is not 3.
             TypeError: If opcond is not of type operatingConditions.
+            ValueError: If initialstates is malformed.
+            NotImplementedError: If initialstates has non-scalar temp or non-None sigma.
             ValueError: If storeStates is not meaningful.
 
         Examples:
@@ -110,10 +115,8 @@ class Snowflake:
             # we exepct this to be immutable
             N_vials = tuple(N_vials)
 
-        if N_vials[2] > 100: # @DRO: Should we eliminate this one now?
-            raise NotImplementedError(
-                "Only 2D (shelf) models are implemented at this moment."
-            )
+        if len(N_vials) != 3:
+            raise ValueError(f"Length of N_vials must be 3, was {len(N_vials)}.")
         else:
             self.N_vials = N_vials
 
@@ -145,6 +148,27 @@ class Snowflake:
         # remember what N_vials was used to build heat flow matrices
         # so if it changes we know to rebuild them
         self._NvialsUsed = self.N_vials
+
+        if (initialStates is not None) and (
+            (~isinstance(initialStates, dict))
+            or ("temp" not in initialStates.keys())
+            or ("sigma" not in initialStates.keys())
+        ):
+            raise ValueError(
+                "initialStates malformed. Must be None or dict with keys 'temp' and 'sigma'."
+            )
+
+        if (initialStates is None) or (initialStates["temp"] is None):
+            self.T_k_0 = self.opcond.cooling["start"]  # C
+        elif len(initialStates["temp"]) == 1:
+            self.T_k_0 = initialStates["temp"]  # C
+        elif len(initialStates["temp"]) > 1:
+            raise NotImplementedError(
+                "Currently can only deal with constant initial temp."
+            )
+
+        if initialStates["sigma"] is not None:
+            raise NotImplementedError("Non-zero sigma initial state not implemented.")
 
         self._emptyStore = False
         if isinstance(storeStates, (list, tuple)):
@@ -366,9 +390,7 @@ class Snowflake:
 
         # Initial state of the system
         # initial temperature
-        T_k = np.ones(N_vials_total) * 20  # [C] @ DRO: We may need to adjust this, 
-        # the initial temp of the vials is for pallet freezing not necessarily the one of the shelf = cooling chamber, i.e. need one more variable here
-        # state of the vials
+        T_k = np.ones(N_vials_total) * self.T_k_0  # [C]
         sigma_k = np.zeros(N_vials_total)  # (0 = liq, 1 = completely frozen)
 
         # Pre-allocate memory
@@ -667,7 +689,9 @@ class Snowflake:
 
         return counter
 
-    def getVialGroup(self, group: Union[str, Sequence[str]] = "all") -> np.ndarray: #@ DRO: Need to adjust definitions for corner, edge, side etc...
+    def getVialGroup(
+        self, group: Union[str, Sequence[str]] = "all"
+    ) -> np.ndarray:  # @ DRO: Need to adjust definitions for corner, edge, side etc...
         """Return mask for given group.
 
         mask[i] = True iff vial[i] is in G where G can be a list of groups.
@@ -695,7 +719,9 @@ class Snowflake:
 
         _, VIAL_EXT = self._buildInteractionMatrices()
 
-        myMask = np.zeros(self.N_vials_total, dtype=bool) # @ DRO: I adjusted this for 3D now
+        myMask = np.zeros(
+            self.N_vials_total, dtype=bool
+        )  # @ DRO: I adjusted this for 3D now
         for g in group:
             if g == "corner":
                 myMask = myMask | (VIAL_EXT == 3)
@@ -834,7 +860,9 @@ class Snowflake:
         # except where i = n_x!
         # this means that in the IA matrix off-diagonal elements are 1
         # except where i%n_x==0 or j%n_x==0
-        dx_pattern = np.ones((n_x * n_y * n_z - 1,)) # @DRO: I added the n_z here, it was missing initially, 
+        dx_pattern = np.ones(
+            (n_x * n_y * n_z - 1,)
+        )  # @DRO: I added the n_z here, it was missing initially,
         # but we did not notice because irrelevant for n_z = 1
         # the vial at index position i+1 is at the edge -> one neighbor less
         idx_delete = [i for i in range(n_x * n_y * n_z - 1) if (i + 1) % n_x == 0]
@@ -847,10 +875,16 @@ class Snowflake:
         # pairs (1,n_x+1), (2,n_x+2), ..., (i,n_x+i) have vertical interactions
         # for i in [1, n_x*(n_y-1)]
         # this means that in the IA matrix n_x-removed-off-diagonal elements are 1
-        dy_pattern = np.ones((n_x * (n_y * n_z - 1) ,)) # @DRO: I added the n_z here, see above
-        idy_delete = [i for i in range(n_x * (n_y * n_z - 1) - 1) if (i + 1) % (n_x*n_y) == 0] 
-        for i in range(n_x): # we need to extract n_x points (i.e. an entire row) every time we have an interaction
-            delete_n_x = [k - i for k in idy_delete] # remove all interactions
+        dy_pattern = np.ones(
+            (n_x * (n_y * n_z - 1),)
+        )  # @DRO: I added the n_z here, see above
+        idy_delete = [
+            i for i in range(n_x * (n_y * n_z - 1) - 1) if (i + 1) % (n_x * n_y) == 0
+        ]
+        for i in range(
+            n_x
+        ):  # we need to extract n_x points (i.e. an entire row) every time we have an interaction
+            delete_n_x = [k - i for k in idy_delete]  # remove all interactions
             dy_pattern[delete_n_x] = 0
 
         DY = csr_matrix(np.diag(dy_pattern, k=n_x) + np.diag(dy_pattern, k=-n_x))
@@ -859,9 +893,12 @@ class Snowflake:
         # matrix is 1 where two vials have an interaction and 0 otherwise
         # pairs (1,(n_x*n_y)+1), (2,(n_x+n_y)+2), ..., (i,i+(n_x+n_y)) have interactions
         # for i in [1, n_x*n_y*(n_z-1)]
-        dz_pattern = np.ones((n_x * n_y * ( n_z - 1),)) # @DRO: For n_z = 1, there will be no pattern
-        DZ = csr_matrix(np.diag(dz_pattern, k=(n_x*n_y)) + np.diag(dz_pattern, k=(-n_x*n_y)))
-
+        dz_pattern = np.ones(
+            (n_x * n_y * (n_z - 1),)
+        )  # @DRO: For n_z = 1, there will be no pattern
+        DZ = csr_matrix(
+            np.diag(dz_pattern, k=(n_x * n_y)) + np.diag(dz_pattern, k=(-n_x * n_y))
+        )
 
         # how many interactions does each vial
         # have with other vials
@@ -879,19 +916,25 @@ class Snowflake:
         # at most, any cubic vial on a 2D shelf can have
         # 4 interactions. 4 - VIAL_INT is the
         # number of external interactions (excl. the shelf)
-   
+
         # @DRO: need to distinguish here among the two models; 3D model has 6 interactions,
         # this is true even in the case for a single vial, to be consistent
-        
-        VIAL_EXT_2D = 4 * np.ones((n_x * n_y * n_z,)) - VIAL_INT_2D.diagonal() # @DRO: Need to multiply with n_z here to ensure consistent format
-        VIAL_EXT_3D = 6 * np.ones((n_x * n_y * n_z,)) - VIAL_INT_3D.diagonal() # @DRO: The only difference now is the 6 instead of the 4
+
+        VIAL_EXT_2D = (
+            4 * np.ones((n_x * n_y * n_z,)) - VIAL_INT_2D.diagonal()
+        )  # @DRO: Need to multiply with n_z here to ensure consistent format
+        VIAL_EXT_3D = (
+            6 * np.ones((n_x * n_y * n_z,)) - VIAL_INT_3D.diagonal()
+        )  # @DRO: The only difference now is the 6 instead of the 4
 
         VIAL_EXT = VIAL_EXT_3D
         interactionMatrix = interactionMatrix_3D
 
         return interactionMatrix, VIAL_EXT
 
-    def _buildShelfHeatFlow(self): # @DRO: Need to adjust this part, should only be called if s_0 > 0. For now, I comment it out in _buildHeatflowMatrices
+    def _buildShelfHeatFlow(
+        self,
+    ):  # @DRO: Need to adjust this part, should only be called if s_0 > 0. For now, I comment it out in _buildHeatflowMatrices
         """Build the shelf heat flow array.
 
         Because the shelf heat flow may be dependent on the rng if
@@ -938,7 +981,7 @@ class Snowflake:
         self._H_ext = VIAL_EXT * self.k["ext"] * A
 
         # compute H_shelf (potentially depends on rng/seed)
-        # self._buildShelfHeatFlow() # @DRO: not needed, since we do not have a shelf anymore. still may make sense to keep the function, 
+        # self._buildShelfHeatFlow() # @DRO: not needed, since we do not have a shelf anymore. still may make sense to keep the function,
         # it seems a useful feature to define a position-independent heat flow to every vial
 
     def to_frame(
@@ -966,7 +1009,7 @@ class Snowflake:
 
         _, VIAL_EXT = self._buildInteractionMatrices()
 
-        df["group"] = VIAL_EXT  #LTD: Dave, I also updated the groups here
+        df["group"] = VIAL_EXT  # LTD: Dave, I also updated the groups here
         df.loc[df.group == 3, "group"] = "corner"
         df.loc[df.group == 2, "group"] = "edge"
         df.loc[df.group == 1, "group"] = "side"
@@ -988,7 +1031,7 @@ class Snowflake:
                 ]
             )
             df["vial"] = np.tile(np.where(self._storageMask)[0], 2)
-            df["group"] = np.tile(VIAL_EXT[self._storageMask], 2) 
+            df["group"] = np.tile(VIAL_EXT[self._storageMask], 2)
 
             df.loc[df.group == 3, "group"] = "corner"
             df.loc[df.group == 2, "group"] = "edge"
