@@ -32,9 +32,9 @@ class Snowflake:
     """A class to handle a single Stochastic Nucleation of Water simulation.
 
     More information regarding the equations and their derivation can be found in
-    "Stochastic shelf-scale modeling framework for the freezing stage in freeze-drying processes",
-     Deck, Ochsenbein and Mazzotti (2022), Int J Pharm, 613, 121276 
-     https://doi.org/10.1016/j.ijpharm.2021.121276
+    "Stochastic shelf-scale modeling framework for the freezing stage in
+    freeze-drying processes", Deck, Ochsenbein, and Mazzotti (2022),
+    Int J Pharm, 613, 121276, https://doi.org/10.1016/j.ijpharm.2021.121276.
 
     Parameters:
         configPath (Optional[str]): The path of the (optional) custom config yaml.
@@ -163,7 +163,8 @@ class Snowflake:
             or ("sigma" not in initialStates.keys())
         ):
             raise ValueError(
-                "initialStates malformed. Must be None or dict with keys 'temp' and 'sigma'."
+                "initialStates malformed. Must be None or dict with keys "
+                + "'temp' and 'sigma'."
             )
 
         if (initialStates is None) or (initialStates["temp"] is None):
@@ -886,9 +887,8 @@ class Snowflake:
         idy_delete = [
             i for i in range(n_x * (n_y * n_z - 1) - 1) if (i + 1) % (n_x * n_y) == 0
         ]
-        for i in range(
-            n_x
-        ):  # we need to extract n_x points (i.e. an entire row) every time we have an interaction
+        for i in range(n_x):  # need to extract n_x points (i.e. an entire row)
+            # every time we have an interaction
             delete_n_x = [k - i for k in idy_delete]  # remove all interactions
             dy_pattern[delete_n_x] = 0
 
