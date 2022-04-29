@@ -730,15 +730,15 @@ class Snowflake:
 
         _, VIAL_EXT = self._buildInteractionMatrices()
 
-        myMask = np.zeros(
-            self.N_vials_total, dtype=bool
-        )  # @ DRO: I adjusted this for 3D now
+        myMask = np.zeros(self.N_vials_total, dtype=bool)
         for g in group:
             if g == "corner":
+                # for the 3D case, a corner vial has 3 external IAs
                 myMask = myMask | (VIAL_EXT == 3 - (self.N_vials[2] == 1))
             elif g == "edge":
-                myMask = myMask | (VIAL_EXT == 2)
+                myMask = myMask | (VIAL_EXT == 2 - (self.N_vials[2] == 1))
             elif g == "side":
+                # side and edge are equivalent for 2D
                 myMask = myMask | (VIAL_EXT == 1)
             elif g == "core":
                 myMask = myMask | (VIAL_EXT == 0)
@@ -1025,9 +1025,9 @@ class Snowflake:
         _, VIAL_EXT = self._buildInteractionMatrices()
 
         df["group"] = VIAL_EXT
-        df.loc[df.group == 3, "group"] = "corner"
-        df.loc[df.group == 2, "group"] = "edge"
-        df.loc[df.group == 1, "group"] = "side"
+        df.loc[df.group == 3 - (self.N_vials[2] == 1), "group"] = "corner"
+        df.loc[df.group == 2 - (self.N_vials[2] == 1), "group"] = "edge"
+        df.loc[df.group == 1 - (self.N_vials[2] == 1), "group"] = "side"
         df.loc[df.group == 0, "group"] = "core"
 
         stats_df = df.melt(id_vars=["group", "vial"])
