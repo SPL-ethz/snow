@@ -160,23 +160,28 @@ class Snowflake:
         if (initialStates is not None) and (
             (not isinstance(initialStates, dict))
             or ("temp" not in initialStates.keys())
-            or ("sigma" not in initialStates.keys())
         ):
             raise ValueError(
                 "initialStates malformed. Must be None or dict with keys "
-                + f"'temp' and 'sigma'. Was {initialStates}."
+                + f"'temp' (and 'sigma'). Was {initialStates}."
             )
 
         if (initialStates is None) or (initialStates["temp"] is None):
             self.T_k_0 = self.opcond.cooling["start"]  # C
-        elif len(initialStates["temp"]) == 1:
+        elif not hasattr(initialStates["temp"], "__len__"):
             self.T_k_0 = initialStates["temp"]  # C
-        elif len(initialStates["temp"]) > 1:
+        elif (hasattr(initialStates["temp"], "__len__")) and (
+            len(initialStates["temp"]) == 1
+        ):
+            self.T_k_0 = initialStates["temp"][0]
+        elif (hasattr(initialStates["temp"], "__len__")) and (
+            len(initialStates["temp"]) > 1
+        ):
             raise NotImplementedError(
                 "Currently can only deal with constant initial temp."
             )
 
-        if initialStates["sigma"] is not None:
+        if ("sigma" in initialStates.keys()) and (initialStates["sigma"] is not None):
             raise NotImplementedError("Non-zero sigma initial state not implemented.")
 
         self._emptyStore = False
