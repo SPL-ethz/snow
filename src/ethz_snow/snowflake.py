@@ -9,6 +9,7 @@ from ethz_snow.constants import calculateDerived
 import numpy as np
 import pandas as pd
 import re
+import warnings
 
 # import matplotlib.pyplot as plt
 import seaborn as sns
@@ -17,7 +18,14 @@ from scipy.sparse import csr_matrix
 from typing import List, Tuple, Union, Sequence, Optional
 
 HEATFLOW_REQUIREDKEYS = ("int", "ext", "s0")
-VIAL_GROUPS = ("corner", "edge", "center", "all")
+VIAL_GROUPS = (
+    "corner",
+    "edge",
+    "core",
+    "side",
+    "all",
+    "center",
+)  # center will be deprecated
 
 
 class Snowflake:
@@ -96,7 +104,7 @@ class Snowflake:
         Examples:
             >>> Sf = Snowflake()
             >>> Sf = Snowflake(Nvials=(4, 3, 1), dt = 5)
-            >>> Sf = Snowflake(storeStates = ['edge_random_4', 'uniform.center.5'])
+            >>> Sf = Snowflake(storeStates = ['edge_random_4', 'uniform.core.5'])
             >>> Sf = Snowflake(storeStates = (0, 4, 10))
         """
         if not isinstance(k, dict):
@@ -453,9 +461,6 @@ class Snowflake:
 
             # LIQUID VIALS
             if any(liquidMask):
-                # DRO: Leif, I've moved the dt out of the Hs
-                # because I associate Q with fluxes
-                # LTD: OK
                 T_k[liquidMask] = T_k[liquidMask] + q_k[liquidMask] / hl * self.dt
                 # a mask that is True where the temperature is
                 # below the equilibrium temperature
@@ -698,7 +703,7 @@ class Snowflake:
 
         Args:
             group (Union[str, Sequence[str]], optional): Subgroup to return.
-                Defaults to "all".
+                Can be "corner", "edge", "side", "core", "all". Defaults to "all".
 
         Raises:
             ValueError: Group is not known.
@@ -711,7 +716,7 @@ class Snowflake:
             >>> S.getVialGroup('corner')
             array([True, True, True, True])
 
-            >>> S.getVialGroup(['edge', 'center'])
+            >>> S.getVialGroup(['edge', 'core'])
             array([False, False, False, False])
         """
         if isinstance(group, str):
@@ -731,6 +736,11 @@ class Snowflake:
                 myMask = myMask | (VIAL_EXT == 1)
             elif g == "core":
                 myMask = myMask | (VIAL_EXT == 0)
+            elif g == "center":
+                myMask = myMask | (VIAL_EXT == 0)
+                warnings.warn(
+                    "'center' is deprecated terminology. Please use 'core' instead."
+                )
             elif g == "all":
                 myMask = np.ones(self.N_vials_total, dtype=bool)
                 break
@@ -860,10 +870,7 @@ class Snowflake:
         # except where i = n_x!
         # this means that in the IA matrix off-diagonal elements are 1
         # except where i%n_x==0 or j%n_x==0
-        dx_pattern = np.ones(
-            (n_x * n_y * n_z - 1,)
-        )  # @DRO: I added the n_z here, it was missing initially,
-        # but we did not notice because irrelevant for n_z = 1
+        dx_pattern = np.ones((n_x * n_y * n_z - 1,))
         # the vial at index position i+1 is at the edge -> one neighbor less
         idx_delete = [i for i in range(n_x * n_y * n_z - 1) if (i + 1) % n_x == 0]
         dx_pattern[idx_delete] = 0
@@ -875,9 +882,7 @@ class Snowflake:
         # pairs (1,n_x+1), (2,n_x+2), ..., (i,n_x+i) have vertical interactions
         # for i in [1, n_x*(n_y-1)]
         # this means that in the IA matrix n_x-removed-off-diagonal elements are 1
-        dy_pattern = np.ones(
-            (n_x * (n_y * n_z - 1),)
-        )  # @DRO: I added the n_z here, see above
+        dy_pattern = np.ones((n_x * (n_y * n_z - 1),))
         idy_delete = [
             i for i in range(n_x * (n_y * n_z - 1) - 1) if (i + 1) % (n_x * n_y) == 0
         ]
@@ -893,42 +898,36 @@ class Snowflake:
         # matrix is 1 where two vials have an interaction and 0 otherwise
         # pairs (1,(n_x*n_y)+1), (2,(n_x+n_y)+2), ..., (i,i+(n_x+n_y)) have interactions
         # for i in [1, n_x*n_y*(n_z-1)]
-        dz_pattern = np.ones(
-            (n_x * n_y * (n_z - 1),)
-        )  # @DRO: For n_z = 1, there will be no pattern
-        DZ = csr_matrix(
-            np.diag(dz_pattern, k=(n_x * n_y)) + np.diag(dz_pattern, k=(-n_x * n_y))
-        )
+        if n_z > 1:
+            dz_pattern = np.ones(
+                (n_x * n_y * (n_z - 1),)
+            )  # @DRO: For n_z = 1, there will be no pattern
+            DZ = csr_matrix(
+                np.diag(dz_pattern, k=(n_x * n_y)) + np.diag(dz_pattern, k=(-n_x * n_y))
+            )
+        else:
+            # no pattern in z-direction
+            DZ = 0
 
         # how many interactions does each vial
         # have with other vials
         # diagflat because sum over a sparse matrix
         # returns a np.matrix object, not an ndarray
-        VIAL_INT_2D = csr_matrix(np.diagflat(np.sum(DX + DY, axis=1)))
-        VIAL_INT_3D = csr_matrix(np.diagflat(np.sum(DX + DY + DZ, axis=1)))
+        VIAL_INT = csr_matrix(np.diagflat(np.sum(DX + DY + DZ, axis=1)))
 
         # the overall interaction matrix is given by the sum
         # of the interaction matrices DX and DY
         # minus the diagonal containing the sum of all vial-vial interactions
-        interactionMatrix_2D = DX + DY - VIAL_INT_2D
-        interactionMatrix_3D = DX + DY + DZ - VIAL_INT_3D
+        interactionMatrix = DX + DY + DZ - VIAL_INT
 
         # at most, any cubic vial on a 2D shelf can have
         # 4 interactions. 4 - VIAL_INT is the
-        # number of external interactions (excl. the shelf)
+        # number of external interactions (excl. the shelf).
+        # For the 3D case this max is 6.
 
-        # @DRO: need to distinguish here among the two models; 3D model has 6 interactions,
-        # this is true even in the case for a single vial, to be consistent
+        maxInteractions = 4 + (n_z > 1) * 2
 
-        VIAL_EXT_2D = (
-            4 * np.ones((n_x * n_y * n_z,)) - VIAL_INT_2D.diagonal()
-        )  # @DRO: Need to multiply with n_z here to ensure consistent format
-        VIAL_EXT_3D = (
-            6 * np.ones((n_x * n_y * n_z,)) - VIAL_INT_3D.diagonal()
-        )  # @DRO: The only difference now is the 6 instead of the 4
-
-        VIAL_EXT = VIAL_EXT_3D
-        interactionMatrix = interactionMatrix_3D
+        VIAL_EXT = maxInteractions * np.ones((n_x * n_y * n_z,)) - VIAL_INT.diagonal()
 
         return interactionMatrix, VIAL_EXT
 
