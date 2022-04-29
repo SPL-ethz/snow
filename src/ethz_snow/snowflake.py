@@ -158,13 +158,13 @@ class Snowflake:
         self._NvialsUsed = self.N_vials
 
         if (initialStates is not None) and (
-            (~isinstance(initialStates, dict))
+            (not isinstance(initialStates, dict))
             or ("temp" not in initialStates.keys())
             or ("sigma" not in initialStates.keys())
         ):
             raise ValueError(
                 "initialStates malformed. Must be None or dict with keys "
-                + "'temp' and 'sigma'."
+                + f"'temp' and 'sigma'. Was {initialStates}."
             )
 
         if (initialStates is None) or (initialStates["temp"] is None):
