@@ -789,6 +789,10 @@ class Snowflake:
 
         if kind.lower().startswith("traj"):
             df = df[df.state.str.contains(what)]
+            if len(df) == 0:
+                raise ValueError(
+                    f"No data for {what} for plot type {kind} and group {group}. Please check your inputs."
+                )
             ax = sns.lineplot(data=df, hue="group", y="value", x="Time")
 
             if (what == "temperature") and context:
@@ -809,6 +813,10 @@ class Snowflake:
 
         else:
             df = df[df.variable.str.contains(what)]
+            if len(df) == 0:
+                raise ValueError(
+                    f"No data for {what} for plot type {kind} and group {group}. Please check your inputs."
+                )
             sns.catplot(data=df, hue="group", y="value", kind=kind, x="variable")
 
     def _sigmaCrossingIndices(

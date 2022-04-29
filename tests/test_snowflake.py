@@ -56,11 +56,11 @@ def test_storeStatesMeaningless(input):
         ("all", 9),
         ("corner", 4),
         ("edge", 4),
-        ("center", 1),
+        ("core", 1),
         (["corner", "edge"], 8),
         ("random4", 4),
         ("uniform+3", 3),
-        (("center", "corner_random_2"), 3),
+        (("core", "corner_random_2"), 3),
     ],
 )
 def test_storageMaskFunction(input_result):
@@ -104,9 +104,9 @@ def test_sigmaCounter(fakeS):
 
 def test_getvialgroup(S_331_all):
     """Test that vialgrouping masks are correctly computed."""
-    assert np.where(S_331_all.getVialGroup("center"))[0] == 4
+    assert np.where(S_331_all.getVialGroup("core"))[0] == 4
     assert all(
-        np.where(S_331_all.getVialGroup(["center", "corner"]))[0] == [0, 2, 4, 6, 8]
+        np.where(S_331_all.getVialGroup(["core", "corner"]))[0] == [0, 2, 4, 6, 8]
     )
 
     with pytest.raises(ValueError):
