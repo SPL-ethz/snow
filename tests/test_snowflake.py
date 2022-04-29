@@ -34,10 +34,11 @@ def test_opcond_must_be_operatingcondition():
         S = Snowflake(opcond=dict(a=1))
 
 
-def test_only2D_implemented():
-    """Ensure no 3D model is being asked."""
-    with pytest.raises(NotImplementedError):
-        S = Snowflake(N_vials=(3, 3, 3))
+@pytest.mark.parametrize("input", [(1, 1,), (1,), (3, 3, 3, 3)])
+def test_N_vials_dims(input):
+    """N_vials must be a tuple with length 3."""
+    with pytest.raises(ValueError):
+        S = Snowflake(N_vials=input)
 
 
 @pytest.mark.parametrize(

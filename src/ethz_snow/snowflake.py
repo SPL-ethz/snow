@@ -735,7 +735,7 @@ class Snowflake:
         )  # @ DRO: I adjusted this for 3D now
         for g in group:
             if g == "corner":
-                myMask = myMask | (VIAL_EXT == 3)
+                myMask = myMask | (VIAL_EXT == 3 - (self.N_vials[2] == 1))
             elif g == "edge":
                 myMask = myMask | (VIAL_EXT == 2)
             elif g == "side":
