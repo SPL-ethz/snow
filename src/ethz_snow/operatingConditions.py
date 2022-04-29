@@ -5,6 +5,7 @@ store information regarding the operating conditions
 in freezing processes.
 """
 import numpy as np
+import warnings
 
 from typing import Optional, Iterable, Union
 
@@ -63,12 +64,34 @@ class OperatingConditions:
 
         self.holding = holding
 
+        if self._t_tot_implied > t_tot:
+            warnings.warn(
+                (
+                    f"The implied process time (inferred from cooling rate + holding step(s)) "
+                    + f"is larger than the total time t_tot ({self._t_tot_implied}>{t_tot}). "
+                    + f"The simulation will stop at t_tot={t_tot}."
+                )
+            )
+
         self.cnTemp = cnTemp
 
     @property
     def holding(self) -> Iterable[dict]:
         """Get holding property."""
         return self._holding
+
+    @property
+    def _t_tot_implied(self) -> float:
+        coolingTime = (self.cooling["start"] - self.cooling["end"]) / self.cooling[
+            "rate"
+        ]
+        if (self.holding is not None) and (isinstance(self.holding, (tuple, list))):
+            holdingTime = sum([h["duration"] for h in self.holding])
+        elif (self.holding is not None) and (isinstance(self.holding, (dict))):
+            holdingTime = self.holding["duration"]
+        else:
+            holdingTime = 0
+        return coolingTime + holdingTime
 
     @holding.setter
     def holding(self, value: Union[dict, list, tuple]):
