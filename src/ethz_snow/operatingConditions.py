@@ -13,7 +13,9 @@ class OperatingConditions:
     """A class to handle a single Stochastic Nucleation of Water simulation.
 
     More information regarding the equations and their derivation can be found in
-    XXX, Deck et al. (2021).
+    "Stochastic shelf-scale modeling framework for the freezing stage in
+    freeze-drying processes", Deck, Ochsenbein, and Mazzotti (2022),
+    Int J Pharm, 613, 121276, https://doi.org/10.1016/j.ijpharm.2021.121276.
 
     Parameters:
         cnt (float): Controlled nucleation time.
@@ -47,6 +49,16 @@ class OperatingConditions:
         self.t_tot = t_tot
         if not all([key in cooling.keys() for key in ["rate", "start", "end"]]):
             raise ValueError("Cooling dictionary does not contain all required keys.")
+
+        # deal with constant temp; basically a convenience wrapper
+        if (cooling["rate"] == 0) and (cooling["start"] == cooling["end"]):
+            cooling["rate"] = 1e-16  # rate equal zero would yields divide by zero error
+
+            if holding is None:
+                holding = dict(duration=t_tot, temp=cooling["start"])
+            elif holding is not None:
+                raise ValueError("Cannot have cooling rate 0 _and_ holding steps.")
+
         self.cooling = cooling
 
         self.holding = holding
