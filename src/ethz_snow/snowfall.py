@@ -21,7 +21,10 @@ class Snowfall:
     """A class to handle multiple Stochastic Nucleation of Water simulation.
 
     More information regarding the equations and their derivation can be found in
-    XXX, Deck et al. (2021) as well as the Snowflake class documentation.
+    "Stochastic shelf-scale modeling framework for the freezing stage in
+    freeze-drying processes", Deck, Ochsenbein, and Mazzotti (2022),
+    Int J Pharm, 613, 121276, https://doi.org/10.1016/j.ijpharm.2021.121276
+    as well as in the Snowflake class documentation.
 
     Parameters:
         Nrep (int): Number of repetitions.
