@@ -931,9 +931,7 @@ class Snowflake:
 
         return interactionMatrix, VIAL_EXT
 
-    def _buildShelfHeatFlow(
-        self,
-    ):  # @DRO: Need to adjust this part, should only be called if s_0 > 0. For now, I comment it out in _buildHeatflowMatrices
+    def _buildShelfHeatFlow(self,):
         """Build the shelf heat flow array.
 
         Because the shelf heat flow may be dependent on the rng if
@@ -945,15 +943,20 @@ class Snowflake:
         # if the value changes)
         self._seedUsed = self.seed
 
-        if ("s_sigma_rel" in self.k.keys()) and (self.k["s_sigma_rel"] > 0):
-            self.k["shelf"] = (
-                self.k["s0"]
-                + self._rng.normal(size=self.N_vials_total)
-                * self.k["s_sigma_rel"]
-                * self.k["s0"]
-            )
+        if self.N_vials[2] == 1:
+            # 2D/shelf simulation
+            if ("s_sigma_rel" in self.k.keys()) and (self.k["s_sigma_rel"] > 0):
+                self.k["shelf"] = (
+                    self.k["s0"]
+                    + self._rng.normal(size=self.N_vials_total)
+                    * self.k["s_sigma_rel"]
+                    * self.k["s0"]
+                )
+            else:
+                self.k["shelf"] = self.k["s0"]
         else:
-            self.k["shelf"] = self.k["s0"]
+            # 3D/pallet simulation
+            self.k["shelf"] = 0
 
         if np.any(self.k["shelf"] < 0):
             # k cannot be smaller than 0
@@ -980,8 +983,8 @@ class Snowflake:
         self._H_ext = VIAL_EXT * self.k["ext"] * A
 
         # compute H_shelf (potentially depends on rng/seed)
-        # self._buildShelfHeatFlow() # @DRO: not needed, since we do not have a shelf anymore. still may make sense to keep the function,
-        # it seems a useful feature to define a position-independent heat flow to every vial
+        # will be zero in case of 3D system (assumes pallet in storage freezing)
+        self._buildShelfHeatFlow()
 
     def to_frame(
         self, n_timeSteps: int = 250
@@ -1008,7 +1011,7 @@ class Snowflake:
 
         _, VIAL_EXT = self._buildInteractionMatrices()
 
-        df["group"] = VIAL_EXT  # LTD: Dave, I also updated the groups here
+        df["group"] = VIAL_EXT
         df.loc[df.group == 3, "group"] = "corner"
         df.loc[df.group == 2, "group"] = "edge"
         df.loc[df.group == 1, "group"] = "side"
