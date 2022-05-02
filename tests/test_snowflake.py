@@ -4,6 +4,12 @@ from ethz_snow.operatingConditions import OperatingConditions
 from ethz_snow.snowflake import Snowflake
 import numpy as np
 
+# TODO
+# - correct vial groups for 3D simus
+# - correct handling of initial temp
+# - notimplementederror when sigma initial state is passed
+# - must be ok to have no kshelf when 3D
+
 
 def test_k_must_be_fine():
     """Test that k is checked properly."""

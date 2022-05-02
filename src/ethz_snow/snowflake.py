@@ -71,6 +71,7 @@ class Snowflake:
         seed: int = 2021,
         opcond: OperatingConditions = OperatingConditions(),
         configPath: Optional[str] = None,
+        initIce: str = "indirect",
     ):
         """Construct a Snowflake object.
 
@@ -91,6 +92,8 @@ class Snowflake:
                 Defaults to OperatingConditions().
             configPath (Optional[str], optional): The location of a custom configuration
                 file (in yaml format), used to update/overwrite the default settings.
+            initIce (str, optional): Which formulation for the initial amount of ice
+                formed to use (see docs).
 
         Raises:
             TypeError: If k is not a dict.
@@ -212,6 +215,8 @@ class Snowflake:
             self._emptyStore = True
 
         self._storageMask = storageMask
+
+        self.initIce = initIce
 
     @property
     def simulationStatus(self) -> int:
@@ -509,7 +514,11 @@ class Snowflake:
 
                 q0 = (T_eq_l - T_k[nucleatedVialsMask]) * cp_solution * mass
 
-                sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
+                if self.initIce == "indirect":
+                    sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
+                else:
+                    # please fill in here model-10 and remove the "pass", Leif - DRO
+                    pass
                 # assumption is that during solidification T = Teq
                 T_k[nucleatedVialsMask] = T_eq - depression * (
                     1 / (1 - sigma_k[nucleatedVialsMask])
