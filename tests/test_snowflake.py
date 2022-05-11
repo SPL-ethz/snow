@@ -4,9 +4,6 @@ from ethz_snow.operatingConditions import OperatingConditions
 from ethz_snow.snowflake import Snowflake
 import numpy as np
 
-# TODO
-# - correct vial groups for 3D simus
-
 
 @pytest.mark.parametrize("inits", [[1, 2, 3], "something"])
 def test_initialStates_fine(inits):
@@ -141,15 +138,23 @@ def test_sigmaCounter(fakeS):
     assert fakeS.sigmaCounter(time=2, threshold=0.4, fromStates=True) == 3
 
 
-def test_getvialgroup(S_331_all):
+def test_getvialgroup(S_331_all, S_333_all):
     """Test that vialgrouping masks are correctly computed."""
     assert np.where(S_331_all.getVialGroup("core"))[0] == 4
     assert all(
         np.where(S_331_all.getVialGroup(["core", "corner"]))[0] == [0, 2, 4, 6, 8]
     )
 
+    assert S_331_all.getVialGroup("side").sum() == S_331_all.getVialGroup("edge").sum()
+
     with pytest.raises(ValueError):
         S_331_all.getVialGroup("rubbish")
+
+    assert S_333_all.getVialGroup("core").sum() == 1
+    assert S_333_all.getVialGroup("corner").sum() == 8
+    assert S_333_all.getVialGroup("side").sum() == 6
+    assert S_333_all.getVialGroup("edge").sum() == 12
+    assert S_333_all.getVialGroup("all").sum() == 27
 
 
 def test_to_frame(fakeS):
@@ -169,6 +174,13 @@ def test_to_frame(fakeS):
         ].item()
         == 0.95
     )
+
+
+@pytest.fixture(scope="module")
+def S_333_all():
+    """Fixture to share Snowflake across tests."""
+    S = Snowflake(N_vials=(3, 3, 3))
+    return S
 
 
 @pytest.fixture(scope="module")

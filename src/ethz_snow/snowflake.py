@@ -87,6 +87,7 @@ class Snowflake:
             initialStates (dict): Initial states of the vials (temp and sigma).
             storeStates (Union[str, Sequence[str], Sequence[int], None]):
                 Whether and for which vials to store states (temp, sigma).
+                Defaults to None -> Nothing stored.
             solidificationThreshold (float, optional): What sigma value is
                 a 'solid'. Defaults to 0.9.
             dt (float, optional): Time step size. Defaults to 2.
@@ -96,7 +97,7 @@ class Snowflake:
             configPath (Optional[str], optional): The location of a custom configuration
                 file (in yaml format), used to update/overwrite the default settings.
             initIce (str, optional): Which formulation for the initial amount of ice
-                formed to use (see docs).
+                formed to use (see docs). Defaults to 'indirect'.
 
         Raises:
             TypeError: If k is not a dict.
@@ -114,7 +115,16 @@ class Snowflake:
             >>> Sf = Snowflake(storeStates = (0, 4, 10))
         """
 
-        if N_vials[2] > 1:
+        if isinstance(N_vials, list):
+            # we exepct this to be immutable
+            N_vials = tuple(N_vials)
+
+        if len(N_vials) != 3:
+            raise ValueError(f"Length of N_vials must be 3, was {len(N_vials)}.")
+        else:
+            self.N_vials = N_vials
+
+        if self.N_vials[2] > 1:
             # 3D case, k_shelf can be missing
             hflowKeys = tuple([elem for elem in HEATFLOW_REQUIREDKEYS if elem != "s0"])
         else:
@@ -131,15 +141,6 @@ class Snowflake:
             )
         else:
             self.k = k
-
-        if isinstance(N_vials, list):
-            # we exepct this to be immutable
-            N_vials = tuple(N_vials)
-
-        if len(N_vials) != 3:
-            raise ValueError(f"Length of N_vials must be 3, was {len(N_vials)}.")
-        else:
-            self.N_vials = N_vials
 
         self.dt = dt
 
