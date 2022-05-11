@@ -15,7 +15,7 @@ import warnings
 import seaborn as sns
 
 from scipy.sparse import csr_matrix
-from typing import List, Tuple, Union, Sequence, Optional
+from typing import List, Tuple, Type, Union, Sequence, Optional
 
 HEATFLOW_REQUIREDKEYS = ("int", "ext", "s0")
 VIAL_GROUPS = (
@@ -44,7 +44,8 @@ class Snowflake:
         H_int (csr_matrix): Internal heat transfer matrix.
         H_shelf (np.ndarray): Shelf heat transfer vector.
         initIce (str, optional): Which formulation for the initial amount of ice
-                formed to use (see docs).
+                formed to use (see docs). Can be 'direct' or 'indirect'.
+                Defaults to 'indirect'.
         k (dict): Heat transfer coefficients.
         N_vials (tuple): Number of vials in each dimension.
         N_vials_total (int): Total number of vials.
@@ -225,7 +226,14 @@ class Snowflake:
 
         self._storageMask = storageMask
 
-        self.initIce = initIce
+        if not isinstance(initIce, str) or (
+            (initIce.lower() != "direct") and (initIce.lower() != "indirect")
+        ):
+            raise ValueError(
+                "initIce must be a string equal to 'indirect' or 'direct'. ",
+                f"But it was {initIce}.",
+            )
+        self.initIce = initIce.lower()
 
     @property
     def simulationStatus(self) -> int:

@@ -6,9 +6,6 @@ import numpy as np
 
 # TODO
 # - correct vial groups for 3D simus
-# - correct handling of initial temp
-# - must be ok to have no kshelf when 3D
-# - accept direct and indirect init
 
 
 @pytest.mark.parametrize("inits", [[1, 2, 3], "something"])
@@ -36,6 +33,12 @@ def test_k_must_be_fine():
 
     # in case of 3D s0 is not required
     S = Snowflake(N_vials=(3, 3, 3), k=dict(int=1, ext=1))
+
+
+@pytest.mark.parametrize("initIce", ["nondirect", dict(initIce=1), 3])
+def test_initIce_fine(initIce):
+    with pytest.raises(ValueError):
+        S = Snowflake(initIce=initIce)
 
 
 def test_Constant_kShelf_fine():
@@ -171,7 +174,7 @@ def test_to_frame(fakeS):
 @pytest.fixture(scope="module")
 def S_331_all():
     """Fixture to share Snowflake across tests."""
-    S = Snowflake(N_vials=(3, 3, 1), storeStates="all")
+    S = Snowflake(N_vials=(3, 3, 1), storeStates="all", initialStates=dict(temp=21))
     S.run()
     return S
 
@@ -179,9 +182,15 @@ def S_331_all():
 @pytest.fixture(scope="module")
 def S_331_edge():
     """Fixture to share Snowflake across tests."""
-    S = Snowflake(N_vials=(3, 3, 1), storeStates="edge")
+    S = Snowflake(N_vials=(3, 3, 1), storeStates="edge", initialStates=dict(temp=21))
     S.run()
     return S
+
+
+def test_initialTemp(S_331_all, S_331_edge):
+    # we had defined initial temperature as 21
+    assert all(S_331_all.X_T[:, 0] == 21)
+    assert all(S_331_edge.X_T[:, 0] == 21)
 
 
 @pytest.fixture(scope="module")
