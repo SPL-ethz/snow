@@ -198,7 +198,7 @@ class Snowflake:
                         + f"and <{self.N_vials_total - 1}."
                     )
                 storageMask = np.zeros(self.N_vials_total, dtype=bool)
-                storageMask[storeStates] = True
+                storageMask[list(storeStates)] = True
             elif all([isinstance(x, str) for x in storeStates]):
                 storageMasks = list(
                     map(lambda x: self._interpretStorageString(x), storeStates)
