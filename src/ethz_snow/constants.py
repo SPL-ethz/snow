@@ -8,9 +8,6 @@ from collections.abc import Mapping
 
 from typing import Optional, List, Any
 
-# TODO:
-# - ensure that this works in a from-scratch installation
-
 
 def __getAllKeys_gen(dl: Any) -> list:
     """Help recursive key search with generator.

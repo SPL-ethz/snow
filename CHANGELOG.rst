@@ -2,6 +2,17 @@
 Changelog
 =========
 
+Version 1.1
+===========
+
+- Support for 3D configurations, typically of use to simulate the freezing of vials for storage in pallets
+- Enhancements:
+    - Initial Temp of vials can now be set independently (used to be defined by operating condition)
+    - Fixing a minor bug where freezing point depression was not considered
+    - Allow for cooling rate of 0
+    - Additional warnings if holding and cooling times exceed the total time
+    - Other, minor bug fixes
+
 Version 1.0
 ===========
 
