@@ -4,6 +4,7 @@ import pytest
 from ethz_snow.operatingConditions import OperatingConditions
 
 import numpy as np
+import warnings
 
 
 def test_holdingType():
@@ -20,12 +21,30 @@ def test_holdingType():
         ({"start": 10, "end": 1, "rate": 1}, {"duration": 10}),
         ({"start": 10, "end": 1}, {"duration": 10, "temp": 0}),
         ({"start": 10, "end": 1}, [{"duration": 10, "temp": 0}, {"duration": 3}]),
+        ({"start": 20, "end": 10, "rate": 0}, None),
+        ({"start": 20, "end": 20, "rate": 0}, {"duration": 10, "temp": 0}),
     ],
 )
 def test_requiredKeys(cooling, holding):
     """Make sure inputs are tested for required keys."""
     with pytest.raises(ValueError):
         OperatingConditions(holding=holding, cooling=cooling)
+
+
+@pytest.mark.parametrize(
+    ("cooling", "holding"),
+    [
+        ({"start": 10, "end": 1, "rate": 1}, None),
+        ({"rate": 1e-16, "start": -20, "end": -20}, {"duration": 10, "temp": 0}),
+    ],
+)
+def test_impliedTimesvsTotal(cooling, holding):
+    with pytest.warns(UserWarning):
+        OperatingConditions(
+            t_tot=1,
+            cooling=cooling,
+            holding=holding,
+        )
 
 
 @pytest.fixture(scope="module")

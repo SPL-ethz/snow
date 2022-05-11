@@ -7,8 +7,22 @@ import numpy as np
 # TODO
 # - correct vial groups for 3D simus
 # - correct handling of initial temp
-# - notimplementederror when sigma initial state is passed
 # - must be ok to have no kshelf when 3D
+# - accept direct and indirect init
+
+# currently does not raise exception, but will in the future
+# # @pytest.mark.parametrize("inits", [dict(temp=20)])
+# def test_initialStates_fine(inits):
+#     with pytest.raises(ValueError):
+#         S = Snowflake(initialStates=inits)
+
+
+@pytest.mark.parametrize(
+    "inits", [dict(sigma=0.5, temp=20), dict(sigma=None, temp=(1, 2, 3))]
+)
+def test_sigmaInit_notImplemented(inits):
+    with pytest.raises(NotImplementedError):
+        S = Snowflake(initialStates=inits)
 
 
 def test_k_must_be_fine():
@@ -40,7 +54,17 @@ def test_opcond_must_be_operatingcondition():
         S = Snowflake(opcond=dict(a=1))
 
 
-@pytest.mark.parametrize("input", [(1, 1,), (1,), (3, 3, 3, 3)])
+@pytest.mark.parametrize(
+    "input",
+    [
+        (
+            1,
+            1,
+        ),
+        (1,),
+        (3, 3, 3, 3),
+    ],
+)
 def test_N_vials_dims(input):
     """N_vials must be a tuple with length 3."""
     with pytest.raises(ValueError):
