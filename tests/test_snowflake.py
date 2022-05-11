@@ -10,11 +10,11 @@ import numpy as np
 # - must be ok to have no kshelf when 3D
 # - accept direct and indirect init
 
-# currently does not raise exception, but will in the future
-# # @pytest.mark.parametrize("inits", [dict(temp=20)])
-# def test_initialStates_fine(inits):
-#     with pytest.raises(ValueError):
-#         S = Snowflake(initialStates=inits)
+
+@pytest.mark.parametrize("inits", [[1, 2, 3], "something"])
+def test_initialStates_fine(inits):
+    with pytest.raises(ValueError):
+        S = Snowflake(initialStates=inits)
 
 
 @pytest.mark.parametrize(
@@ -33,6 +33,9 @@ def test_k_must_be_fine():
     # make sure k is checked w.r.t. its keys
     with pytest.raises(ValueError):
         S = Snowflake(k={"int": 1, "ext": 1, "s0f": 1})
+
+    # in case of 3D s0 is not required
+    S = Snowflake(N_vials=(3, 3, 3), k=dict(int=1, ext=1))
 
 
 def test_Constant_kShelf_fine():
@@ -55,15 +58,7 @@ def test_opcond_must_be_operatingcondition():
 
 
 @pytest.mark.parametrize(
-    "input",
-    [
-        (
-            1,
-            1,
-        ),
-        (1,),
-        (3, 3, 3, 3),
-    ],
+    "input", [(1, 1,), (1,), (3, 3, 3, 3),],
 )
 def test_N_vials_dims(input):
     """N_vials must be a tuple with length 3."""
@@ -99,6 +94,16 @@ def test_storageMaskFunction(input_result):
     S = Snowflake(N_vials=(3, 3, 1), storeStates=input_result[0])
 
     assert np.sum(S._storageMask) == input_result[1]
+
+
+@pytest.mark.parametrize(
+    "method_kwargs", [("to_frame", {}), ("sigmaCounter", {"time": 1})],
+)
+def test_mustRunFirst(method_kwargs):
+    S = Snowflake()
+
+    with pytest.raises(ValueError):
+        getattr(S, method_kwargs[0])(**method_kwargs[1])
 
 
 @pytest.fixture(scope="module")

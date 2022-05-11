@@ -112,13 +112,20 @@ class Snowflake:
             >>> Sf = Snowflake(storeStates = ['edge_random_4', 'uniform.core.5'])
             >>> Sf = Snowflake(storeStates = (0, 4, 10))
         """
+
+        if N_vials[2] > 1:
+            # 3D case, k_shelf can be missing
+            hflowKeys = tuple([elem for elem in HEATFLOW_REQUIREDKEYS if elem != "s0"])
+        else:
+            hflowKeys = HEATFLOW_REQUIREDKEYS
+
         if not isinstance(k, dict):
             raise TypeError(f"Input k must be of type dict. Was given {type(k)}.")
-        elif not all([key in k.keys() for key in HEATFLOW_REQUIREDKEYS]):
+        elif not all([key in k.keys() for key in hflowKeys]):
             raise ValueError(
                 (
                     f"A required key was missing from dictionary k, specifically "
-                    + f"{set(HEATFLOW_REQUIREDKEYS) - set(k.keys())}."
+                    + f"{set(hflowKeys) - set(k.keys())}."
                 )
             )
         else:
@@ -956,9 +963,7 @@ class Snowflake:
 
         return interactionMatrix, VIAL_EXT
 
-    def _buildShelfHeatFlow(
-        self,
-    ):
+    def _buildShelfHeatFlow(self,):
         """Build the shelf heat flow array.
 
         Because the shelf heat flow may be dependent on the rng if
