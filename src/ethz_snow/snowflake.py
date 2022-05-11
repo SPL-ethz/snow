@@ -43,6 +43,8 @@ class Snowflake:
         H_ext (np.ndarray): External heat transfer vector.
         H_int (csr_matrix): Internal heat transfer matrix.
         H_shelf (np.ndarray): Shelf heat transfer vector.
+        initIce (str, optional): Which formulation for the initial amount of ice
+                formed to use (see docs).
         k (dict): Heat transfer coefficients.
         N_vials (tuple): Number of vials in each dimension.
         N_vials_total (int): Total number of vials.
@@ -754,7 +756,8 @@ class Snowflake:
             elif g == "center":
                 myMask = myMask | (VIAL_EXT == 0)
                 warnings.warn(
-                    "'center' is deprecated terminology. Please use 'core' instead."
+                    "'center' is deprecated terminology. Please use 'core' instead.",
+                    DeprecationWarning,
                 )
             elif g == "all":
                 myMask = np.ones(self.N_vials_total, dtype=bool)
@@ -953,7 +956,9 @@ class Snowflake:
 
         return interactionMatrix, VIAL_EXT
 
-    def _buildShelfHeatFlow(self,):
+    def _buildShelfHeatFlow(
+        self,
+    ):
         """Build the shelf heat flow array.
 
         Because the shelf heat flow may be dependent on the rng if

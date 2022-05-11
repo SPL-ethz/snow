@@ -60,6 +60,11 @@ class OperatingConditions:
             elif holding is not None:
                 raise ValueError("Cannot have cooling rate 0 _and_ holding steps.")
 
+        elif (cooling["rate"] == 0) and (cooling["start"] != cooling["end"]):
+            raise ValueError(
+                "If cooling rate is zero, start must match end temperature."
+            )
+
         self.cooling = cooling
 
         self.holding = holding
@@ -70,7 +75,8 @@ class OperatingConditions:
                     f"The implied process time (inferred from cooling rate + holding step(s)) "
                     + f"is larger than the total time t_tot ({self._t_tot_implied}>{t_tot}). "
                     + f"The simulation will stop at t_tot={t_tot}."
-                )
+                ),
+                UserWarning,
             )
 
         self.cnTemp = cnTemp
@@ -173,7 +179,10 @@ class OperatingConditions:
 
             # ramp from start to hold temp
             T_vec_toHold = self._simpleCool(
-                Tstart=T_start, Tend=T_hold, coolingRate=cr, dt=dt,
+                Tstart=T_start,
+                Tend=T_hold,
+                coolingRate=cr,
+                dt=dt,
             )
 
             # append holding period

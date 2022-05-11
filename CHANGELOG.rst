@@ -11,6 +11,7 @@ Version 1.1
     - Fixing a minor bug where freezing point depression was not considered
     - Allow for cooling rate of 0
     - Additional warnings if holding and cooling times exceed the total time
+    - Vial group 'center' is going to be deprecated in favor of 'core' (also: new type 'side' was added for 3D)
     - Other, minor bug fixes
 
 Version 1.0

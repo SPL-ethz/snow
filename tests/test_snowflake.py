@@ -9,6 +9,8 @@ import numpy as np
 # - correct handling of initial temp
 # - notimplementederror when sigma initial state is passed
 # - must be ok to have no kshelf when 3D
+# - accept direct and indirect init
+# - warning if time doesn't add up
 
 
 def test_k_must_be_fine():
@@ -40,7 +42,17 @@ def test_opcond_must_be_operatingcondition():
         S = Snowflake(opcond=dict(a=1))
 
 
-@pytest.mark.parametrize("input", [(1, 1,), (1,), (3, 3, 3, 3)])
+@pytest.mark.parametrize(
+    "input",
+    [
+        (
+            1,
+            1,
+        ),
+        (1,),
+        (3, 3, 3, 3),
+    ],
+)
 def test_N_vials_dims(input):
     """N_vials must be a tuple with length 3."""
     with pytest.raises(ValueError):
