@@ -277,11 +277,20 @@ class Snowfall:
                 columns=["group", "vial", "variable", "value", "seed"]
             )
             self.Sf_template._simulationStatus = 1
-            for i in range(self.Nrep):
-                self.Sf_template.stats = self.stats[i]
-                loc_stats_df, _ = self.Sf_template.to_frame()
-                loc_stats_df["seed"] = i
-                stats_df = stats_df.append(loc_stats_df)
+            # call Snowflake function for the first Snowflake
+            # to get the right layout
+            N_tot = self.Sf_template.N_vials_total
+            self.Sf_template.stats = self.stats[0]
+            stats_df = pd.concat([self.Sf_template.to_frame()[0]] * self.Nrep)
+            varCol, valCol = (
+                stats_df.columns.get_loc("variable"),
+                stats_df.columns.get_loc("value"),
+            )
+            for i in range(1, self.Nrep):
+                stats_df.iloc[
+                    i * N_tot * 3 : (i + 1) * N_tot * 3, [varCol, valCol]
+                ] = pd.DataFrame(self.stats[i]).melt()
+            stats_df["seed"] = np.repeat(np.arange(0, self.Nrep), N_tot * 3)
 
             # clean up template
             self.Sf_template.stats = dict()

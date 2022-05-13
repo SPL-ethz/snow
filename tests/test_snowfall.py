@@ -6,6 +6,9 @@ from ethz_snow.operatingConditions import OperatingConditions
 
 import numpy as np
 
+# TODO
+# ensure that snowfall.to_frame() gives the same as concatenating snowflake.to_frame()
+
 
 def test_passSnowflakeArgs():
     """Test that Snowflake arguments are passed correctly."""
