@@ -532,11 +532,15 @@ class Snowflake:
 
                 q0 = (T_eq_l - T_k[nucleatedVialsMask]) * cp_solution * mass
 
-                if self.initIce == "indirect":
+                if self.initIce == "indirect": 
                     sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
-                else:
-                    # please fill in here model-10 and remove the "pass", Leif - DRO
-                    pass
+                else: # LTD: referred to as "direct" approach - this is the one used in the derivation of the manuscripts
+                    gamma_direct = - alpha / mass / cp_solution
+                    B_direct = T_eq - T_k[nucleatedVialsMask] + gamma_direct
+                    C_direct = T_k[nucleatedVialsMask] - T_eq + depression
+                    
+                    sigma_k[nucleatedVialsMask] = (- B_direct + np.sqrt(B_direct ** 2  + 4*gamma_direct*C_direct) ) / (-2*gamma_direct)
+
                 # assumption is that during solidification T = Teq
                 T_k[nucleatedVialsMask] = T_eq - depression * (
                     1 / (1 - sigma_k[nucleatedVialsMask])
