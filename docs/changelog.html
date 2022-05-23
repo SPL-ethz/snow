@@ -5,10 +5,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Changelog &mdash; ethz_snow 1.0.0 documentation</title>
+  <title>Changelog &mdash; ethz_snow 0.0.post1.dev66+g1fc083d documentation</title>
   
 
   
@@ -37,9 +38,9 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="ethz_snow 1.0.0 documentation" href="index.html"/>
+    <link rel="top" title="ethz_snow 0.0.post1.dev66+g1fc083d documentation" href="index.html"/>
         <link rel="next" title="ethz_snow" href="api/modules.html"/>
-        <link rel="prev" title="Contributors" href="authors.html"/> 
+        <link rel="prev" title="Contributors" href="AUTHORS.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                1.0.0
+                0.0.post1.dev66+g1fc083d
               </div>
             
           
@@ -91,15 +92,13 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="readme.html#ethz-snow">ethz_snow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html#installation">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html#first-steps-general-information">First steps: General information</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html#example">Example</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html#simulation-output">Simulation output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TUTORIAL.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="validation.html">Numerical implementation of the initial amount of ice</a></li>
+<li class="toctree-l1"><a class="reference internal" href="validation.html#numerical-validation-of-snow-version-1-1">Numerical validation of SNOW version 1.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AUTHORS.html">Authors</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-1">Version 1.1</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-0">Version 1.0</a></li>
 </ul>
 </li>
@@ -154,7 +153,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/changelog.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/CHANGELOG.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -167,9 +166,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="changelog">
-<span id="changes"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="version-1-0">
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<section id="version-1-1">
+<h2>Version 1.1<a class="headerlink" href="#version-1-1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Support for 3D configurations, typically of use to simulate the freezing of vials for storage in pallets</p></li>
+<li><dl class="simple">
+<dt>Enhancements:</dt><dd><ul>
+<li><p>Initial Temp of vials can now be set independently (used to be defined by operating condition)</p></li>
+<li><p>Fixing a minor bug where freezing point depression was not considered</p></li>
+<li><p>Allow for cooling rate of 0</p></li>
+<li><p>Additional warnings if holding and cooling times exceed the total time</p></li>
+<li><p>Vial group ‘center’ is going to be deprecated in favor of ‘core’ (also: new type ‘side’ was added for 3D)</p></li>
+<li><p>Other, minor bug fixes</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="version-1-0">
 <h2>Version 1.0<a class="headerlink" href="#version-1-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Implementation of freezing model for the freezing stage in freeze-drying of a batch of vials on a shelf in python</p></li>
@@ -185,8 +202,8 @@
 </dl>
 </li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -198,7 +215,7 @@
         <a href="api/modules.html" class="btn btn-neutral float-right" title="ethz_snow" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="authors.html" class="btn btn-neutral" title="Contributors" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="AUTHORS.html" class="btn btn-neutral" title="Contributors" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -229,7 +246,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.0',
+            VERSION:'0.0.post1.dev66+g1fc083d',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
