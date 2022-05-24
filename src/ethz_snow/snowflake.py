@@ -1076,9 +1076,9 @@ class Snowflake:
             df["vial"] = np.tile(np.where(self._storageMask)[0], 2)
             df["group"] = np.tile(VIAL_EXT[self._storageMask], 2)
 
-            df.loc[df.group == 3, "group"] = "corner"
-            df.loc[df.group == 2, "group"] = "edge"
-            df.loc[df.group == 1, "group"] = "site"
+            df.loc[df.group == 3 - (self.N_vials[2] == 1), "group"] = "corner"
+            df.loc[df.group == 2 - (self.N_vials[2] == 1), "group"] = "edge"
+            df.loc[df.group == 1 - (self.N_vials[2] == 1), "group"] = "side"
             df.loc[df.group == 0, "group"] = "core"
 
             traj_df = df.melt(id_vars=["group", "vial", "state"])
