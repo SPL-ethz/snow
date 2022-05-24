@@ -135,4 +135,25 @@ We may use **S.plot(what="T_nucleation")** to immediately get an understanding o
 
 will show the evolution of the temperatures as well as the shelf, which is a very useful first information for understanding the freezing process as well as a sanity check of the simulation outcome. Note that the plotting of trajectories is slow at the moment because of the way seaborn calculates the shaded area (representing all the trajectories).
 
+=================
+Version 1.1. Simulations with vials arranged in three spatial dimensions
+=================
 
+The main additional feature of version 1.1 is the capability to simulate the freezing of systems with vials arranged in 3D, e.g. in pallets. These pallets may comprise tens of thousands of vials and are commonly frozen in cold storage rooms over the course of days. Pallt simulations are initiated in the same way as two dimensional arrangements; however, the number of vials in the vertical (z) direction is to be set to a value larger than one. For example, a system with 40x36x18 vials may be setup via
+
+
+.. code-block:: python
+
+    S = Snowfall(pool_size=8,k=d,Nrep=128,N_vials=(40,36,18),opcond=op,dt=5, initialStates = initial)
+    
+    
+Note that due to the geometry applied, the heat transfer settings for a pallet configuration may be different than for freezing on a shelf. Specifically, no shelf-to-vial heat transfer may be present and the external, i.e. the storage temperature is most ofen constant. However, the storage temperature is colder than the initial temperature of the vials; this difference between initial temperature and storage temperature is considered via the new option **initialStates**. A sample configuration may be
+
+.. code-block:: python
+
+    d = {"int": 10, "ext": 10, "s0": 0, "s_sigma_rel": 0} 
+    c = {"rate": 1e-16, "start": -8, "end": -8} # rate equals zero yields divide by zero error
+    initial = {"temp": 20}
+    op = OperatingConditions(t_tot=6e6,cooling= c, holding =dict(duration=6e6,temp=-8) )
+    
+In order to simulate a constant storage temperature, an arbitrarily small cooling rate may be defined in addition with a holding step. In this way, the temperature is set for the entire process duration to the storage temperature, which is -8°C in this case. Note that due to the large system size, typically longer process durations have to be simulated for pallets compared to shelf freezing. 
