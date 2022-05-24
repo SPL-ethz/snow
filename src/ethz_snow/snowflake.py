@@ -1055,7 +1055,7 @@ class Snowflake:
         df["group"] = VIAL_EXT
         df.loc[df.group == 3 - (self.N_vials[2] == 1), "group"] = "corner"
         df.loc[df.group == 2 - (self.N_vials[2] == 1), "group"] = "edge"
-        df.loc[df.group == 1 - (self.N_vials[2] == 1), "group"] = "side"
+        df.loc[df.group == 1, "group"] = "side"
         df.loc[df.group == 0, "group"] = "core"
 
         stats_df = df.melt(id_vars=["group", "vial"])
