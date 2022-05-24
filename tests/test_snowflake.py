@@ -157,7 +157,8 @@ def test_getvialgroup(S_331_all, S_333_all):
     assert S_333_all.getVialGroup("all").sum() == 27
 
 
-def test_to_frame(fakeS):
+@pytest.mark.slow
+def test_to_frame(fakeS, S_331_all):
     """Test that conversion to dataframe works as intended."""
     stats_df, traj_df = fakeS.to_frame(n_timeSteps=4)
 
@@ -174,6 +175,16 @@ def test_to_frame(fakeS):
         ].item()
         == 0.95
     )
+
+    # making sure getVialGroup and to_frame have same
+    # interpretation of groups
+    df = S_331_all.to_frame()[0]
+    groupVial = (
+        df[["group", "vial"]].drop_duplicates().groupby("group")["vial"].unique()
+    )
+
+    for g, vials in groupVial.iteritems():
+        assert (np.where(S_331_all.getVialGroup(g))[0] == vials).all()
 
 
 @pytest.fixture(scope="module")

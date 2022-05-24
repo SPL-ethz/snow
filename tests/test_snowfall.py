@@ -5,6 +5,7 @@ from ethz_snow.snowflake import Snowflake
 from ethz_snow.operatingConditions import OperatingConditions
 
 import numpy as np
+import pandas as pd
 
 
 def test_passSnowflakeArgs():
@@ -76,3 +77,46 @@ def test_statsComputation(S_seq):
         ].squeeze()
         == S_seq.stats[0]["T_nucleation"][1]
     )
+
+    stats_df_slow = pd.DataFrame(columns=["group", "vial", "variable", "value", "seed"])
+    for i in range(S_seq.Nrep):
+        S_seq.Sf_template.stats = S_seq.stats[i]
+        loc_stats_df, _ = S_seq.Sf_template.to_frame()
+        loc_stats_df["seed"] = i
+        stats_df_slow = stats_df_slow.append(loc_stats_df)
+
+    # ensure same dtype
+    # otherwise equals will fail
+    for col in df.columns:
+        stats_df_slow[col] = stats_df_slow[col].astype(df[col].dtype)
+
+    # clean up
+    S_seq.Sf_template.stats = dict()
+
+    assert df.equals(stats_df_slow)
+
+
+@pytest.mark.slow
+def test_statsServers(S_seq):
+    df = S_seq.to_frame()
+
+    tsol = S_seq.solidificationTimes()
+    tnuc = S_seq.nucleationTimes(seed=3)
+    Tnuc = S_seq.nucleationTemperatures(group="corner", seed=7)
+
+    assert (
+        df.loc[(df.variable == "t_solidification"), "value"].to_numpy() == tsol
+    ).all()
+
+    assert (
+        df.loc[(df.variable == "t_nucleation") & (df.seed == 3), "value"].to_numpy()
+        == tnuc
+    ).all()
+
+    assert (
+        df.loc[
+            (df.variable == "T_nucleation") & (df.seed == 7) & (df.group == "corner"),
+            "value",
+        ].to_numpy()
+        == Tnuc
+    ).all()
