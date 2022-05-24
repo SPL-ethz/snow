@@ -86,8 +86,9 @@ def test_statsComputation(S_seq):
         stats_df_slow = stats_df_slow.append(loc_stats_df)
 
     # ensure same dtype
-    stats_df_slow["vial"] = stats_df_slow["vial"].astype(df["vial"].dtype)
-    stats_df_slow["seed"] = stats_df_slow["seed"].astype(df["seed"].dtype)
+    # otherwise equals will fail
+    for col in df.columns:
+        stats_df_slow[col] = stats_df_slow[col].astype(df[col].dtype)
 
     # clean up
     S_seq.Sf_template.stats = dict()
