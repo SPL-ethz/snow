@@ -532,11 +532,15 @@ class Snowflake:
 
                 q0 = (T_eq_l - T_k[nucleatedVialsMask]) * cp_solution * mass
 
-                if self.initIce == "indirect":
+                if self.initIce == "indirect": 
                     sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
-                else:
-                    # please fill in here model-10 and remove the "pass", Leif - DRO
-                    pass
+                else: # LTD: referred to as "direct" approach - this is the one used in the derivation of the manuscripts
+                    gamma_direct = - alpha / mass / cp_solution
+                    B_direct = T_eq - T_k[nucleatedVialsMask] + gamma_direct
+                    C_direct = T_k[nucleatedVialsMask] - T_eq + depression
+                    
+                    sigma_k[nucleatedVialsMask] = (- B_direct + np.sqrt(B_direct ** 2  + 4*gamma_direct*C_direct) ) / (-2*gamma_direct)
+
                 # assumption is that during solidification T = Teq
                 T_k[nucleatedVialsMask] = T_eq - depression * (
                     1 / (1 - sigma_k[nucleatedVialsMask])
@@ -1055,7 +1059,7 @@ class Snowflake:
         df["group"] = VIAL_EXT
         df.loc[df.group == 3 - (self.N_vials[2] == 1), "group"] = "corner"
         df.loc[df.group == 2 - (self.N_vials[2] == 1), "group"] = "edge"
-        df.loc[df.group == 1 - (self.N_vials[2] == 1), "group"] = "side"
+        df.loc[df.group == 1, "group"] = "side"
         df.loc[df.group == 0, "group"] = "core"
 
         stats_df = df.melt(id_vars=["group", "vial"])
@@ -1076,9 +1080,9 @@ class Snowflake:
             df["vial"] = np.tile(np.where(self._storageMask)[0], 2)
             df["group"] = np.tile(VIAL_EXT[self._storageMask], 2)
 
-            df.loc[df.group == 3, "group"] = "corner"
-            df.loc[df.group == 2, "group"] = "edge"
-            df.loc[df.group == 1, "group"] = "site"
+            df.loc[df.group == 3 - (self.N_vials[2] == 1), "group"] = "corner"
+            df.loc[df.group == 2 - (self.N_vials[2] == 1), "group"] = "edge"
+            df.loc[df.group == 1 - (self.N_vials[2] == 1), "group"] = "side"
             df.loc[df.group == 0, "group"] = "core"
 
             traj_df = df.melt(id_vars=["group", "vial", "state"])
