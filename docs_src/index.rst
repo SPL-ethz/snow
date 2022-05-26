@@ -22,11 +22,11 @@ Contents
    :maxdepth: 2
 
    Overview <readme>
-   Tutorial <TUTORIAL>
-   Development <validation>
+   Tutorial <tutorial>
+   Development <development>
    License <license>
-   Authors <AUTHORS>
-   Changelog <CHANGELOG>
+   Authors <authors>
+   Changelog <changelog>
    Module Reference <api/modules>
 
 

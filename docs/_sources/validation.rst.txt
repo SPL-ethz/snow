@@ -1,16 +1,14 @@
-.. role:: raw-latex(raw)
-   :format: latex
-..
-
-.. _initialice:
+==========
+validation
+==========
 
 Numerical implementation of the initial amount of ice
 =====================================================
 
 The modeling framework that forms the basis for the SNOW python package
-was derived initially by :raw-latex:`\citet{Deck2021}` (version 1.0) for
+was derived initially by :cite:t:`deck2022` (version 1.0) for
 systems comprising vials arranged in two spatial dimensions, and by
-:raw-latex:`\citet{Deck2022}` (version 1.1) for systems comprising vials
+:cite:t:`deck2022_pallet` (version 1.1) for systems comprising vials
 arranged in three spatial dimensions.
 
 This section discusses a minor aspect of this modeling framework, namely
@@ -30,27 +28,17 @@ Model derivation
 
 The starting point for these methods are equations
 `[eqn:8] <#eqn:8>`__,\ `[eqn:9] <#eqn:9>`__ and `[eqn:10] <#eqn:10>`__
-of the manuscript by :raw-latex:`\citet{Deck2021}`. For the sake of
+of the manuscript by :cite:t:`deck2022`. For the sake of
 consistency, the original numbering of equations is used within this
 comment. The relevant equations are:
 
 .. math::
 
-   \begin{aligned}
-   \label{eqn:8}
-   \dot{Q}_{(m,n)} =\left( m_{\mathrm{s}} c_{\mathrm{p,s}} + m_{\mathrm{\ell},(m,n)} c_{\mathrm{p,\ell}} + m_{\mathrm{i},(m,n)} c_{\mathrm{p,i}} \right) \dfrac{\mathrm{d}T_{(m,n)}^{\mathrm{eq}}}{\mathrm{d}t} - \lambda_{\mathrm{w}} \dfrac{\mathrm{d}m_{\mathrm{i},(m,n)}}{\mathrm{d}t} \end{aligned}
-
-.. math::
-
-   \begin{aligned}
-   \label{eqn:9}
-       T^{\mathrm{eq}}_{(m,n)} ~= T_{\mathrm{m}} - k_{\mathrm{f}} b_{\mathrm{s},(m,n)} = T_{\mathrm{m}} - \frac{k_{\mathrm{f}}}{M_{\mathrm{s}}} \left( \frac{m_{\mathrm{s}}}{m_{\mathrm{w}} - m_{\mathrm{i},(m,n)}} \right)\end{aligned}
-
-.. math::
-
-   \begin{aligned}
-   \label{eqn:10}
-    \left(T^{\mathrm{eq}}_{(m,n)} - T^{\mathrm{nuc}}_{(m,n)}\right) c_{\mathrm{p}} m_{\mathrm{v}} = \lambda_{\mathrm{w}} m_{\mathrm{i},(m,n)} \end{aligned}
+   \begin{align}
+   \dot{Q}_{(m,n)} &=\left( m_{\mathrm{s}} c_{\mathrm{p,s}} + m_{\mathrm{\ell},(m,n)} c_{\mathrm{p,\ell}} + m_{\mathrm{i},(m,n)} c_{\mathrm{p,i}} \right) \dfrac{\mathrm{d}T_{(m,n)}^{\mathrm{eq}}}{\mathrm{d}t} - \lambda_{\mathrm{w}} \dfrac{\mathrm{d}m_{\mathrm{i},(m,n)}}{\mathrm{d}t} \label{eqn:8} \tag{8} \\
+   T^{\mathrm{eq}}_{(m,n)} &= T_{\mathrm{m}} - k_{\mathrm{f}} b_{\mathrm{s},(m,n)} = T_{\mathrm{m}} - \frac{k_{\mathrm{f}}}{M_{\mathrm{s}}} \left( \frac{m_{\mathrm{s}}}{m_{\mathrm{w}} - m_{\mathrm{i},(m,n)}} \right) \label{eqn:9} \tag{9} \\
+    \left(T^{\mathrm{eq}}_{(m,n)} - T^{\mathrm{nuc}}_{(m,n)}\right) c_{\mathrm{p}} m_{\mathrm{v}} &= \lambda_{\mathrm{w}} m_{\mathrm{i},(m,n)}    \label{eqn:10} \tag{10}
+   \end{align}
 
 These equations are based on the total mass of the formulation in a
 vial. When implementing these equations in the MATLAB and python codes,
@@ -96,7 +84,7 @@ into the enthalpy balance, the following expression is obtained:
 Indirect method
 ---------------
 
-This method relies on the enthalpy balance (eqn
+This method relies on the enthalpy balance :ref:`Equation 8 <#eqn:8>`(eqn
 `[eqn:8] <#eqn:8>`__,\ `[eqn:11] <#eqn:11>`__) to calculate the amount
 of ice formed upon nucleation. In line with the overall description of
 freezing used in the derivation, nucleation is considered to be an
@@ -177,8 +165,8 @@ following quadratic equation, which may be solved analytically:
 Comparison of the two methods
 -----------------------------
 
-For the system studied by :raw-latex:`\citet{Deck2021}` and by
-:raw-latex:`\citet{Deck2021}`, namely a 5 wt.% sucrose solution, the
+For the system studied by :cite:t:`deck2022` and by
+:cite:t:`deck2022_pallet`, namely a 5 wt.% sucrose solution, the
 predictions of both methods for the initial amount of formed ice are
 compared. Figure `1 <#fig:models>`__ visualizes the predictions and the
 relative error between the two methods.
@@ -195,7 +183,7 @@ It is found that for the relevant range of nucleation temperatures, i.e.
 0.1%, so that both methods may be considered as equivalent. In a second
 step, we compare the impact of both methods on the freezing of a complex
 system. We chose a box of 20x12x3 vials, a system discussed in detail by
-:raw-latex:`\citet{Deck2022}`. This is shown in Figure `2 <#fig:box>`__.
+:cite:t:`deck2022_pallet`. This is shown in Figure `2 <#fig:box>`__.
 
 .. figure:: figures/comparison_box.svg
    :alt: Freezing of a box of vials.
@@ -226,7 +214,7 @@ discussion of the approach.
 Here, we present simulation results for pallet freezing, the main
 application of version 1.1. The model system is a pallet comprising
 40x36x18 vials, in line with the systems studied in the pre-print by
-:raw-latex:`\citet{Deck2022}`. The two most "extreme" storage
+:cite:t:`deck2022_pallet`. The two most "extreme" storage
 temperatures are considered here, i.e. -8°C and -40°C to enable a
 comprehensive comparison. 128 simulations are carried out, a typical
 number of repetitions used in the manuscript. The run at -8°C was
@@ -251,9 +239,11 @@ One notable difference between the two packages, however, lies in their
 runtime. Thus, the runtimes for the simulation at -8°C were compared.
 The simulations were carried out on a Dell Optiplex 7070 workstation
 with 32 GB RAM and Intel Core i9-9900 CPU. 8 parallel workers were
-employed, resulting in runtimes of XXX min for the MATLAB implementation
+employed, resulting in runtimes of 454 min for the MATLAB implementation
 and 718 min for SNOW version 1.1. Given that the system is embarassingly
 parallel, the runtime may be reduced considerably by increasing the
 number of workers. While the python implementation is slower, the
 difference in runtime is small enough to be not a limiting factor of
 use.
+
+.. bibliography:: refs.bib
