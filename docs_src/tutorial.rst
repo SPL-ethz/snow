@@ -4,7 +4,6 @@ Tutorial
 
 This tutorial provides some basic explanations to help users getting started with the ethz_snow package. 
 
-============
 Installation
 ============
 
@@ -14,7 +13,6 @@ Either, download/clone any stable or unstable version from `GitHub <https://gith
 
 Or install the latest release version via ``pip install ethz_snow``.
 
-================================
 First steps: General information 
 ================================
 
@@ -24,7 +22,6 @@ Both models require a number of operatingConditions and constants as input param
 
 Operating conditions are to be provided directly when calling the **snowflake** / **Snowfall** functions, while we specify the constants separately in a .yaml file. If no values are specified, the default configurations are used; these are stored in the **operatingConditions.py** and the **snowConfig_default.yaml** (see the next subsection for more details on the latter).
 
----------
 Constants
 ---------
 Below is a copy of the yaml file used to configure the constants used in **Snowflake** / **Snowfall**.
@@ -68,7 +65,6 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
       kb: 1e-9
       b: 12
 
-========
 Example
 ========
 
@@ -121,7 +117,6 @@ Finally, we may define the Snowfall class. We set the pool_size parameter to the
 
 We then start the simulation via **S.run()** and may check whether it completed via **S.simulationStatus()**. In case we are only interested in a single repetition, the **Snowflake** class may be used instead. Compared to **Snowfall**, **Snowflake** does not require Nrep or pool_size as input. However, it is able to store information on the thermal evolution of all vials, which is a feature that was removed for **Snowfall** to increase computational performance. 
 
-=================
 Simulation output
 =================
 
@@ -135,9 +130,8 @@ We may use **S.plot(what="T_nucleation")** to immediately get an understanding o
 
 will show the evolution of the temperatures as well as the shelf, which is a very useful first information for understanding the freezing process as well as a sanity check of the simulation outcome. Note that the plotting of trajectories is slow at the moment because of the way seaborn calculates the shaded area (representing all the trajectories).
 
-=================
 Version 1.1. Pallet freezing
-=================
+============================
 
 The main additional feature of version 1.1 is the capability to simulate the freezing of systems with vials arranged in three spatial dimensions, e.g. in pallets. These pallets may comprise tens of thousands of vials and are commonly frozen in cold storage rooms over the course of days. Pallt simulations are initiated in the same way as two dimensional arrangements; however, the number of vials in the vertical (z) direction is to be set to a value larger than one. For example, a system with 40x36x18 vials may be setup via
 
