@@ -81,7 +81,10 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "m2r2",
+    "sphinxcontrib.bibtex",
 ]
+
+bibtex_bibfiles = ["refs.bib"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -97,7 +100,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "ethz_snow"
-copyright = "2021, Leif-Thore Deck, David Ochsenbein"
+copyright = "2021-2022, Leif-Thore Deck, David Ochsenbein"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
