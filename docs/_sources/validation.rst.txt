@@ -184,8 +184,7 @@ compared. Figure `1 <#fig:models>`__ visualizes the predictions and the
 relative error between the two methods.
 
 .. figure:: figures/comparison_methods.svg
-   :alt: Comparison of the two models. Left: Prediction of the amount of
-   ice formed. Right: Relative error between the two predictions.
+   :alt: Comparison of the two models.
    :name: fig:models
 
    Comparison of the two models. Left: Prediction of the amount of ice
@@ -199,10 +198,7 @@ system. We chose a box of 20x12x3 vials, a system discussed in detail by
 :raw-latex:`\citet{Deck2022}`. This is shown in Figure `2 <#fig:box>`__.
 
 .. figure:: figures/comparison_box.svg
-   :alt: Freezing of a box of vials. Comparison of the two methods to
-   compute the initial amount of ice. (a): Distribution of nucleation
-   temperatures. (b) Distribution of solidification times. (c):
-   Distribution of nucleation times.
+   :alt: Freezing of a box of vials.
    :name: fig:box
 
    Freezing of a box of vials. Comparison of the two methods to compute

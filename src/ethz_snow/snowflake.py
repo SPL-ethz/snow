@@ -536,7 +536,9 @@ class Snowflake:
 
                 if self.initIce == "indirect":
                     sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
-                else:  # LTD: referred to as "direct" approach - this is the one used in the derivation of the manuscripts
+                else:
+                    # LTD: referred to as "direct" approach
+                    # this is the one used in the derivation of the manuscripts
                     gamma_direct = -alpha / mass / cp_solution
                     B_direct = T_eq - T_k[nucleatedVialsMask] + gamma_direct
                     C_direct = T_k[nucleatedVialsMask] - T_eq + depression
@@ -832,7 +834,8 @@ class Snowflake:
             df = df[df.state.str.contains(what)]
             if len(df) == 0:
                 raise ValueError(
-                    f"No data for {what} for plot type {kind} and group {group}. Please check your inputs."
+                    f"No data for {what} for plot type {kind} and group {group}. "
+                    + "Please check your inputs."
                 )
             ax = sns.lineplot(data=df, hue="group", y="value", x="Time")
 
@@ -856,7 +859,8 @@ class Snowflake:
             df = df[df.variable.str.contains(what)]
             if len(df) == 0:
                 raise ValueError(
-                    f"No data for {what} for plot type {kind} and group {group}. Please check your inputs."
+                    f"No data for {what} for plot type {kind} and group {group}. "
+                    + "Please check your inputs."
                 )
             sns.catplot(data=df, hue="group", y="value", kind=kind, x="variable")
 

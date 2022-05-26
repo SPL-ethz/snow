@@ -74,8 +74,10 @@ class OperatingConditions:
         if self._t_tot_implied > t_tot:
             warnings.warn(
                 (
-                    f"The implied process time (inferred from cooling rate + holding step(s)) "
-                    + f"is larger than the total time t_tot ({self._t_tot_implied}>{t_tot}). "
+                    "The implied process time (inferred from cooling rate "
+                    + "+ holding step(s)) "
+                    + f"is larger than the total time t_tot "
+                    + "({self._t_tot_implied}>{t_tot}). "
                     + f"The simulation will stop at t_tot={t_tot}."
                 ),
                 UserWarning,
