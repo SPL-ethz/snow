@@ -9,6 +9,8 @@ import warnings
 
 from typing import Optional, Iterable, Union
 
+from .__init__ import __citation__, __bibtex__
+
 
 class OperatingConditions:
     """A class to handle a single Stochastic Nucleation of Water simulation.

@@ -8,6 +8,8 @@ from collections.abc import Mapping
 
 from typing import Optional, List, Any
 
+from .__init__ import __citation__, __bibtex__
+
 
 def __getAllKeys_gen(dl: Any) -> list:
     """Help recursive key search with generator.
