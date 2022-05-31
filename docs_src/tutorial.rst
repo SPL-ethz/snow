@@ -30,40 +30,41 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
 
 .. code-block:: yaml
 
-    vial:
-      geometry:
-        # base shape of vial (currently only cube is accepted)
-        shape: cube
-        # length [m]
-        length: 0.01
-        # width [m]
-        width: 0.01
-        # height [m]
-        height: 0.01
-    water:
-      # J/[Kkg] heat capacity liquid water
-      cp_w: 4187
-      # J/[Kkg] heat capacity ice 0°C
-      cp_i: 2108
-      # J/kg heat of fusion water
-      Dh: 333550
-    solution:
-      # kg/m^3 density of water / assumed constant for all phases
-      rho_l: 1000
-      # K kg / mol cryoscopic constant
-      k_f: 1.853
-      # J/Kkg, heat capacity sucrose
-      cp_s: 1240
-      # molar mass sucrose [kg/mol]
-      M_s: 0.3423
-      # mass fraction of solute in solution
-      solid_fraction: 0.05
-      # °C equilibrium freezing temperature
-      T_eq: 0
-    kinetics:
-      # m−3 s−1 K−b value reduced compared to Braatz paper (he had a value of 10)
-      kb: 1e-9
-      b: 12
+   vial:
+    geometry:
+    # base shape of vial (currently only cube is accepted)
+    shape: cube
+    # length [m]
+    length: 0.01
+    # width [m]
+    width: 0.01
+    # height [m]
+    height: 0.01
+ water:
+  # J/[Kkg] heat capacity liquid water
+  cp_w: 4187
+  # J/[Kkg] heat capacity ice 0°C
+  cp_i: 2108
+  # J/kg heat of fusion water
+  Dh: 333550
+ solution:
+  # kg/m^3 density of water / assumed constant for all phases
+  rho_l: 1000
+  # K kg / mol cryoscopic constant
+  k_f: 1.853
+  # J/Kkg, heat capacity sucrose
+  cp_s: 1240
+  # molar mass sucrose [kg/mol]
+  M_s: 0.3423
+  # mass fraction of solute in solution
+  solid_fraction: 0.05
+  # °C equilibrium freezing temperature pure water
+  T_eq: 0
+  # initial temperature of the solution
+  T_init: 20
+ kinetics:
+  kb: 1e-9 # m−3 s−1 K−b
+  b: 12
 
 Example
 ========
