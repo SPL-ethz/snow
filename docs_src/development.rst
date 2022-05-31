@@ -7,8 +7,8 @@ Numerical implementation of the initial amount of ice
 
 The modeling framework that forms the basis for the SNOW python package
 was derived initially by :cite:t:`deck2022` (version 1.0) for
-systems comprising vials arranged in two spatial dimensions, and by
-:cite:t:`deck2022_pallet` (version 1.1) for systems comprising vials
+systems comprising vials arranged in two spatial dimensions, and was extended by
+:cite:t:`deck2022_pallet` (version 1.1) to simulate systems comprising vials
 arranged in three spatial dimensions.
 
 This section discusses a minor aspect of this modeling framework, namely
@@ -70,12 +70,12 @@ into the enthalpy balance, the following expression is obtained:
 Indirect method
 ---------------
 
-This method relies on the enthalpy balance (equations :math:`\ref{eq8_org}` and :math:`\ref{eq1}` to calculate the amount
+This method relies on the enthalpy balance (equations :math:`\ref{eq8_org}` and :math:`\ref{eq1}`) to calculate the amount
 of ice formed upon nucleation. In line with the overall description of
 freezing used in the derivation, nucleation is considered to be an
-adiabatic process, i.e. it occurs fast enough that the vial does not
-exchange a relevant amount of heat during nucleation. At the time of
-nucleation, the enthalpy balance thus reads
+adiabatic process. This means it occurs fast enough that the vial does not
+exchange a relevant amount of heat during nucleation with the environment.
+At the time of nucleation, the enthalpy balance thus reads
 
 .. math::
    \begin{align}
