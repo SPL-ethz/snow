@@ -115,7 +115,7 @@ insert the expression for the equilibrium freezing temperature to obtain
 a system dependent only on :math:`\sigma`:
 
 .. math::
-    \left(T_{\mathrm{m}} - D \left( \frac{1}{1 - \sigma_{(m,n)}} \right)  - T^{\mathrm{nuc}}_{(m,n)}\right) c_{\mathrm{p}} m_{\mathrm{v}} = \lambda_{\mathrm{w}} \sigma_{(m,n)} (1 - w_{\mathrm{s}})  \label{eq10} \tag{10}
+    \left(T_{\mathrm{m}} - D \left( \frac{1}{1 - \sigma_{(m,n)}} \right)  - T^{\mathrm{nuc}}_{(m,n)}\right) c_{\mathrm{p}} = \lambda_{\mathrm{w}} \sigma_{(m,n)} (1 - w_{\mathrm{s}})  \label{eq10} \tag{10}
 
 For the sake of simplicity, we introduce the parameter
 :math:`\gamma = (1 - w_{\mathrm{s}})   \frac{\lambda_{\mathrm{w}}}{c_{\mathrm{p}}}`:
