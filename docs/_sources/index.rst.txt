@@ -1,0 +1,54 @@
+=========
+ethz_snow
+=========
+
+This is the documentation of **ethz_snow**. A package for the simulation of stochastic nucleation of water in small vials.
+Please have a look at the :ref:`readme` for a high-level description of what this package does, or check out the :ref:`Tutorial`.
+
+Getting Started
+===============
+This package can be installed via pip. Simply use
+
+.. code-block:: python
+
+   pip install ethz_snow
+
+or see the :ref:`Tutorial` for more details.
+
+Contents
+========
+
+.. toctree::
+   :maxdepth: 2
+
+   Overview <readme>
+   Tutorial <tutorial>
+   Development <development>
+   License <license>
+   Authors <authors>
+   Changelog <changelog>
+   Module Reference <api/modules>
+
+
+Indices and Tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+.. _toctree: http://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
+.. _reStructuredText: http://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
+.. _references: http://www.sphinx-doc.org/en/stable/markup/inline.html
+.. _Python domain syntax: http://sphinx-doc.org/domains.html#the-python-domain
+.. _Sphinx: http://www.sphinx-doc.org/
+.. _Python: http://docs.python.org/
+.. _Numpy: http://docs.scipy.org/doc/numpy
+.. _SciPy: http://docs.scipy.org/doc/scipy/reference/
+.. _matplotlib: https://matplotlib.org/contents.html#
+.. _Pandas: http://pandas.pydata.org/pandas-docs/stable
+.. _Scikit-Learn: http://scikit-learn.org/stable
+.. _autodoc: http://www.sphinx-doc.org/en/stable/ext/autodoc.html
+.. _Google style: https://github.com/google/styleguide/blob/gh-pages/pyguide.md#38-comments-and-docstrings
+.. _NumPy style: https://numpydoc.readthedocs.io/en/latest/format.html
+.. _classical style: http://www.sphinx-doc.org/en/stable/domains.html#info-field-lists

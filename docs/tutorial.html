@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial &mdash; ethz_snow 1.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="ethz_snow 1.1.0 documentation" href="index.html"/>
+        <link rel="next" title="Development" href="development.html"/>
+        <link rel="prev" title="Overview" href="readme.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ethz_snow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#first-steps-general-information">First steps: General information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#constants">Constants</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simulation-output">Simulation output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-1-pallet-freezing">Version 1.1. Pallet freezing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ethz_snow</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tutorial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tutorial.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial provides some basic explanations to help users getting started with the ethz_snow package.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>After downloading the package, you need to install it. (The requirements for the python version and dependent packages are listed in the setup.cfg file and will be read automatically by pip.)</p>
+<p>Either, download/clone any stable or unstable version from <cite>GitHub &lt;https://github.com/SPL-ethz/snow/&gt;</cite> Then navigate to the folder and install the package via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code></p>
+<p>Or install the latest release version via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ethz_snow</span></code>.</p>
+</div>
+<div class="section" id="first-steps-general-information">
+<h2>First steps: General information<a class="headerlink" href="#first-steps-general-information" title="Permalink to this headline">¶</a></h2>
+<p>The package contains several files, two of which enable the simulation of freezing processes. <strong>snowflake.py</strong> is the basis version of the model, capable of simulating the freezing process of a shelf comprising an arbitrary number of vials exactly once. <strong>snowfall.py</strong> is setup to run such simulation repetitively, namely for <strong>Nrep</strong> times. The idea behind the naming, of course, is that Snowfall in reality comprises a large number of Snowflakes, all of which are unique. In the same way, every freezing process will be unique as a consequence of the stochasticity of primary ice nucleation.</p>
+<p>Both models require a number of operatingConditions and constants as input parameters, which may be adjusted by the user. We define operating conditions as those input parameters, that are related to the numerics of the model (e.g. time step, number of repetitions) or to technical aspects (e.g. heat transfer parameters, cooling protocol). Constants, on the other hand, refer to formulation specific parameters, such as the volume of a vial, its composition and the required individual physicochemical parameters of the individual components (including ice nucleation kinetics).</p>
+<p>Operating conditions are to be provided directly when calling the <strong>snowflake</strong> / <strong>Snowfall</strong> functions, while we specify the constants separately in a .yaml file. If no values are specified, the default configurations are used; these are stored in the <strong>operatingConditions.py</strong> and the <strong>snowConfig_default.yaml</strong> (see the next subsection for more details on the latter).</p>
+<div class="section" id="constants">
+<h3>Constants<a class="headerlink" href="#constants" title="Permalink to this headline">¶</a></h3>
+<p>Below is a copy of the yaml file used to configure the constants used in <strong>Snowflake</strong> / <strong>Snowfall</strong>.
+If you wish to modify any (subset) of these constants, simply create a new yaml that follows the same schema in an arbitrary location and link to it via the <strong>configPath</strong> input of Snowflake.
+A partial config is allowed (e.g., one only containing a new water:cp_w entry). The remaining keys will be taken from the default.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span>  <span class="nt">vial</span><span class="p">:</span>
+   <span class="nt">geometry</span><span class="p">:</span>
+   <span class="c1"># base shape of vial (currently only cube is accepted)</span>
+   <span class="nt">shape</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cube</span>
+   <span class="c1"># length [m]</span>
+   <span class="nt">length</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+   <span class="c1"># width [m]</span>
+   <span class="nt">width</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+   <span class="c1"># height [m]</span>
+   <span class="nt">height</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="nt">water</span><span class="p">:</span>
+ <span class="c1"># J/[Kkg] heat capacity liquid water</span>
+ <span class="nt">cp_w</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">4187</span>
+ <span class="c1"># J/[Kkg] heat capacity ice 0°C</span>
+ <span class="nt">cp_i</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2108</span>
+ <span class="c1"># J/kg heat of fusion water</span>
+ <span class="nt">Dh</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">333550</span>
+<span class="nt">solution</span><span class="p">:</span>
+ <span class="c1"># kg/m^3 density of water / assumed constant for all phases</span>
+ <span class="nt">rho_l</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1000</span>
+ <span class="c1"># K kg / mol cryoscopic constant</span>
+ <span class="nt">k_f</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.853</span>
+ <span class="c1"># J/Kkg, heat capacity sucrose</span>
+ <span class="nt">cp_s</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1240</span>
+ <span class="c1"># molar mass sucrose [kg/mol]</span>
+ <span class="nt">M_s</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.3423</span>
+ <span class="c1"># mass fraction of solute in solution</span>
+ <span class="nt">solid_fraction</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
+ <span class="c1"># °C equilibrium freezing temperature pure water</span>
+ <span class="nt">T_eq</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+ <span class="c1"># initial temperature of the solution</span>
+ <span class="nt">T_init</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">20</span>
+<span class="nt">kinetics</span><span class="p">:</span>
+ <span class="nt">kb</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1e-9</span> <span class="c1"># m−3 s−1 K−b</span>
+ <span class="nt">b</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">12</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>Let us consider we would like to run a simulation following the default parameters in the snowConfig_default.yaml, however with a specific set of operating conditions. Indeed, we want to study the freezing of a system with a slow, but variable shelf-to-vial heat transfer, 7 times 7 vials on the shelf, a cooling rate of 1 K/min and two holding steps at -5°C and -10°C. This relates to typical conditions for freezing in a lab freeze-dryer.</p>
+<p>We first import both Snowfall and the OperatingConditions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ethz_snow.snowfall</span> <span class="kn">import</span> <span class="n">Snowfall</span>
+<span class="kn">from</span> <span class="nn">ethz_snow.operatingConditions</span> <span class="kn">import</span> <span class="n">OperatingConditions</span>
+</pre></div>
+</div>
+<p>Then, we define the values of the four heat transfer coefficients: “int” refers to thermal interaction among vials, “ext” to thermal interaction of the edge vials with the environment. We neglect both effects and set the values to zero. “s0” refers to the mean shelf-to-vial heat transfer coefficient, “s_sigma_rel” refers to its relative variability. We assume a rather low value of 20 for “s0” and 0.1 for its variability. Note that the pre-defined unit of the heat transfer coefficients is W/m^2K and that there is currently no feature to change that unit.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;int&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;ext&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;s0&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;s_sigma_rel&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Next, we define the cooling protocol. Note that holding steps are defined separately. In terms of cooling, we set the cooling rate, the start temperature and the end temperature as follows. Here, the temperatures are defined in °C and the cooling rate in K/s. Typical values are in the range between 0.1 - 1.0 K/min. The start temperature typically is set to ambient temperature, while the final temperature may depend on the technical capabilities of the freezing device.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="mi">60</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">50</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>For the holding steps, we need to define duration and temperature of each step separately. Let us say, that both steps at -5°C and at -10°C take 90 min. Again, it is important that the time is based in s, thus we need to multiply with 60. Note that the program will automatically adjust the sequence of the holding steps in the way that they are in the order of decreasing holding temperatures.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">h</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="mi">90</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="n">temp</span><span class="o">=-</span><span class="mi">10</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="mi">90</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="n">temp</span><span class="o">=-</span><span class="mi">5</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Next, let us think about the total time of the simulation that is required; this depends on the cooling and holding parameters as well as on heat transfer and on some of the formulation constants. It is thus not automatically calculated, but needs to be set. We recommend to provide at least one hour more than is required for the shelf to reach the final temperature. One may use the Snowflake simulation to test if the set time is sufficient. Here, let us set t_tot = 3e4:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">OperatingConditions</span><span class="p">(</span><span class="n">t_tot</span><span class="o">=</span><span class="mf">3e4</span><span class="p">,</span> <span class="n">cooling</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">holding</span><span class="o">=</span><span class="n">h</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In case, we are interested in controlled nucleation, we can add the argument cnTemp to trigger nucleation at the end of a holding step. By defining</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">OperatingConditions</span><span class="p">(</span><span class="n">t_tot</span><span class="o">=</span><span class="mf">3e4</span><span class="p">,</span> <span class="n">cooling</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">holding</span> <span class="o">=</span> <span class="n">h</span><span class="p">,</span> <span class="n">cnTemp</span> <span class="o">=</span> <span class="o">-</span><span class="mi">5</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>we trigger nucleation at the end of the holding step at -5°C. Note that in the current version, controlled nucleation may only be defined at the end of a holding step.</p>
+<p>Finally, we may define the Snowfall class. We set the pool_size parameter to the number of available workers and Nrep to a statistically relevant number. To fully capture the effects of the stochasticity of ice nucleation in a quantitative manner, we recommend Nrep &gt; 1000. For a qualitative view, we set Nrep = 50:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">=</span> <span class="n">Snowfall</span><span class="p">(</span><span class="n">pool_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">Nrep</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">N_vials</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">opcond</span><span class="o">=</span><span class="n">op</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We then start the simulation via <strong>S.run()</strong> and may check whether it completed via <strong>S.simulationStatus()</strong>. In case we are only interested in a single repetition, the <strong>Snowflake</strong> class may be used instead. Compared to <strong>Snowfall</strong>, <strong>Snowflake</strong> does not require Nrep or pool_size as input. However, it is able to store information on the thermal evolution of all vials, which is a feature that was removed for <strong>Snowfall</strong> to increase computational performance.</p>
+</div>
+<div class="section" id="simulation-output">
+<h2>Simulation output<a class="headerlink" href="#simulation-output" title="Permalink to this headline">¶</a></h2>
+<p>After running the simulation, several information are stored that characterize the freezing process. Importantly, these are the <strong>solidificationTimes()</strong>, <strong>nucleationTimes()</strong>, and <strong>nucleationTemperatures()</strong>. These are also grouped based on position, allowing to understand potential differences among center, edge and corner vials.</p>
+<p>We may use <strong>S.plot(what=”T_nucleation”)</strong> to immediately get an understanding of the nucleation temperatures, and similarly for the other quantities. The plot function is also capable of showing trajectories, in case <strong>Snowflake</strong> is used instead of <strong>Snowfall</strong>. In this case,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">S</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">what</span><span class="o">=</span><span class="s2">&quot;T_nucleation&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will show the evolution of the temperatures as well as the shelf, which is a very useful first information for understanding the freezing process as well as a sanity check of the simulation outcome. Note that the plotting of trajectories is slow at the moment because of the way seaborn calculates the shaded area (representing all the trajectories).</p>
+</div>
+<div class="section" id="version-1-1-pallet-freezing">
+<h2>Version 1.1. Pallet freezing<a class="headerlink" href="#version-1-1-pallet-freezing" title="Permalink to this headline">¶</a></h2>
+<p>The main additional feature of version 1.1 is the capability to simulate the freezing of systems with vials arranged in three spatial dimensions, e.g. in pallets. These pallets may comprise tens of thousands of vials and are commonly frozen in cold storage rooms over the course of days. Pallet simulations are initiated in the same way as two dimensional arrangements; however, the number of vials in the vertical (z) direction is to be set to a value larger than one. For example, a system with 40x36x18 vials may be setup via</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">=</span> <span class="n">Snowfall</span><span class="p">(</span><span class="n">pool_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="n">d</span><span class="p">,</span><span class="n">Nrep</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span><span class="n">N_vials</span><span class="o">=</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span><span class="mi">36</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span><span class="n">opcond</span><span class="o">=</span><span class="n">op</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">initialStates</span> <span class="o">=</span> <span class="n">initial</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that due to the geometry applied, the heat transfer settings for a pallet configuration may be different than for freezing on a shelf. Specifically, no shelf-to-vial heat transfer may be present and the external, i.e. the storage temperature is most often constant. However, the storage temperature is colder than the initial temperature of the vials; this difference between initial temperature and storage temperature is considered via the new option <strong>initialStates</strong>. A sample configuration may be</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;int&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;ext&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;s0&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;s_sigma_rel&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+<span class="n">c</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="mf">1e-16</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">8</span><span class="p">}</span> <span class="c1"># rate equals zero yields divide by zero error</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;temp&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+<span class="n">op</span> <span class="o">=</span> <span class="n">OperatingConditions</span><span class="p">(</span><span class="n">t_tot</span><span class="o">=</span><span class="mf">6e6</span><span class="p">,</span><span class="n">cooling</span><span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">holding</span> <span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="mf">6e6</span><span class="p">,</span><span class="n">temp</span><span class="o">=-</span><span class="mi">8</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>In order to simulate a constant storage temperature, an arbitrarily small cooling rate may be defined in addition with a holding step. In this way, the temperature is set for the entire process duration to the storage temperature, which is -8°C in this case. Note that due to the large system size, typically longer process durations have to be simulated for pallets compared to shelf freezing.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="development.html" class="btn btn-neutral float-right" title="Development" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="readme.html" class="btn btn-neutral" title="Overview" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021-2022, Leif-Thore Deck, David Ochsenbein.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> and ❤️  using a custom <a href="https://github.com/LinxiFan/Stanford-theme">theme</a> based on <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

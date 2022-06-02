@@ -1,0 +1,215 @@
+===========
+Development
+===========
+
+Numerical implementation of the initial amount of ice
+=====================================================
+
+The modeling framework that forms the basis for the SNOW python package
+was derived initially by :cite:t:`deck2022` (version 1.0) for
+systems comprising vials arranged in two spatial dimensions, and was extended by
+:cite:t:`deck2022_pallet` (version 1.1) to simulate systems comprising vials
+arranged in three spatial dimensions.
+
+This section discusses a minor aspect of this modeling framework, namely
+the numerical implementation of the initial amount of ice formed upon
+nucleation. The authors realized that there are two different approaches
+leading to comparable, but not identical results. These methods are
+named "direct" and "indirect"; the derivation of the original
+manuscripts leads to the "direct" method, while the "indirect" one
+requires rearranging the enthalpy balance. This will be discussed in the
+following.
+
+With respect to numerical implementation, version 1.0 contains the
+"indirect" method only, while version 1.1 supports both methods.
+
+Model derivation
+----------------
+
+The starting point for these methods are equations
+:math:`\ref{eq8_org}` to :math:`\ref{eq10_org}` of the manuscript by :cite:t:`deck2022`. The relevant equations are:
+
+.. math::
+
+   \begin{align}
+   \dot{Q}_{(m,n)} &=\left( m_{\mathrm{s}} c_{\mathrm{p,s}} + m_{\mathrm{\ell},(m,n)} c_{\mathrm{p,\ell}} + m_{\mathrm{i},(m,n)} c_{\mathrm{p,i}} \right) \dfrac{\mathrm{d}T_{(m,n)}^{\mathrm{eq}}}{\mathrm{d}t} \\
+   &\qquad - \lambda_{\mathrm{w}} \dfrac{\mathrm{d}m_{\mathrm{i},(m,n)}}{\mathrm{d}t} \label{eq8_org} \tag{8-original} \\
+   T^{\mathrm{eq}}_{(m,n)} &= T_{\mathrm{m}} - k_{\mathrm{f}} b_{\mathrm{s},(m,n)} = T_{\mathrm{m}} - \frac{k_{\mathrm{f}}}{M_{\mathrm{s}}} \left( \frac{m_{\mathrm{s}}}{m_{\mathrm{w}} - m_{\mathrm{i},(m,n)}} \right) \label{eq9_org} \tag{9-original} \\
+    \left(T^{\mathrm{eq}}_{(m,n)} - T^{\mathrm{nuc}}_{(m,n)}\right) c_{\mathrm{p}} m_{\mathrm{v}} &= \lambda_{\mathrm{w}} m_{\mathrm{i},(m,n)}  \label{eq10_org}  \tag{10-original}
+   \end{align}
+
+These equations are based on the total mass of the formulation in a
+vial. When implementing these equations in the MATLAB and python codes,
+rescaled version based on the ice fraction
+:math:`\sigma_{(m,n)} = \frac{ m_{\mathrm{i},(m,n)}}{m_{\mathrm{w}}}`
+were derived:
+
+.. math::
+
+   \begin{align}
+   \frac{\dot{Q}_{(m,n)}}{m_{\mathrm{v}}} &=\left( w_{\mathrm{s}} c_{\mathrm{p,s}} + (1- w_{\mathrm{s}})(c_{\mathrm{p,\ell}} + \sigma_{(m,n)}( c_{\mathrm{p,i}}-c_{\mathrm{p,\ell}})) \right) \dfrac{\mathrm{d}T_{(m,n)}^{\mathrm{eq}}}{\mathrm{d}t} \\
+   &\qquad - \lambda_{\mathrm{w}} (1-w_{\mathrm{s}}) \dfrac{\mathrm{d}\sigma_{(m,n)}}{\mathrm{d}t} \label{eq1} \tag{1} \\
+   T^{\mathrm{eq}}_{(m,n)} &= T_{\mathrm{m}} - \frac{k_{\mathrm{f}}}{M_{\mathrm{s}}} \left( \frac{w_{\mathrm{s}}}{1 - w_{\mathrm{s}}} \right) \left( \frac{1}{1 - \sigma_{(m,n)}} \right) = T_{\mathrm{m}} - D  \left( \frac{1}{1 - \sigma_{(m,n)}} \right) \label{eq2} \tag{2} \\
+    \left(T^{\mathrm{eq}}_{(m,n)} - T^{\mathrm{nuc}}_{(m,n)}\right) c_{\mathrm{p}} m_{\mathrm{v}} &= \lambda_{\mathrm{w}} \sigma_{(m,n)} (1 - w_{\mathrm{s}}) \label{eq3}  \tag{3}
+   \end{align}
+
+Equations :math:`\ref{eq1}` and :math:`\ref{eq2}` form a
+system of two equations in two unknowns. When inserting
+
+.. math::
+   \dfrac{\mathrm{d}T^{\mathrm{eq}}_{(m,n)}}{\mathrm{d}t} = -D \dfrac{\mathrm{d}\sigma_{(m,n)}}{\mathrm{d}t} \left( \frac{1}{(1 - \sigma_{(m,n)})^2 } \right) \label{eq4} \tag{4}
+
+into the enthalpy balance, the following expression is obtained:
+
+.. math::
+   \begin{align}
+      - \frac{\dot{Q}_{(m,n)}}{m_{\mathrm{v}}} &=  \dfrac{\mathrm{d}\sigma_{(m,n)}}{\mathrm{d}t}  \left[ \left( w_{\mathrm{s}} c_{\mathrm{p,s}} + (1- w_{\mathrm{s}})(c_{\mathrm{p,\ell}} + \sigma_{(m,n)}( c_{\mathrm{p,i}}-c_{\mathrm{p,\ell}})) \right)  \frac{D}{(1 - \sigma_{(m,n)})^2 } \right. \\
+     &\left. \vphantom{\dfrac{\mathrm{d}\sigma_{(m,n)}}{\mathrm{d}t}} + \lambda_{\mathrm{w}} (1-w_{\mathrm{s}}) \right] \label{eq5} \tag{5}
+   \end{align}
+
+Indirect method
+---------------
+
+This method relies on the enthalpy balance (equations :math:`\ref{eq8_org}` and :math:`\ref{eq1}`) to calculate the amount
+of ice formed upon nucleation. In line with the overall description of
+freezing used in the derivation, nucleation is considered to be an
+adiabatic process. This means it occurs fast enough that the vial does not
+exchange a relevant amount of heat during nucleation with the environment.
+At the time of nucleation, the enthalpy balance thus reads
+
+.. math::
+   \begin{align}
+   - \frac{Q_{(m,n)}^{\mathrm{nuc}}}{m_{\mathrm{v}}} &=  \Delta \sigma_{(m,n)}  \left[ \left( w_{\mathrm{s}} c_{\mathrm{p,s}} + (1- w_{\mathrm{s}})(c_{\mathrm{p,\ell}} + \sigma_{(m,n)}( c_{\mathrm{p,i}}-c_{\mathrm{p,\ell}})) \right)  \frac{D}{(1 - \sigma_{(m,n)})^2 } \right.\\
+   &\left. \vphantom{\frac{D}{(1 - \sigma_{(m,n)})^2 }} + \lambda_{\mathrm{w}} (1-w_{\mathrm{s}}) \right] \label{eq6} \tag{6}
+   \end{align}
+
+whereby :math:`Q^{\mathrm{nuc}}_{(m,n)}` is defined as:
+
+.. math::
+       Q^{\mathrm{nuc}}_{(m,n)} = m_{\mathrm{v}} c_{\mathrm{p,}\ell} (T^{\mathrm{eq}}_{\ell} - T^{\mathrm{nuc}}_{(m,n)})\label{eq7} \tag{7}
+
+Note that the definition of :math:`Q^{\mathrm{nuc}}_{(m,n)}` relies on
+:math:`T^{\mathrm{eq}}_{\ell}`, the equilibrium freezing temperature of
+the solution. This corresponds to the initial state at the onset of
+nucleation, when no ice is present. :math:`Q^{\mathrm{nuc}}_{(m,n)}`
+thus represents the difference in enthalpy among the supercooled
+solution and its hypothetical equilibrium state. Since initially no ice
+is present (i.e. :math:`\sigma_{(m,n)} = 0` and
+:math:`\Delta \sigma_{(m,n)} = \sigma_{\mathrm{nuc},(m,n)}`), the
+balance simplifies to:
+
+.. math::
+   - \frac{Q^{\mathrm{nuc}}_{(m,n)}}{m_{\mathrm{v}}} = \sigma_{\mathrm{nuc},(m,n)}  \left( \left( w_{\mathrm{s}} c_{\mathrm{p,s}} + (1- w_{\mathrm{s}})(c_{\mathrm{p,\ell}} \right) D + \lambda_{\mathrm{w}} (1-w_{\mathrm{s}}) \right)\label{eq8} \tag{8}
+
+Rearranging leads to the final expression for the formed ice:
+
+.. math::
+   \sigma_{\mathrm{nuc},(m,n)} = \frac{T^{\mathrm{eq}}_{\ell} - T^{\mathrm{nuc}}_{(m,n)}}{D + \frac{\lambda_{\mathrm{w}}}{c_{\mathrm{p}}}(1 - w_{\mathrm{s}})}\label{eq9} \tag{9}
+
+Direct method
+-------------
+
+The second method relies on the use of equation :math:`\ref{eq10_org}`
+and its rescaled equivalent, equation :math:`\ref{eq3}`. Again, we
+insert the expression for the equilibrium freezing temperature to obtain
+a system dependent only on :math:`\sigma`:
+
+.. math::
+    \left(T_{\mathrm{m}} - D \left( \frac{1}{1 - \sigma_{(m,n)}} \right)  - T^{\mathrm{nuc}}_{(m,n)}\right) c_{\mathrm{p}} = \lambda_{\mathrm{w}} \sigma_{(m,n)} (1 - w_{\mathrm{s}})  \label{eq10} \tag{10}
+
+For the sake of simplicity, we introduce the parameter
+:math:`\gamma = (1 - w_{\mathrm{s}})   \frac{\lambda_{\mathrm{w}}}{c_{\mathrm{p}}}`:
+
+.. math::
+    \left(T_{\mathrm{m}} - D \left( \frac{1}{1 - \sigma_{(m,n)}} \right)  - T^{\mathrm{nuc}}_{(m,n)}\right) = \sigma_{(m,n)} \gamma  \label{eqn:11} \tag{11}
+
+Multiplying with :math:`(1 - \sigma_{(m,n)})` and rearranging yields the
+following quadratic equation, which may be solved analytically:
+
+.. math::
+       \sigma_{(m,n)}^2 (- \gamma) +  \sigma_{(m,n)} ( T_{\mathrm{m}} - T^{\mathrm{nuc}}_{(m,n)} + \gamma) + D - T_{\mathrm{m}} + T^{\mathrm{nuc}}_{(m,n)} = 0\label{12} \tag{12}
+
+Comparison of the two methods
+-----------------------------
+
+For the system studied by :cite:t:`deck2022` and by
+:cite:t:`deck2022_pallet`, namely a 5 wt.% sucrose solution, the
+predictions of both methods for the initial amount of formed ice are
+compared. Figure `1 <#fig:models>`__ visualizes the predictions and the
+relative error between the two methods.
+
+.. figure:: figures/comparison_methods.svg
+   :alt: Comparison of the two models.
+   :align: center
+   :name: fig:models
+
+   Comparison of the two models. Left: Prediction of the amount of ice
+   formed. Right: Relative error between the two predictions.
+
+It is found that for the relevant range of nucleation temperatures, i.e.
+-10°C to -15°C, the relative error between the predictions is below
+0.1%, so that both methods may be considered as equivalent. In a second
+step, we compare the impact of both methods on the freezing of a complex
+system. We chose a box of 20x12x3 vials, a system discussed in detail by
+:cite:t:`deck2022_pallet`. This is shown in Figure `2 <#fig:box>`__.
+
+.. figure:: figures/comparison_box.svg
+   :alt: Freezing of a box of vials.
+   :name: fig:box
+
+   Freezing of a box of vials. Comparison of the two methods to compute
+   the initial amount of ice. (a): Distribution of nucleation
+   temperatures. (b) Distribution of solidification times. (c):
+   Distribution of nucleation times.
+
+As can be seen, no relevant difference is observed between the two model
+predictions. Given that their computational costs are similar and that
+both are grounded on the same set of model equations, both represent
+suitable choices for implementation in the model. Thus, both methods are
+integrated in version 1.1. of the SNOW package.
+
+Numerical validation of SNOW version 1.1
+========================================
+
+Similar to the validation of SNOW version 1.0, the numerical
+implementation of version 1.1. is also validated by comparison with the
+earlier MATLAB implementation. We refer the reader to the initial
+numerical validation document of version 1.0 for a more detailed
+discussion of the approach.
+
+Here, we present simulation results for pallet freezing, the main
+application of version 1.1. The model system is a pallet comprising
+40x36x18 vials, in line with the systems studied in the pre-print by
+:cite:t:`deck2022_pallet`. The two most "extreme" storage
+temperatures are considered here, i.e. -8°C and -40°C to enable a
+comprehensive comparison. 128 simulations are carried out, a typical
+number of repetitions used in the manuscript. The run at -8°C was
+simulated for a total of 6e6 seconds, while the one at -40°C was faster
+with 1e6 s.
+
+.. figure:: figures/validation_pallet.svg
+   :alt: Freezing of a pallet of vials.
+   :name: fig:pallet
+
+   Freezing of a pallet of vials. Comparison of the model predictions
+   obtained from the MATLAB and python implementations. Left:
+   Distribution of nucleation temperatures. Center: Distribution of
+   solidification times. Right: Distribution of nucleation times.
+
+Figure `3 <#fig:pallet>`__ shows a close agreement between both
+implementations, independent of studied storage temperature. This
+indicates that both implementations may be used interchangeably for
+freezing simulations.
+
+One notable difference between the two packages, however, lies in their
+runtime. Thus, the runtimes for the simulation at -8°C were compared.
+The simulations were carried out on a Dell Optiplex 7070 workstation
+with 32 GB RAM and Intel Core i9-9900 CPU. 8 parallel workers were
+employed, resulting in runtimes of 454 min for the MATLAB implementation
+and 718 min for SNOW version 1.1. Given that the system is embarassingly
+parallel, the runtime may be reduced considerably by increasing the
+number of workers. While the python implementation is slower, the
+difference in runtime is small enough to be not a limiting factor of
+use.
+
+.. bibliography:: refs.bib

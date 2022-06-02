@@ -1,0 +1,431 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ethz_snow.constants &mdash; ethz_snow 1.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="ethz_snow 1.1.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ethz_snow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ethz_snow</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ethz_snow.constants</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ethz_snow.constants</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Calculate derived constants and shortcut definitions.&quot;&quot;&quot;</span>
+
+<span class="c1"># Loading yaml config file</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">from</span> <span class="nn">.__init__</span> <span class="kn">import</span> <span class="n">__citation__</span><span class="p">,</span> <span class="n">__bibtex__</span>
+
+
+<span class="k">def</span> <span class="nf">__getAllKeys_gen</span><span class="p">(</span><span class="n">dl</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Help recursive key search with generator.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dl (Any): Some dictionary or dict value.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: The list of keys in dl.</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        Iterator[list]: A generator of keys.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">dl</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">yield from</span> <span class="n">__getAllKeys_gen</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="k">yield</span> <span class="nb">list</span><span class="p">(</span><span class="n">dl</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+
+<span class="k">def</span> <span class="nf">_getAllKeys</span><span class="p">(</span><span class="n">dl</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Return all keys in a potentially nested dict.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dl (dict): A dictionary of dictionaries of arbitrary depth.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[str]: All keys.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">keys_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">__getAllKeys_gen</span><span class="p">(</span><span class="n">dl</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">subl</span> <span class="ow">in</span> <span class="n">keys_list</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">subl</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_nestedDictUpdate</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Update a nested dictionary with another.</span>
+
+<span class="sd">    Both dictionaries come from the config yaml.</span>
+<span class="sd">    We only want to update the entries in the custom</span>
+<span class="sd">    config (u) that are different from the default (d).</span>
+<span class="sd">    Args:</span>
+<span class="sd">        d (dict): The reference nested dictionary.</span>
+<span class="sd">        u (dict): The nested dictionary containing the updates.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: The updated nested dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># courtesy of stackoverflow (Alex Martelli)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">_nestedDictUpdate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="n">d</span>
+
+
+<span class="k">def</span> <span class="nf">_loadConfig</span><span class="p">(</span><span class="n">fpath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Load the default config file and the custom one.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fpath (Optional[str], optional): The filepath of the custom</span>
+<span class="sd">            config file. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: The loaded config as dict.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># the default config is listed as part of the package data</span>
+    <span class="c1"># therefore we can access it with pkg_resources</span>
+    <span class="n">defaultConfig_fpath</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>
+        <span class="s2">&quot;ethz_snow&quot;</span><span class="p">,</span> <span class="s2">&quot;config/snowConfig_default.yaml&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">defaultConfig_fpath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fpath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">customConfig</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+
+        <span class="c1"># ensure that custom updates are</span>
+        <span class="c1"># subset of the valid set of keys</span>
+        <span class="c1"># (there is an edge case where the user</span>
+        <span class="c1"># uses a valid key nested in the wrong place</span>
+        <span class="c1"># we currently do not control for that)</span>
+        <span class="n">validKeys</span> <span class="o">=</span> <span class="n">_getAllKeys</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">newKeys</span> <span class="o">=</span> <span class="n">_getAllKeys</span><span class="p">(</span><span class="n">customConfig</span><span class="p">)</span>
+
+        <span class="n">diffSet</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">newKeys</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">validKeys</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">diffSet</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;WARNING: Custom config key</span><span class="si">{</span><span class="s1">&#39;s&#39;</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">diffSet</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">diffSet</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;is&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">diffSet</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;are&#39;</span><span class="si">}</span><span class="s2"> not valid &quot;</span>
+                    <span class="o">+</span> <span class="s2">&quot;and will be ignored.&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="n">_nestedDictUpdate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">customConfig</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">config</span>
+
+
+<div class="viewcode-block" id="calculateDerived"><a class="viewcode-back" href="../../api/ethz_snow.html#ethz_snow.constants.calculateDerived">[docs]</a><span class="k">def</span> <span class="nf">calculateDerived</span><span class="p">(</span><span class="n">fpath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute the constants needed for Snowflake. Derive where needed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fpath (Optional[str], optional): The filepath of the custom</span>
+<span class="sd">            config file. Defaults to None.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        NotImplementedError: Vial geometry is not cubic.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary of constants.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># the below code uses somewhat clunky casting</span>
+    <span class="c1"># it&#39;s needed because pyyaml parses certain numbers</span>
+    <span class="c1"># in scienfitic notation as strings (YAML 1.1 vs 1.2 I suppose)</span>
+    <span class="c1"># I&#39;m too lazy to write something more sophisticated.</span>
+
+    <span class="n">config</span> <span class="o">=</span> <span class="n">_loadConfig</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+
+    <span class="n">const</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="c1"># copy directly from yaml</span>
+    <span class="n">T_eq</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;T_eq&quot;</span><span class="p">])</span>
+    <span class="n">kb</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;kinetics&quot;</span><span class="p">][</span><span class="s2">&quot;kb&quot;</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;kinetics&quot;</span><span class="p">][</span><span class="s2">&quot;b&quot;</span><span class="p">])</span>
+
+    <span class="c1"># derived properties of vial</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;cub&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Cannot handle shape &quot;</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;. &#39;</span>
+                <span class="o">+</span> <span class="s2">&quot;Only cubic shape is supported at this moment.&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;length&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;width&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;height&quot;</span><span class="p">])</span>
+
+    <span class="c1"># derived properties of solution</span>
+    <span class="n">cp_s</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;cp_s&quot;</span><span class="p">])</span>
+    <span class="n">solid_fraction</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;solid_fraction&quot;</span><span class="p">])</span>
+    <span class="n">cp_w</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;water&quot;</span><span class="p">][</span><span class="s2">&quot;cp_w&quot;</span><span class="p">])</span>
+    <span class="n">cp_i</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;water&quot;</span><span class="p">][</span><span class="s2">&quot;cp_i&quot;</span><span class="p">])</span>
+
+    <span class="n">Dcp</span> <span class="o">=</span> <span class="n">cp_i</span> <span class="o">-</span> <span class="n">cp_w</span>
+    <span class="n">cp_solution</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">solid_fraction</span> <span class="o">*</span> <span class="n">cp_s</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">solid_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="n">cp_w</span>
+    <span class="p">)</span>  <span class="c1"># heat capacity of solution</span>
+
+    <span class="c1"># Shortcut definitions</span>
+    <span class="n">mass</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;rho_l&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">V</span>
+    <span class="n">hl</span> <span class="o">=</span> <span class="n">mass</span> <span class="o">*</span> <span class="n">cp_solution</span>
+    <span class="n">depression</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;k_f&quot;</span><span class="p">])</span>
+        <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;M_s&quot;</span><span class="p">])</span>
+        <span class="o">*</span> <span class="p">(</span><span class="n">solid_fraction</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">solid_fraction</span><span class="p">))</span>
+    <span class="p">)</span>
+
+    <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="o">-</span><span class="n">mass</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;water&quot;</span><span class="p">][</span><span class="s2">&quot;Dh&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">solid_fraction</span><span class="p">)</span>
+    <span class="p">)</span>  <span class="c1"># used for sigma time step</span>
+    <span class="n">beta_solution</span> <span class="o">=</span> <span class="n">depression</span> <span class="o">*</span> <span class="n">mass</span> <span class="o">*</span> <span class="n">cp_solution</span>
+
+    <span class="n">T_eq_l</span> <span class="o">=</span> <span class="n">T_eq</span> <span class="o">-</span> <span class="n">depression</span>
+
+    <span class="c1"># bundle things into a dict now</span>
+    <span class="c1"># don&#39;t do it earlier for readability</span>
+    <span class="n">constVars</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;T_eq&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;T_eq_l&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kb&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;b&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;A&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;V&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cp_s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;solid_fraction&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cp_w&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cp_i&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cp_solution&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mass&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;depression&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;alpha&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;beta_solution&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">myvar</span> <span class="ow">in</span> <span class="n">constVars</span><span class="p">:</span>
+        <span class="n">const</span><span class="p">[</span><span class="n">myvar</span><span class="p">]</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()[</span><span class="n">myvar</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">const</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021-2022, Leif-Thore Deck, David Ochsenbein.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> and ❤️  using a custom <a href="https://github.com/LinxiFan/Stanford-theme">theme</a> based on <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
