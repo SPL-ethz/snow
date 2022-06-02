@@ -5,11 +5,10 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Tutorial &mdash; ethz_snow 0.0.post1.dev18+gfe77915 documentation</title>
+  <title>Tutorial &mdash; ethz_snow 1.0.4.post1.dev28+gf482729.d20220110 documentation</title>
   
 
   
@@ -38,8 +37,8 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="ethz_snow 0.0.post1.dev18+gfe77915 documentation" href="index.html"/>
-        <link rel="next" title="validation" href="validation.html"/>
+    <link rel="top" title="ethz_snow 1.0.4.post1.dev28+gf482729.d20220110 documentation" href="index.html"/>
+        <link rel="next" title="Development" href="development.html"/>
         <link rel="prev" title="Overview" href="readme.html"/> 
 
   
@@ -69,7 +68,7 @@
             
             
               <div class="version">
-                0.0.post1.dev18+gfe77915
+                1.0.4.post1.dev28+gf482729.d20220110
               </div>
             
           
@@ -103,7 +102,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#version-1-1-pallet-freezing">Version 1.1. Pallet freezing</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="validation.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -171,64 +170,65 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="tutorial">
+  <div class="section" id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial provides some basic explanations to help users getting started with the ethz_snow package.</p>
-<section id="installation">
+<div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>After downloading the package, you need to install it. (The requirements for the python version and dependent packages are listed in the setup.cfg file and will be read automatically by pip.)</p>
 <p>Either, download/clone any stable or unstable version from <cite>GitHub &lt;https://github.com/SPL-ethz/snow/&gt;</cite> Then navigate to the folder and install the package via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code></p>
 <p>Or install the latest release version via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ethz_snow</span></code>.</p>
-</section>
-<section id="first-steps-general-information">
+</div>
+<div class="section" id="first-steps-general-information">
 <h2>First steps: General information<a class="headerlink" href="#first-steps-general-information" title="Permalink to this headline">¶</a></h2>
 <p>The package contains several files, two of which enable the simulation of freezing processes. <strong>snowflake.py</strong> is the basis version of the model, capable of simulating the freezing process of a shelf comprising an arbitrary number of vials exactly once. <strong>snowfall.py</strong> is setup to run such simulation repetitively, namely for <strong>Nrep</strong> times. The idea behind the naming, of course, is that Snowfall in reality comprises a large number of Snowflakes, all of which are unique. In the same way, every freezing process will be unique as a consequence of the stochasticity of primary ice nucleation.</p>
 <p>Both models require a number of operatingConditions and constants as input parameters, which may be adjusted by the user. We define operating conditions as those input parameters, that are related to the numerics of the model (e.g. time step, number of repetitions) or to technical aspects (e.g. heat transfer parameters, cooling protocol). Constants, on the other hand, refer to formulation specific parameters, such as the volume of a vial, its composition and the required individual physicochemical parameters of the individual components (including ice nucleation kinetics).</p>
 <p>Operating conditions are to be provided directly when calling the <strong>snowflake</strong> / <strong>Snowfall</strong> functions, while we specify the constants separately in a .yaml file. If no values are specified, the default configurations are used; these are stored in the <strong>operatingConditions.py</strong> and the <strong>snowConfig_default.yaml</strong> (see the next subsection for more details on the latter).</p>
-<section id="constants">
+<div class="section" id="constants">
 <h3>Constants<a class="headerlink" href="#constants" title="Permalink to this headline">¶</a></h3>
 <p>Below is a copy of the yaml file used to configure the constants used in <strong>Snowflake</strong> / <strong>Snowfall</strong>.
 If you wish to modify any (subset) of these constants, simply create a new yaml that follows the same schema in an arbitrary location and link to it via the <strong>configPath</strong> input of Snowflake.
 A partial config is allowed (e.g., one only containing a new water:cp_w entry). The remaining keys will be taken from the default.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">vial</span><span class="p">:</span>
-  <span class="nt">geometry</span><span class="p">:</span>
-    <span class="c1"># base shape of vial (currently only cube is accepted)</span>
-    <span class="nt">shape</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cube</span>
-    <span class="c1"># length [m]</span>
-    <span class="nt">length</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
-    <span class="c1"># width [m]</span>
-    <span class="nt">width</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
-    <span class="c1"># height [m]</span>
-    <span class="nt">height</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span>  <span class="nt">vial</span><span class="p">:</span>
+   <span class="nt">geometry</span><span class="p">:</span>
+   <span class="c1"># base shape of vial (currently only cube is accepted)</span>
+   <span class="nt">shape</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cube</span>
+   <span class="c1"># length [m]</span>
+   <span class="nt">length</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+   <span class="c1"># width [m]</span>
+   <span class="nt">width</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+   <span class="c1"># height [m]</span>
+   <span class="nt">height</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
 <span class="nt">water</span><span class="p">:</span>
-  <span class="c1"># J/[Kkg] heat capacity liquid water</span>
-  <span class="nt">cp_w</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">4187</span>
-  <span class="c1"># J/[Kkg] heat capacity ice 0°C</span>
-  <span class="nt">cp_i</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2108</span>
-  <span class="c1"># J/kg heat of fusion water</span>
-  <span class="nt">Dh</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">333550</span>
+ <span class="c1"># J/[Kkg] heat capacity liquid water</span>
+ <span class="nt">cp_w</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">4187</span>
+ <span class="c1"># J/[Kkg] heat capacity ice 0°C</span>
+ <span class="nt">cp_i</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2108</span>
+ <span class="c1"># J/kg heat of fusion water</span>
+ <span class="nt">Dh</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">333550</span>
 <span class="nt">solution</span><span class="p">:</span>
-  <span class="c1"># kg/m^3 density of water / assumed constant for all phases</span>
-  <span class="nt">rho_l</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1000</span>
-  <span class="c1"># K kg / mol cryoscopic constant</span>
-  <span class="nt">k_f</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.853</span>
-  <span class="c1"># J/Kkg, heat capacity sucrose</span>
-  <span class="nt">cp_s</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1240</span>
-  <span class="c1"># molar mass sucrose [kg/mol]</span>
-  <span class="nt">M_s</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.3423</span>
-  <span class="c1"># mass fraction of solute in solution</span>
-  <span class="nt">solid_fraction</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
-  <span class="c1"># °C equilibrium freezing temperature</span>
-  <span class="nt">T_eq</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+ <span class="c1"># kg/m^3 density of water / assumed constant for all phases</span>
+ <span class="nt">rho_l</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1000</span>
+ <span class="c1"># K kg / mol cryoscopic constant</span>
+ <span class="nt">k_f</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.853</span>
+ <span class="c1"># J/Kkg, heat capacity sucrose</span>
+ <span class="nt">cp_s</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1240</span>
+ <span class="c1"># molar mass sucrose [kg/mol]</span>
+ <span class="nt">M_s</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.3423</span>
+ <span class="c1"># mass fraction of solute in solution</span>
+ <span class="nt">solid_fraction</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
+ <span class="c1"># °C equilibrium freezing temperature pure water</span>
+ <span class="nt">T_eq</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+ <span class="c1"># initial temperature of the solution</span>
+ <span class="nt">T_init</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">20</span>
 <span class="nt">kinetics</span><span class="p">:</span>
-  <span class="c1"># m−3 s−1 K−b value reduced compared to Braatz paper (he had a value of 10)</span>
-  <span class="nt">kb</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1e-9</span>
-  <span class="nt">b</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">12</span>
+ <span class="nt">kb</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1e-9</span> <span class="c1"># m−3 s−1 K−b</span>
+ <span class="nt">b</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">12</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="example">
+</div>
+</div>
+<div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>Let us consider we would like to run a simulation following the default parameters in the snowConfig_default.yaml, however with a specific set of operating conditions. Indeed, we want to study the freezing of a system with a slow, but variable shelf-to-vial heat transfer, 7 times 7 vials on the shelf, a cooling rate of 1 K/min and two holding steps at -5°C and -10°C. This relates to typical conditions for freezing in a lab freeze-dryer.</p>
 <p>We first import both Snowfall and the OperatingConditions:</p>
@@ -262,8 +262,8 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
 </pre></div>
 </div>
 <p>We then start the simulation via <strong>S.run()</strong> and may check whether it completed via <strong>S.simulationStatus()</strong>. In case we are only interested in a single repetition, the <strong>Snowflake</strong> class may be used instead. Compared to <strong>Snowfall</strong>, <strong>Snowflake</strong> does not require Nrep or pool_size as input. However, it is able to store information on the thermal evolution of all vials, which is a feature that was removed for <strong>Snowfall</strong> to increase computational performance.</p>
-</section>
-<section id="simulation-output">
+</div>
+<div class="section" id="simulation-output">
 <h2>Simulation output<a class="headerlink" href="#simulation-output" title="Permalink to this headline">¶</a></h2>
 <p>After running the simulation, several information are stored that characterize the freezing process. Importantly, these are the <strong>solidificationTimes()</strong>, <strong>nucleationTimes()</strong>, and <strong>nucleationTemperatures()</strong>. These are also grouped based on position, allowing to understand potential differences among center, edge and corner vials.</p>
 <p>We may use <strong>S.plot(what=”T_nucleation”)</strong> to immediately get an understanding of the nucleation temperatures, and similarly for the other quantities. The plot function is also capable of showing trajectories, in case <strong>Snowflake</strong> is used instead of <strong>Snowfall</strong>. In this case,</p>
@@ -271,14 +271,14 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
 </pre></div>
 </div>
 <p>will show the evolution of the temperatures as well as the shelf, which is a very useful first information for understanding the freezing process as well as a sanity check of the simulation outcome. Note that the plotting of trajectories is slow at the moment because of the way seaborn calculates the shaded area (representing all the trajectories).</p>
-</section>
-<section id="version-1-1-pallet-freezing">
+</div>
+<div class="section" id="version-1-1-pallet-freezing">
 <h2>Version 1.1. Pallet freezing<a class="headerlink" href="#version-1-1-pallet-freezing" title="Permalink to this headline">¶</a></h2>
-<p>The main additional feature of version 1.1 is the capability to simulate the freezing of systems with vials arranged in three spatial dimensions, e.g. in pallets. These pallets may comprise tens of thousands of vials and are commonly frozen in cold storage rooms over the course of days. Pallt simulations are initiated in the same way as two dimensional arrangements; however, the number of vials in the vertical (z) direction is to be set to a value larger than one. For example, a system with 40x36x18 vials may be setup via</p>
+<p>The main additional feature of version 1.1 is the capability to simulate the freezing of systems with vials arranged in three spatial dimensions, e.g. in pallets. These pallets may comprise tens of thousands of vials and are commonly frozen in cold storage rooms over the course of days. Pallet simulations are initiated in the same way as two dimensional arrangements; however, the number of vials in the vertical (z) direction is to be set to a value larger than one. For example, a system with 40x36x18 vials may be setup via</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">=</span> <span class="n">Snowfall</span><span class="p">(</span><span class="n">pool_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="n">d</span><span class="p">,</span><span class="n">Nrep</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span><span class="n">N_vials</span><span class="o">=</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span><span class="mi">36</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span><span class="n">opcond</span><span class="o">=</span><span class="n">op</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">initialStates</span> <span class="o">=</span> <span class="n">initial</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Note that due to the geometry applied, the heat transfer settings for a pallet configuration may be different than for freezing on a shelf. Specifically, no shelf-to-vial heat transfer may be present and the external, i.e. the storage temperature is most ofen constant. However, the storage temperature is colder than the initial temperature of the vials; this difference between initial temperature and storage temperature is considered via the new option <strong>initialStates</strong>. A sample configuration may be</p>
+<p>Note that due to the geometry applied, the heat transfer settings for a pallet configuration may be different than for freezing on a shelf. Specifically, no shelf-to-vial heat transfer may be present and the external, i.e. the storage temperature is most often constant. However, the storage temperature is colder than the initial temperature of the vials; this difference between initial temperature and storage temperature is considered via the new option <strong>initialStates</strong>. A sample configuration may be</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;int&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;ext&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;s0&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;s_sigma_rel&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
 <span class="n">c</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="mf">1e-16</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">8</span><span class="p">}</span> <span class="c1"># rate equals zero yields divide by zero error</span>
 <span class="n">initial</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;temp&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
@@ -286,8 +286,8 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
 </pre></div>
 </div>
 <p>In order to simulate a constant storage temperature, an arbitrarily small cooling rate may be defined in addition with a holding step. In this way, the temperature is set for the entire process duration to the storage temperature, which is -8°C in this case. Note that due to the large system size, typically longer process durations have to be simulated for pallets compared to shelf freezing.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
@@ -296,7 +296,7 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="validation.html" class="btn btn-neutral float-right" title="validation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="development.html" class="btn btn-neutral float-right" title="Development" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="readme.html" class="btn btn-neutral" title="Overview" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -330,7 +330,7 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.0.post1.dev18+gfe77915',
+            VERSION:'1.0.4.post1.dev28+gf482729.d20220110',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

@@ -30,40 +30,41 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
 
 .. code-block:: yaml
 
-    vial:
-      geometry:
-        # base shape of vial (currently only cube is accepted)
-        shape: cube
-        # length [m]
-        length: 0.01
-        # width [m]
-        width: 0.01
-        # height [m]
-        height: 0.01
-    water:
-      # J/[Kkg] heat capacity liquid water
-      cp_w: 4187
-      # J/[Kkg] heat capacity ice 0°C
-      cp_i: 2108
-      # J/kg heat of fusion water
-      Dh: 333550
-    solution:
-      # kg/m^3 density of water / assumed constant for all phases
-      rho_l: 1000
-      # K kg / mol cryoscopic constant
-      k_f: 1.853
-      # J/Kkg, heat capacity sucrose
-      cp_s: 1240
-      # molar mass sucrose [kg/mol]
-      M_s: 0.3423
-      # mass fraction of solute in solution
-      solid_fraction: 0.05
-      # °C equilibrium freezing temperature
-      T_eq: 0
-    kinetics:
-      # m−3 s−1 K−b value reduced compared to Braatz paper (he had a value of 10)
-      kb: 1e-9
-      b: 12
+   vial:
+    geometry:
+    # base shape of vial (currently only cube is accepted)
+    shape: cube
+    # length [m]
+    length: 0.01
+    # width [m]
+    width: 0.01
+    # height [m]
+    height: 0.01
+ water:
+  # J/[Kkg] heat capacity liquid water
+  cp_w: 4187
+  # J/[Kkg] heat capacity ice 0°C
+  cp_i: 2108
+  # J/kg heat of fusion water
+  Dh: 333550
+ solution:
+  # kg/m^3 density of water / assumed constant for all phases
+  rho_l: 1000
+  # K kg / mol cryoscopic constant
+  k_f: 1.853
+  # J/Kkg, heat capacity sucrose
+  cp_s: 1240
+  # molar mass sucrose [kg/mol]
+  M_s: 0.3423
+  # mass fraction of solute in solution
+  solid_fraction: 0.05
+  # °C equilibrium freezing temperature pure water
+  T_eq: 0
+  # initial temperature of the solution
+  T_init: 20
+ kinetics:
+  kb: 1e-9 # m−3 s−1 K−b
+  b: 12
 
 Example
 ========
@@ -133,7 +134,7 @@ will show the evolution of the temperatures as well as the shelf, which is a ver
 Version 1.1. Pallet freezing
 ============================
 
-The main additional feature of version 1.1 is the capability to simulate the freezing of systems with vials arranged in three spatial dimensions, e.g. in pallets. These pallets may comprise tens of thousands of vials and are commonly frozen in cold storage rooms over the course of days. Pallt simulations are initiated in the same way as two dimensional arrangements; however, the number of vials in the vertical (z) direction is to be set to a value larger than one. For example, a system with 40x36x18 vials may be setup via
+The main additional feature of version 1.1 is the capability to simulate the freezing of systems with vials arranged in three spatial dimensions, e.g. in pallets. These pallets may comprise tens of thousands of vials and are commonly frozen in cold storage rooms over the course of days. Pallet simulations are initiated in the same way as two dimensional arrangements; however, the number of vials in the vertical (z) direction is to be set to a value larger than one. For example, a system with 40x36x18 vials may be setup via
 
 
 .. code-block:: python
@@ -141,7 +142,7 @@ The main additional feature of version 1.1 is the capability to simulate the fre
     S = Snowfall(pool_size=8,k=d,Nrep=128,N_vials=(40,36,18),opcond=op,dt=5, initialStates = initial)
     
     
-Note that due to the geometry applied, the heat transfer settings for a pallet configuration may be different than for freezing on a shelf. Specifically, no shelf-to-vial heat transfer may be present and the external, i.e. the storage temperature is most ofen constant. However, the storage temperature is colder than the initial temperature of the vials; this difference between initial temperature and storage temperature is considered via the new option **initialStates**. A sample configuration may be
+Note that due to the geometry applied, the heat transfer settings for a pallet configuration may be different than for freezing on a shelf. Specifically, no shelf-to-vial heat transfer may be present and the external, i.e. the storage temperature is most often constant. However, the storage temperature is colder than the initial temperature of the vials; this difference between initial temperature and storage temperature is considered via the new option **initialStates**. A sample configuration may be
 
 .. code-block:: python
 
