@@ -666,7 +666,9 @@ class Snowing:
             0.4 * dz**2 / alpha_max
         )  # [s] size of time step (determined by the CFL cond.)
 
-        Nt_exp = self.opcond.N_timeSteps(dt)  # number of temporal grid points
+        Nt_exp = (
+            int(np.ceil(self.opcond.t_tot / dt)) + 1
+        )  # the total number of timesteps
 
         # Preallocation of arrays for saving results from the cooling stage.
         N_save_cool = 10000
@@ -1139,7 +1141,9 @@ class Snowing:
             (0.4 / alpha_max) * (dz**2 * dr**2) / (dr**2 + dz**2)
         )  # [s] size of time step
 
-        Nt_exp = self.opcond.N_timeSteps(dt)  # number of temporal grid points
+        Nt_exp = (
+            int(np.ceil(self.opcond.t_tot / dt)) + 1
+        )  # the total number of timesteps
 
         # Preallocation of arrays for saving results from the cooling stage.
         N_save_cool = 10000

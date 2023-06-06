@@ -209,9 +209,12 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
     )  # used for sigma time step
     beta_solution = depression * mass * cp_solution
 
+    T_eq_l = T_eq - depression
+
     constVars = [
         "dimensionality",
         "T_eq",
+        "T_eq_l",
         "kb",
         "b",
         "A",

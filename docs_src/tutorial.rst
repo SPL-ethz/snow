@@ -160,7 +160,7 @@ In version 2.0. new functionalities related to spatial phenomena during freezing
 
 .. code-block:: python
 
-    from ethz_snow.snowfall import Snowfall
+    from ethz_snow.snowing import Snowing
 
 Additionally, we also need to import the operatingConditions, define the heat parameters in a dictionary and constants in a Yaml file linked to Snowing via configPath (same as in previous versions, see above). A sample configuration of the spatial model may in this case be initiated by creating an instance of the **Snowing** class:
 
@@ -201,4 +201,17 @@ When **Nrep > 1**, plotting is automatically set to False, hence no evolution pl
     S_1D_shelf.plot_cdf(what = "t_sol")
     S_1D_shelf.plot_cdf(what = "t_fr")
 
-In case of spatial model, temperature at the time of nculeation is a field, hence the choice of nucleation temperature is not straightforward. To this end, ``the S_1D_shelf.plot_cdf(what = "T_nuc")`` plots distributions of 4 different temepratures: minimum, kinetic mean, mean and maximum temeprature at nucleation. For more information see the relevant publication.
+In case of spatial model, temperature at the time of nculeation is a field, hence the choice of nucleation temperature is not straightforward. To this end, ``the S_1D_shelf.plot_cdf(what = "T_nuc")`` plots distributions of 4 different temepratures: minimum, kinetic mean, mean and maximum temeprature at nucleation. For more information see the relevant publication. Finally, in case the users are interested in all the statistics the user can run the following commands to get the relevant data frames:
+
+.. code-block:: python
+
+    S_1D_shelf.getResults
+
+In case of a single simulation, the following commands also provide detailed simulation results (time array, shelf temeprature profile, temperature and ice mass fraction field evolution):
+
+.. code-block:: python
+
+    time = S_1D_shelf.getTime
+    shelf = S_1D_shelf.getShelfTemp
+    temp = S_1D_shelf.getTemp
+    ice = S_1D_shelf.getIceMassFraction
