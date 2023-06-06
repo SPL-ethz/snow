@@ -1,36 +1,87 @@
+# temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
+temperature: spatial_2D
+
+# freezing configuration to be simulated (shelf, VISF, jacket)
+configuration: jacket
+
+# all vial-related parameters
 vial:
+  # define the geometry
   geometry:
-    # base shape of vial (currently only cube is accepted)
-    shape: cube
-    # length [m]
-    length: 0.01
-    # width [m]
-    width: 0.01
-    # height [m]
+    # base shape of vial (in the spatial version only cylinder is accepted)
+    shape: cylinder
+    # diameter of the vial for cylindrical geometry [m]
+    diameter: 0.01
+    # height of the filled product for cylindrical geometry [m]
     height: 0.01
+    # length of the vial when shape is cube [m]
+    length: 0.01
+    # width of the vial when shape is cube [m]
+    width: 0.01
+
+# parameters used in VISF simulation
+VISF:
+  # vacuum pressure [Pa]
+  p_vac: 100
+  # evaporation coefficient [-]
+  kappa: 0.01
+  # latent heat of vaporization for water [J/kg]
+  Dh_evaporation: 2500.9e3
+  # mass of water molecule [kg]
+  m_water: 2.99e-26
+  # time for vacuum start [h]
+  t_vac_start: 0.75
+  # duration of the vacuum [h]
+  t_vac_duration: 0.1
+
+# parameters for jacket-ramped freezing
+jacket:
+  # air gap between the wall and the vial [m]
+  air_gap: 0.001
+  # heat conductivity of air [W/mK]
+  lambda_air: 0.025
+
+# all parameters realted to water
 water:
-  # J/[Kkg] heat capacity liquid water
+  # specific heat capacity of liquid water [J/kgK]
   cp_w: 4187
-  # J/[Kkg] heat capacity ice 0°C
+  # specific heat capacity of ice [J/kgK]
   cp_i: 2108
-  # J/kg heat of fusion water
+  # heat conductivity of liquid water [W/mK]
+  lambda_w: 0.598
+  # heat conductivity of ice [W/mK]
+  lambda_i: 2.25
+  # latent heat of fusion of water [J/kg]
   Dh: 333550
+
+# all solution parameters
 solution:
-  # kg/m^3 density of water / assumed constant for all phases
-  rho_l: 1000
-  # K kg / mol cryoscopic constant
-  k_f: 1.853
-  # J/Kkg, heat capacity sucrose
-  cp_s: 1240
-  # molar mass sucrose [kg/mol]
-  M_s: 0.3423
-  # mass fraction of solute in solution
-  solid_fraction: 0.05
-  # °C equilibrium freezing temperature pure water
+  # solute mass fraction [-]
+  solid_fraction: 0.25
+  # melting temperature of pure water [°C]
   T_eq: 0
-  # initial temperature of the solution
-  T_init: 20
+  # density of liquid water [kg/m3]
+  rho_l: 1000
+  # specific heat capacity of solute [J/kgK]
+  cp_s: 1240
+  # heat conductivity of solute [W/mK]
+  lambda_s: 0.126
+  # cryoscopic constant of water [K/kgmol]
+  k_f: 1.853
+  # molar mass of solute [kg/mol]
+  M_s: 0.3423
+
+# nucleation kinetics
 kinetics:
-  # m−3 s−1 K−b
+  # pre-exponential nucleation parameter [1/m3sKb]
   kb: 1e-9
+  # exponential nucleation parameter [-]
   b: 12
+
+general:
+  # the Stefan-Boltzmann constant [W/m2]
+  sigma_B: 5.67e-8
+  # Boltzmann cosntant [JK]
+  k_B: 1.38e-23
+
+
