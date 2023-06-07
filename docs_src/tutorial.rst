@@ -207,7 +207,7 @@ If the argument in the lines above is omitted, distrubution of nucleation times 
 
     S_1D_shelf.getResults
 
-In case of a single simulation, the following commands also provide detailed simulation results (time array, shelf temeprature profile, temperature and ice mass fraction field evolution):
+In case of a single simulation, the following commands also provide detailed simulation results (time array, shelf temperature profile, temperature and ice mass fraction field evolution):
 
 .. code-block:: python
 
