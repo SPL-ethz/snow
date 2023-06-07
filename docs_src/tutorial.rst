@@ -162,13 +162,13 @@ In version 2.0. new functionalities related to spatial phenomena during freezing
 
     from ethz_snow.snowing import Snowing
 
-Additionally, we also need to import the operatingConditions, define the heat parameters in a dictionary and constants in a Yaml file linked to Snowing via configPath (same as in previous versions, see above). A sample configuration of the spatial model may in this case be initiated by creating an instance of the **Snowing** class:
+Additionally, we also need to import the operatingConditions, define the heat transfer parameters in a dictionary and constants in a Yaml file linked to Snowing via configPath (same as in previous versions, see above). A sample configuration of the spatial model may in this case be initiated by creating an instance of the **Snowing** class:
 
 .. code-block:: python
 
     S = Snowing(k=d, opcond=op, temperature="spatial_1D", configuration="shelf", plotting=True)
 
-The line above is used to run a spatial model simulation in 1D (considering heat transfer only in the vertical direction) with the freezing configuration being set to the conventional shelf-ramped freezing. The first two parameters (heat transfer and operating conditions are identical to the ones used for Snowfall and Snowflake). Different dimensionalities of the model can be called by varying the **temperature** parameter:
+The line above is used to run a spatial model simulation in 1D (considering heat transfer only in the vertical direction) with the freezing configuration being set to the conventional shelf-ramped freezing. The first two parameters (considering heat transfer and operating conditions are identical to the ones used for Snowfall and Snowflake). Different dimensionalities of the model can be called by varying the **temperature** parameter:
 
 .. code-block:: python
 
@@ -184,7 +184,7 @@ Conversely, different configurations (in 2D complexity for instance) may be simu
     S_2D_VISF = Snowing(k=d, opcond=op, temperature="spatial_2D", configuration="VISF", plotting=True)
     S_2D_jacket = Snowing(k=d, opcond=op, temperature="spatial_2D", configuration="jacket", plotting=True)
 
-Finally, the last input parameter, **plotting = True**, automatically plots the temperature and the ice mass fraction evolution at different positions in the vial. This can be omitted by setting **plotting = False**.
+Finally, the last input parameter, **plotting = True**, automatically plots the temperature and the ice mass fraction evolution at different positions in the vial. This can be omitted by setting **plotting = False**, hence no plots will be produced.
 
 In order to evaluate the variability in nucleation times, temperatures and solidification times due to the stochasticity of nucleation a larger number of the single vial simulations may be carried out. This can be achieved by adding an integer parameter **Nrep** denoting the number of repeated simulations:
 
@@ -192,7 +192,7 @@ In order to evaluate the variability in nucleation times, temperatures and solid
 
     S_1D_shelf = Snowing(k=d, opcond=op, temperature="spatial_1D", configuration="shelf", plotting=True, Nrep = 100)
 
-When **Nrep > 1**, plotting is automatically set to False, hence no evolution plots are produced, instead the user can plot the statistics of a desired variable using (**the default is set to what = "t_nuc"**). The user can plot the cumulative distribution functions of nucleation times (t_nuc), nucleation temperatures (T_nuc), solidification times (t_sol) and times of complete freezing (t_fr):
+When **Nrep > 1**, plotting is automatically set to False, hence no evolution plots are produced, instead the user can plot the statistics of a desired variable using:
 
 .. code-block:: python
 
@@ -201,7 +201,7 @@ When **Nrep > 1**, plotting is automatically set to False, hence no evolution pl
     S_1D_shelf.plot_cdf(what = "t_sol")
     S_1D_shelf.plot_cdf(what = "t_fr")
 
-In case of spatial model, temperature at the time of nculeation is a field, hence the choice of nucleation temperature is not straightforward. To this end, ``the S_1D_shelf.plot_cdf(what = "T_nuc")`` plots distributions of 4 different temepratures: minimum, kinetic mean, mean and maximum temeprature at nucleation. For more information see the relevant publication. Finally, in case the users are interested in all the statistics the user can run the following commands to get the relevant data frames:
+If the argument in the lines above is omitted, distrubution of nucleation times will be plotted as the default variable. Besides nucleation times (t_nuc), the user can plot the cumulative distribution functions of nucleation temperatures (T_nuc), solidification times (t_sol) and times of complete freezing (t_fr). In case of 1D or 2D model complexity, temperature at the time of nculeation is a field, hence the choice of nucleation temperature is not straightforward. To this end, ``the S_1D_shelf.plot_cdf(what = "T_nuc")`` plots distributions of 4 different temepratures: minimum, kinetic mean, mean and maximum temeprature at nucleation. For more information see the relevant publication regarding the spatial model. Finally, the following command allows the user to get the statistics on all the relevant variables (output is a DataFrame):
 
 .. code-block:: python
 
