@@ -2,6 +2,19 @@
 Changelog
 =========
 
+Version 2.0
+===========
+
+- New implementation of freezing model for a single container with spatial resolution (termed snowing). The model considers the gradients in temperature and in ice mass that form during freezing. 
+- Currently supported features of the new spatial model:
+    - Simulation of three different freezing process configuration:
+        - Shelf-ramped freezing (commonly used in freeze-drying)
+        - Vacuum-induced surface freezing (process variation where vacuum is applied to promote freezing through surface evaporation)
+        - Jacket-ramped freezing (process variation where vial is surrounded by a temperature-controlled jacket
+    - Simulation of different heat transfer boundary conditions (natural convection, conduction, thermal radiation, surface evaporation)
+    - Simulation with different dimensionalities (0D, 1D, 2D)
+
+
 Version 1.1
 ===========
 
