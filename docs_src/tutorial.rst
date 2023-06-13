@@ -116,7 +116,7 @@ Finally, we may define the Snowfall class. We set the pool_size parameter to the
 
     S = Snowfall(pool_size=8, k=d, Nrep=50, N_vials=(7,7,1), opcond=op)
 
-We then start the simulation via **S.run()** and may check whether it completed via **S.simulationStatus()**. In case we are only interested in a single repetition, the **Snowflake** class may be used instead. Compared to **Snowfall**, **Snowflake** does not require Nrep or pool_size as input. However, it is able to store information on the thermal evolution of all vials, which is a feature that was removed for **Snowfall** to increase computational performance. 
+We then start the simulation via **S.run()** and may check whether it completed via **S.simulationStatus**. In case we are only interested in a single repetition, the **Snowflake** class may be used instead. Compared to **Snowfall**, **Snowflake** does not require Nrep or pool_size as input. However, it is able to store information on the thermal evolution of all vials, which is a feature that was removed for **Snowfall** to increase computational performance. 
 
 Simulation output
 =================
@@ -156,7 +156,9 @@ In order to simulate a constant storage temperature, an arbitrarily small coolin
 Version 2.0. Freezing simulations with internal gradients
 =========================================================
 
-In version 2.0. new functionalities related to spatial phenomena during freezing are added, meaning we consider internal gradients of temperature and ice mass. We thus simulate a single, independent vial and we do not consider interaction among vials. We model different **dimensionalities (0D, 1D and 2D)** of the vial and different **freezing configurations (shelf-ramped freezing, vacuum-induced surface freezing (VISF) and jacket-ramped freezing)**. Vial geometry, other constants and operating condistions are specified as established in previous versions. We start by importing the **Snowing** module:
+In version 2.0. new functionalities related to spatial phenomena during freezing are integrated into the package: when simulating the freezing process in a single container of arbitrary size, the model considers that internal gradients of temperature and of ice mass fraction form. Such spatial simulation of freezing is currently only available for a single container, i.e., it does not consider thermal interactions with potential neighboring containers. Hence the spatial freezing model in version 2.0. provides complimentary information to the process-scale freezing models introduced earlier. An upcoming scientific publication will discuss the model development, validation, and relevant use cases in detail. 
+
+The spatial model (termed Snowing) accounts for different **dimensionalities (0D, 1D and 2D)** of the vial and for different **freezing configurations (shelf-ramped freezing, vacuum-induced surface freezing (VISF) and jacket-ramped freezing)**. These three configurations represent common freezing conditions employed in both commercial manufacturing and in academia. Vial geometry, other constants and operating conditions are specified as established in previous versions. We start by importing the new **Snowing** module:
 
 .. code-block:: python
 
