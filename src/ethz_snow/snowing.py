@@ -57,13 +57,17 @@ class Snowing:
         """Construct a Snowing object.
 
         Args:
-            k (dict, optional): Heat transfer coefficients. Defaults to {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0}.
-            opcond (OperatingConditions, optional): Operating conditions of the run. Defaults to OperatingConditions().
+            k (dict, optional): Heat transfer coefficients.
+                Defaults to {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0}.
+            opcond (OperatingConditions, optional):
+                Operating conditions of the run. Defaults to OperatingConditions().
             temperature (str, optional): Model dimensionality. Defaults to None.
             configuration (str, optional): Freezing configuration. Defaults to None.
-            plotting (bool, optional): Whether evolutions are plotted or not. Defaults to None.
+            plotting (bool, optional): Whether evolutions are plotted or not.
+                Defaults to None.
             Nrep (int, optional): Number of repetitions. Defaults to 1.
-            configPath (Optional[str], optional): The path of the (optional) custom config yaml. Defaults to None.
+            configPath (Optional[str], optional): The path of the (optional)
+                custom config yaml. Defaults to None.
 
         Raises:
             TypeError: If k is not a dict.
@@ -75,7 +79,11 @@ class Snowing:
         Examples:
             >>> S = Snowing()
             >>> S = Snowing(k=d, opcond=op)
-            >>> S = Snowing(k=d, opcond=op, temperature="spatial_1D", configuration="shelf", plotting=True)
+            >>> S = Snowing(k=d,
+                opcond=op,
+                temperature="spatial_1D",
+                configuration="shelf",
+                plotting=True)
             >>> S = Snowing(k=d, opcond=op, temperature="spatial_1D", configuration="shelf", plotting=False))
             >>> S = Snowing(k=d, opcond=op, temperature="spatial_1D", configuration="visf", plotting=True))
             >>> S = Snowing(k=d, opcond=op, temperature="spatial_2D", configuration="jacket"))
@@ -132,16 +140,16 @@ class Snowing:
             self.configuration = self.const["configuration"]
 
         # check configuration
-        if self.configuration not in ["shelf", "VISF", "jacket"]:
+        if self.configuration not in {"shelf", "VISF", "jacket"}:
             raise NotImplementedError(
                 (
                     f'Configuration "{self.configuration}" '
-                    + "not correctly specified, use shelf, jacket or VISF."
+                    + 'not correctly specified, use "shelf", "jacket" or "VISF".'
                 )
             )
 
         # check complexity
-        if self.temperature not in ["homogeneous", "spatial_1D", "spatial_2D"]:
+        if self.temperature not in {"homogeneous", "spatial_1D", "spatial_2D"}:
             raise NotImplementedError(
                 (
                     f'Model complexity "{self.temperature}" '
@@ -265,7 +273,7 @@ class Snowing:
         if self.temperature == "homogeneous":
             if self.Nrep == 1:
                 self._run_0D()
-                if self.plotting == True:
+                if self.plotting:
                     self._plot_temperature_evolution()
                     self._plot_ice_mass_fraction_evolution()
             else:
@@ -285,7 +293,7 @@ class Snowing:
         elif self.temperature == "spatial_1D":
             if self.Nrep == 1:
                 self._run_1D()
-                if self.plotting == True:
+                if self.plotting:
                     self._plot_temperature_evolution()
                     self._plot_ice_mass_fraction_evolution()
             else:
@@ -313,7 +321,7 @@ class Snowing:
         elif self.temperature == "spatial_2D":
             if self.Nrep == 1:
                 self._run_2D()
-                if self.plotting == True:
+                if self.plotting:
                     self._plot_temperature_evolution()
                     self._plot_ice_mass_fraction_evolution()
             else:
@@ -456,7 +464,7 @@ class Snowing:
                 break
 
         # check if nucleation occured
-        if Nt_cool_end == None:
+        if Nt_cool_end is None:
             raise ValueError("Nucleation did not occur, prolong process time.")
 
         # final solution arrays for cooling stage
@@ -531,13 +539,13 @@ class Snowing:
             # solidification sigma
             sigma_new = w_i_new * mass / (mass - mass_solute)
             # save solidification time
-            if (self._stats["t_sol"] == None) & (sigma_new >= 0.9):
+            if (self._stats["t_sol"] is None) & (sigma_new >= 0.9):
                 Nt_sol_end = i
                 self._stats["t_sol"] = dt * i / 60
                 self._stats["t_fr"] = (t_nuc + dt * i) / 60
 
         # check if solidification is completed
-        if Nt_sol_end == None:
+        if Nt_sol_end is None:
             raise ValueError("Solidification is not completed, prolong process time.")
 
         # evolution of ice mass
@@ -780,7 +788,7 @@ class Snowing:
                 break
 
         # check if nucleation occured
-        if Nt_cool_end == None:
+        if Nt_cool_end is None:
             raise ValueError("Nucleation did not occur, prolong process time.")
 
         # kinetic mean nucleation temperature
@@ -974,13 +982,13 @@ class Snowing:
             # solidification sigma
             sigma_new = (1 / z[-1]) * simps(m_ice, z) / (mass - mass_solute)
             # save solidification time
-            if (self._stats["t_sol"] == None) & (sigma_new >= 0.9):
+            if (self._stats["t_sol"] is None) & (sigma_new >= 0.9):
                 Nt_sol_end = i
                 self._stats["t_sol"] = dt * i / 60
                 self._stats["t_fr"] = (t_nuc + dt * i) / 60
 
         # check if solidification is completed
-        if Nt_sol_end == None:
+        if Nt_sol_end is None:
             raise ValueError("Solidification is not completed, prolong process time.")
 
         # temperature distributions in the product
@@ -1371,7 +1379,7 @@ class Snowing:
                 break
 
         # check if nucleation occured
-        if Nt_cool_end == None:
+        if Nt_cool_end is None:
             raise ValueError("Nucleation did not occur, prolong process time.")
 
         # compute the mean kinetic mean nucleation temperature
@@ -1767,13 +1775,13 @@ class Snowing:
             )
 
             # save solidification time
-            if (self._stats["t_sol"] == None) & (sigma_new >= 0.9):
+            if (self._stats["t_sol"] is None) & (sigma_new >= 0.9):
                 Nt_sol_end = i
                 self._stats["t_sol"] = dt * i / 60
                 self._stats["t_fr"] = (t_nuc + dt * i) / 60
 
         # check if solidification is completed
-        if Nt_sol_end == None:
+        if Nt_sol_end is None:
             raise ValueError("Solidification is not completed, prolong process time.")
 
         # temperature distributions in the product
@@ -2022,7 +2030,7 @@ class Snowing:
             label="$t = t^{nuc}$",
         )
         # plot time of frozen product
-        if self._stats["t_fr"] != None:
+        if self._stats["t_fr"] is not None:
             plt.plot(
                 [self._stats["t_fr"] / 60, self._stats["t_fr"] / 60],
                 [self._shelf.min() - 5, self._shelf.max() + 5],
@@ -2140,7 +2148,7 @@ class Snowing:
             label="$t = t^{nuc}$",
         )
         # plot time of frozen product
-        if self._stats["t_fr"] != None:
+        if self._stats["t_fr"] is not None:
             plt.plot(
                 [self._stats["t_fr"] / 60, self._stats["t_fr"] / 60],
                 [-0.05, 1.05],

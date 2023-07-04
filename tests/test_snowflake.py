@@ -60,10 +60,7 @@ def test_opcond_must_be_operatingcondition():
 @pytest.mark.parametrize(
     "input",
     [
-        (
-            1,
-            1,
-        ),
+        (1, 1),
         (1,),
         (3, 3, 3, 3),
     ],
