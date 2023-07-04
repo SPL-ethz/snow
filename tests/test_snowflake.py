@@ -58,7 +58,15 @@ def test_opcond_must_be_operatingcondition():
 
 
 @pytest.mark.parametrize(
-    "input", [(1, 1,), (1,), (3, 3, 3, 3),],
+    "input",
+    [
+        (
+            1,
+            1,
+        ),
+        (1,),
+        (3, 3, 3, 3),
+    ],
 )
 def test_N_vials_dims(input):
     """N_vials must be a tuple with length 3."""
@@ -97,7 +105,8 @@ def test_storageMaskFunction(input_result):
 
 
 @pytest.mark.parametrize(
-    "method_kwargs", [("to_frame", {}), ("sigmaCounter", {"time": 1})],
+    "method_kwargs",
+    [("to_frame", {}), ("sigmaCounter", {"time": 1})],
 )
 def test_mustRunFirst(method_kwargs):
     S = Snowflake()
@@ -183,7 +192,7 @@ def test_to_frame(fakeS, S_331_all):
         df[["group", "vial"]].drop_duplicates().groupby("group")["vial"].unique()
     )
 
-    for g, vials in groupVial.iteritems():
+    for g, vials in groupVial.items():
         assert (np.where(S_331_all.getVialGroup(g))[0] == vials).all()
 
 
