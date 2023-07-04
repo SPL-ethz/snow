@@ -11,6 +11,14 @@ import colorsys
 
 # vapour pressure estimation (temperature in K, pressure in Pa)
 def vapour_pressure_liquid(T_liq):
+    """_summary_
+
+    Args:
+        T_liq (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     # pressure in Pa
     p_liq = np.exp(
         54.842763
@@ -26,6 +34,14 @@ def vapour_pressure_liquid(T_liq):
 
 # vapour pressure estimation (temperature in K, pressure in Pa)
 def vapour_pressure_solid(T_sol):
+    """_summary_
+
+    Args:
+        T_sol (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     # pressure in Pa
     p_sol = np.exp(
         9.550426 - 5723.265 / T_sol + 3.53068 * np.log(T_sol) - 0.00728332 * T_sol
@@ -36,6 +52,20 @@ def vapour_pressure_solid(T_sol):
 
 # vapour pressure estimation (temperature in K, pressure in Pa)
 def vapour_flux(kappa, m_water, k_B, p_vac, p_vap, T_l, T_v):
+    """_summary_
+
+    Args:
+        kappa (_type_): _description_
+        m_water (_type_): _description_
+        k_B (_type_): _description_
+        p_vac (_type_): _description_
+        p_vap (_type_): _description_
+        T_l (_type_): _description_
+        T_v (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     # calculate flux
     N_w = (
         (2 / (2 - kappa))
@@ -52,6 +82,12 @@ def vapour_flux(kappa, m_water, k_B, p_vac, p_vap, T_l, T_v):
 
 
 def colormap(z):
+    """_summary_
+
+    Args:
+        z (_type_): _description_
+    """
+
     def lighten_color(color, amount=0.5):
         try:
             c = mc.cnames[color]
