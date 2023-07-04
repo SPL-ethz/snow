@@ -133,9 +133,6 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
 
     const = dict()
 
-    # dimensionality
-    dimensionality = str(config["temperature"])
-
     # copy directly from yaml
     T_eq = float(config["solution"]["T_eq"])
     kb = float(config["kinetics"]["kb"])
@@ -144,6 +141,8 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
     rho_l = float(config["solution"]["rho_l"])
     height = float(config["vial"]["geometry"]["height"])
     diameter = float(config["vial"]["geometry"]["diameter"])
+
+    dimensionality = str(config["temperature"])
 
     # derived properties of vial
     if config["vial"]["geometry"]["shape"].startswith("cub"):
@@ -154,12 +153,15 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
     elif config["vial"]["geometry"]["shape"].startswith("cyl"):
         geoKeys = config["vial"]["geometry"].keys()
         if ("radius" in geoKeys) and (config["vial"]["geometry"]["radius"] is not None):
+            # radius is specified (not in defaults!)
             cyl_r = float(config["vial"]["geometry"]["radius"])
         elif ("diameter" in geoKeys) and (
             config["vial"]["geometry"]["diameter"] is not None
         ):
+            # diameter is specified
             cyl_r = float(config["vial"]["geometry"]["diameter"]) / 2
         elif ("length" in geoKeys) and ("width" in geoKeys):
+            # length and width specified
             assert float(config["vial"]["geometry"]["length"]) == float(
                 config["vial"]["geometry"]["width"]
             ), "Length and width must match for cylinders."
@@ -167,8 +169,10 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
             # interpret as diameter
             cyl_r = float(config["vial"]["geometry"]["length"]) / 2
         elif "length" in geoKeys:
+            # only length specified
             cyl_r = float(config["vial"]["geometry"]["length"]) / 2
         elif "width" in geoKeys:
+            # only width specified
             cyl_r = float(config["vial"]["geometry"]["width"]) / 2
 
         A = pi * cyl_r**2
@@ -177,7 +181,7 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         raise NotImplementedError(
             (
                 f'Cannot handle shape "{config["vial"]["geometry"]["shape"]}". '
-                + "Only cubic and cylindrical shapes are supported."
+                + 'Only "cubic" and "cylinder" shapes are supported.'
             )
         )
 
@@ -240,26 +244,26 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
                 )
             )
 
-    # set up additional parameters for VISF
-    p_vac = float(config["VISF"]["p_vac"])
-    kappa = float(config["VISF"]["kappa"])
-    Dh_evaporation = float(config["VISF"]["Dh_evaporation"])
-    m_water = float(config["VISF"]["m_water"])
-    t_vac_start = float(config["VISF"]["t_vac_start"])
-    t_vac_duration = float(config["VISF"]["t_vac_duration"])
+        # set up additional parameters for VISF
+        p_vac = float(config["VISF"]["p_vac"])
+        kappa = float(config["VISF"]["kappa"])
+        Dh_evaporation = float(config["VISF"]["Dh_evaporation"])
+        m_water = float(config["VISF"]["m_water"])
+        t_vac_start = float(config["VISF"]["t_vac_start"])
+        t_vac_duration = float(config["VISF"]["t_vac_duration"])
 
-    constVars.extend(
-        [
-            "p_vac",
-            "kappa",
-            "Dh_evaporation",
-            "m_water",
-            "t_vac_start",
-            "t_vac_duration",
-        ]
-    )
+        constVars.extend(
+            [
+                "p_vac",
+                "kappa",
+                "Dh_evaporation",
+                "m_water",
+                "t_vac_start",
+                "t_vac_duration",
+            ]
+        )
 
-    if config["configuration"] == "jacket":
+    elif config["configuration"] == "jacket":
         if config["temperature"] != "spatial_2D":
             raise NotImplementedError(
                 (
@@ -268,11 +272,11 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
                 )
             )
 
-    # set up additional parameters for VISF
-    air_gap = float(config["jacket"]["air_gap"])
-    lambda_air = float(config["jacket"]["lambda_air"])
+        # set up additional parameters for VISF
+        air_gap = float(config["jacket"]["air_gap"])
+        lambda_air = float(config["jacket"]["lambda_air"])
 
-    constVars.extend(["lambda_air", "air_gap"])
+        constVars.extend(["lambda_air", "air_gap"])
 
     if config["temperature"] != "homogeneous":
         if config["vial"]["geometry"]["shape"] != "cylinder":
