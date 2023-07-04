@@ -9,6 +9,8 @@ import warnings
 
 from typing import Optional, Iterable, Union
 
+from .__init__ import __citation__, __bibtex__
+
 
 class OperatingConditions:
     """A class to handle a single Stochastic Nucleation of Water simulation.
@@ -72,8 +74,10 @@ class OperatingConditions:
         if self._t_tot_implied > t_tot:
             warnings.warn(
                 (
-                    f"The implied process time (inferred from cooling rate + holding step(s)) "
-                    + f"is larger than the total time t_tot ({self._t_tot_implied}>{t_tot}). "
+                    "The implied process time (inferred from cooling rate "
+                    + "+ holding step(s)) "
+                    + f"is larger than the total time t_tot "
+                    + "({self._t_tot_implied}>{t_tot}). "
                     + f"The simulation will stop at t_tot={t_tot}."
                 ),
                 UserWarning,

@@ -23,6 +23,7 @@ Contents
 
    Overview <readme>
    Tutorial <tutorial>
+   Development <development>
    License <license>
    Authors <authors>
    Changelog <changelog>

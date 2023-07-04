@@ -47,6 +47,7 @@ docs_src/_rst/*
 docs_src/_build/*
 cover/*
 MANIFEST
+docs/.doctrees/environment.pickle
 
 # Per-project virtualenvs
 .venv*/

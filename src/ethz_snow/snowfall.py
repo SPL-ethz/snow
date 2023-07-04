@@ -16,6 +16,8 @@ from typing import List, Tuple, Union, Sequence, Optional
 
 from ethz_snow.snowflake import Snowflake
 
+from .__init__ import __citation__, __bibtex__
+
 
 class Snowfall:
     """A class to handle multiple Stochastic Nucleation of Water simulation.

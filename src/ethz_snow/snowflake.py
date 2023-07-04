@@ -17,6 +17,8 @@ import seaborn as sns
 from scipy.sparse import csr_matrix
 from typing import List, Tuple, Type, Union, Sequence, Optional
 
+from .__init__ import __citation__, __bibtex__
+
 HEATFLOW_REQUIREDKEYS = ("int", "ext", "s0")
 VIAL_GROUPS = (
     "corner",
@@ -532,14 +534,18 @@ class Snowflake:
 
                 q0 = (T_eq_l - T_k[nucleatedVialsMask]) * cp_solution * mass
 
-                if self.initIce == "indirect": 
+                if self.initIce == "indirect":
                     sigma_k[nucleatedVialsMask] = -q0 / (alpha - beta_solution)
-                else: # LTD: referred to as "direct" approach - this is the one used in the derivation of the manuscripts
-                    gamma_direct = - alpha / mass / cp_solution
+                else:
+                    # LTD: referred to as "direct" approach
+                    # this is the one used in the derivation of the manuscripts
+                    gamma_direct = -alpha / mass / cp_solution
                     B_direct = T_eq - T_k[nucleatedVialsMask] + gamma_direct
                     C_direct = T_k[nucleatedVialsMask] - T_eq + depression
-                    
-                    sigma_k[nucleatedVialsMask] = (- B_direct + np.sqrt(B_direct ** 2  + 4*gamma_direct*C_direct) ) / (-2*gamma_direct)
+
+                    sigma_k[nucleatedVialsMask] = (
+                        -B_direct + np.sqrt(B_direct ** 2 + 4 * gamma_direct * C_direct)
+                    ) / (-2 * gamma_direct)
 
                 # assumption is that during solidification T = Teq
                 T_k[nucleatedVialsMask] = T_eq - depression * (
@@ -828,7 +834,8 @@ class Snowflake:
             df = df[df.state.str.contains(what)]
             if len(df) == 0:
                 raise ValueError(
-                    f"No data for {what} for plot type {kind} and group {group}. Please check your inputs."
+                    f"No data for {what} for plot type {kind} and group {group}. "
+                    + "Please check your inputs."
                 )
             ax = sns.lineplot(data=df, hue="group", y="value", x="Time")
 
@@ -852,7 +859,8 @@ class Snowflake:
             df = df[df.variable.str.contains(what)]
             if len(df) == 0:
                 raise ValueError(
-                    f"No data for {what} for plot type {kind} and group {group}. Please check your inputs."
+                    f"No data for {what} for plot type {kind} and group {group}. "
+                    + "Please check your inputs."
                 )
             sns.catplot(data=df, hue="group", y="value", kind=kind, x="variable")
 
@@ -976,7 +984,9 @@ class Snowflake:
 
         return interactionMatrix, VIAL_EXT
 
-    def _buildShelfHeatFlow(self,):
+    def _buildShelfHeatFlow(
+        self,
+    ):
         """Build the shelf heat flow array.
 
         Because the shelf heat flow may be dependent on the rng if
