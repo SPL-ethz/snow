@@ -83,7 +83,7 @@ def test_statsComputation(S_seq):
         S_seq.Sf_template.stats = S_seq.stats[i]
         loc_stats_df, _ = S_seq.Sf_template.to_frame()
         loc_stats_df["seed"] = i
-        stats_df_slow = stats_df_slow.append(loc_stats_df)
+        stats_df_slow = pd.concat((stats_df_slow, loc_stats_df))
 
     # ensure same dtype
     # otherwise equals will fail
