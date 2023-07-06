@@ -8,16 +8,31 @@ import colorsys
 # Vacuum-induced surface freezing helper functions
 # -------------------------------------------------------------------------- #
 
+# More information on the following consititutive equations used when
+# simulating VISF can be found in the following literature:
+#
+# Marek, R.; Straub, J. Analysis of the evaporation coefficient and
+# the condensation coefficient of water. International Journal of Heat
+# and Mass Transfer 2001, 44, 39–53.
+# https://doi.org/10.1016/S0017-9310(00)00086-7
+#
+# Murphy, D. M.; Koop, T. Review of the vapour pressures of ice and
+# supercooled water for atmospheric applications. Quarterly Journal of
+# the Royal Meteorological Society 2005, 131, 1539–1565.
+# https://doi.org/10.1256/qj.04.94
+
 
 # vapour pressure estimation (temperature in K, pressure in Pa)
 def vapour_pressure_liquid(T_liq):
-    """_summary_
+    """A function to compute the water vapour pressure above
+    the liquid product in a vial based on the product surface
+    temperature.
 
     Args:
-        T_liq (_type_): _description_
+        T_liq (np.ndarray): Liquid product temperature at the surface.
 
     Returns:
-        _type_: _description_
+        np.ndarray: Water vapour pressure above the product surface.
     """
     # pressure in Pa
     p_liq = np.exp(
@@ -34,13 +49,15 @@ def vapour_pressure_liquid(T_liq):
 
 # vapour pressure estimation (temperature in K, pressure in Pa)
 def vapour_pressure_solid(T_sol):
-    """_summary_
+    """A function to compute the water vapour pressure above
+    the frozen product in a vial based on the frozen product
+    surface temperature.
 
     Args:
-        T_sol (_type_): _description_
+        T_sol (np.ndarray): Frozen product temperature at the surface.
 
     Returns:
-        _type_: _description_
+        np.ndarray: Water vapour pressure above the product surface.
     """
     # pressure in Pa
     p_sol = np.exp(
@@ -52,19 +69,21 @@ def vapour_pressure_solid(T_sol):
 
 # vapour pressure estimation (temperature in K, pressure in Pa)
 def vapour_flux(kappa, m_water, k_B, p_vac, p_vap, T_l, T_v):
-    """_summary_
+    """A function to compute the water vapour flux at the top surface,
+    which is exposed to vacuum during VISF.
 
     Args:
-        kappa (_type_): _description_
-        m_water (_type_): _description_
-        k_B (_type_): _description_
-        p_vac (_type_): _description_
-        p_vap (_type_): _description_
-        T_l (_type_): _description_
-        T_v (_type_): _description_
+        kappa (float): Evaporation efficiency.
+        m_water (float): Mass of a water molecule.
+        k_B (float): Boltzmann constant.
+        p_vac (np.ndarray): Chamber vacuum pressure.
+        p_vap (np.ndarray): Vapour pressure.
+        T_l (np.ndarray): Product temperature.
+        T_v (np.ndarray): Vapour temperature.
 
     Returns:
-        _type_: _description_
+        np.ndarray: FLux of water vapour at the top surface of the frozen
+        or liquid product
     """
     # calculate flux
     N_w = (
@@ -82,10 +101,12 @@ def vapour_flux(kappa, m_water, k_B, p_vac, p_vap, T_l, T_v):
 
 
 def colormap(z):
-    """_summary_
+    """A function to create a colormap used to plot the time evolutions of
+    temperature and ice mass fractions with respect to vertical positions
+    in the vial.
 
     Args:
-        z (_type_): _description_
+        z (np.ndarray): Discretized spatial domain in the vertical direction.
     """
 
     def lighten_color(color, amount=0.5):
