@@ -2250,3 +2250,15 @@ class Snowing:
             loc="best",
         )
         plt.show()
+
+    def __repr__(self) -> str:
+        """Return string representation of the Snowing class.
+
+        Returns:
+            str: The Snowing class string representation giving some basic info.
+        """
+        return (
+            f"Snowing([{self.Nrep} Snowing{'s' if self.Nrep > 1 else ''}, "
+            + f"dimensionality: {self.dimensionality}, "
+            + f"configuration: {self.configuration}])"
+        )
