@@ -77,7 +77,22 @@ class Snowing:
             TypeError: If opcond is not of type operatingConditions.
 
         Examples:
+            The following command will create and instance of the Snowing class with
+            default operating conditions and heat transfer parameters:
+
             >>> S = Snowing()
+
+            TO customize the operating conditions, first define the operating conditions
+            and the heat transfer parameters:
+
+            >>> d = {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0}
+            >>> c = {"rate": 0.5 / 60, "start": 20, "end": -50}
+            >>> h = [dict(duration=60*60, temp=-10)]
+            >>> op = OperatingConditions(t_tot=5*3600, cooling=c, holding=h)
+
+            Then an instance of the Sowing class can be created in multiple ways, while
+            also specifying model dimensionality and freezing configuration:
+
             >>> S = Snowing(k=d, opcond=op)
             >>> S = Snowing(k=d,
                 opcond=op,
@@ -87,6 +102,8 @@ class Snowing:
             >>> S = Snowing(k=d, opcond=op, dimensionality="spatial_1D", configuration="shelf", plotting=False))
             >>> S = Snowing(k=d, opcond=op, dimensionality="spatial_1D", configuration="visf", plotting=True))
             >>> S = Snowing(k=d, opcond=op, dimensionality="spatial_2D", configuration="jacket"))
+
+            See tutorial for more information on how to use the spatial model functionalities.
         """
 
         if not isinstance(k, dict):
