@@ -1,5 +1,5 @@
-# temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
-temperature: spatial_2D
+# model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
+dimensionality: spatial_2D
 
 # freezing configuration to be simulated (shelf, VISF, jacket)
 configuration: jacket
@@ -57,7 +57,7 @@ water:
 # all solution parameters
 solution:
   # solute mass fraction [-]
-  solid_fraction: 0.25
+  solid_fraction: 0.05
   # melting temperature of pure water [°C]
   T_eq: 0
   # density of liquid water [kg/m3]

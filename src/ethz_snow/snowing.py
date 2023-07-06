@@ -48,7 +48,7 @@ class Snowing:
         self,
         k: dict = {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0},
         opcond: OperatingConditions = OperatingConditions(),
-        temperature: str = "spatial_1D",
+        dimensionality: str = "spatial_1D",
         configuration: str = "shelf",
         plotting: bool = True,
         Nrep: int = 1,
@@ -61,7 +61,7 @@ class Snowing:
                 Defaults to {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0}.
             opcond (OperatingConditions, optional):
                 Operating conditions of the run. Defaults to OperatingConditions().
-            temperature (str, optional): Model dimensionality. Defaults to None.
+            dimensionality (str, optional): Model dimensionality. Defaults to None.
             configuration (str, optional): Freezing configuration. Defaults to None.
             plotting (bool, optional): Whether evolutions are plotted or not.
                 Defaults to None.
@@ -81,12 +81,12 @@ class Snowing:
             >>> S = Snowing(k=d, opcond=op)
             >>> S = Snowing(k=d,
                 opcond=op,
-                temperature="spatial_1D",
+                dimensionality="spatial_1D",
                 configuration="shelf",
                 plotting=True)
-            >>> S = Snowing(k=d, opcond=op, temperature="spatial_1D", configuration="shelf", plotting=False))
-            >>> S = Snowing(k=d, opcond=op, temperature="spatial_1D", configuration="visf", plotting=True))
-            >>> S = Snowing(k=d, opcond=op, temperature="spatial_2D", configuration="jacket"))
+            >>> S = Snowing(k=d, opcond=op, dimensionality="spatial_1D", configuration="shelf", plotting=False))
+            >>> S = Snowing(k=d, opcond=op, dimensionality="spatial_1D", configuration="visf", plotting=True))
+            >>> S = Snowing(k=d, opcond=op, dimensionality="spatial_2D", configuration="jacket"))
         """
 
         if not isinstance(k, dict):
@@ -126,11 +126,11 @@ class Snowing:
         self._simulationStatus = 0
 
         # model complexity
-        if temperature is not None:
-            self.temperature = temperature
-            self.const["temperature"] = temperature
+        if dimensionality is not None:
+            self.dimensionality = dimensionality
+            self.const["dimensionality"] = dimensionality
         else:
-            self.temperature = self.const["temperature"]
+            self.dimensionality = self.const["dimensionality"]
 
         # freezing configuration (shelf, VISF, etc.)
         if configuration is not None:
@@ -148,11 +148,11 @@ class Snowing:
                 )
             )
 
-        # check complexity
-        if self.temperature not in {"homogeneous", "spatial_1D", "spatial_2D"}:
+        # check model dimensionality
+        if self.dimensionality not in {"homogeneous", "spatial_1D", "spatial_2D"}:
             raise NotImplementedError(
                 (
-                    f'Model complexity "{self.temperature}" '
+                    f'Model dimensionality "{self.dimensionality}" '
                     + "not correctly specified, use homogeneous, spatial_1D or spatial_2D."
                 )
             )
@@ -270,7 +270,7 @@ class Snowing:
     # simulate the entire process
     def run(self, how="async"):
         # homogeneous model
-        if self.temperature == "homogeneous":
+        if self.dimensionality == "homogeneous":
             if self.Nrep == 1:
                 self._run_0D()
                 if self.plotting:
@@ -290,7 +290,7 @@ class Snowing:
                 self._keys = ["T_nuc", "t_nuc", "t_sol", "t_fr"]
 
         # 1D spatial model
-        elif self.temperature == "spatial_1D":
+        elif self.dimensionality == "spatial_1D":
             if self.Nrep == 1:
                 self._run_1D()
                 if self.plotting:
@@ -318,7 +318,7 @@ class Snowing:
                 ]
 
         # 2D spatial model
-        elif self.temperature == "spatial_2D":
+        elif self.dimensionality == "spatial_2D":
             if self.Nrep == 1:
                 self._run_2D()
                 if self.plotting:
@@ -1932,7 +1932,7 @@ class Snowing:
             plt.ylabel("frrozen product time CDF, $F_{fr}$ [min$^{-1}$]")
 
         # plot data in the requested plot (default: boxplot)
-        if (self.temperature != "homogeneous") & (what == "T_nuc"):
+        if (self.dimensionality != "homogeneous") & (what == "T_nuc"):
             self._data_df_Tnuc = self._statsMultiple_df[
                 ["T_nuc_min", "T_nuc_kin", "T_nuc_mean", "T_nuc_max"]
             ]
@@ -1989,7 +1989,7 @@ class Snowing:
         self._statsMultiple_df = self.getResults
 
         # plot data in the requested plot (default: boxplot)
-        if (self.temperature != "homogeneous") & (what == "T_nuc"):
+        if (self.dimensionality != "homogeneous") & (what == "T_nuc"):
             self._data_df_Tnuc = self._statsMultiple_df[
                 ["T_nuc_min", "T_nuc_kin", "T_nuc_mean", "T_nuc_max"]
             ]
@@ -2050,7 +2050,7 @@ class Snowing:
         # plot shelf temperature evolution
         plt.plot(self._time, self._shelf, "b-", linewidth=2.5, label="shelf T")
 
-        if self.temperature == "homogeneous":
+        if self.dimensionality == "homogeneous":
             # plot temperature evolution for homogeneous model
             plt.plot(self._time, self._temp, "k-", linewidth=2.5, label="product T")
 
@@ -2058,7 +2058,7 @@ class Snowing:
         handles, labels = plt.gca().get_legend_handles_labels()
 
         # plot product temperature evolution for 1D case
-        if self.temperature == "spatial_1D":
+        if self.dimensionality == "spatial_1D":
             # colors
             colors, my_cmap, norm = Utils.colormap(self._domain)
             # plot temperature evolution for different vertical positions
@@ -2078,7 +2078,7 @@ class Snowing:
             labels.append("product T")
 
         # plot product temperature evolution for 2D case
-        elif self.temperature == "spatial_2D":
+        elif self.dimensionality == "spatial_2D":
             # colors
             colors, my_cmap, norm = Utils.colormap(self._domain[0])
             # plot temperature evolution for different vertical positions
@@ -2166,7 +2166,7 @@ class Snowing:
             label="$w_{i} = 1 - w_{s}$",
         )
 
-        if self.temperature == "homogeneous":
+        if self.dimensionality == "homogeneous":
             # plot temperature evolution for homogeneous model
             plt.plot(
                 self._time, self._ice, "k-", linewidth=2.5, label="product $w_{i}$"
@@ -2176,7 +2176,7 @@ class Snowing:
         handles, labels = plt.gca().get_legend_handles_labels()
 
         # plot product temperature evolution for 1D case
-        if self.temperature == "spatial_1D":
+        if self.dimensionality == "spatial_1D":
             # colors
             colors, my_cmap, norm = Utils.colormap(self._domain)
             # colorbar
@@ -2196,7 +2196,7 @@ class Snowing:
             labels.append("product $w_{i}$")
 
         # plot product temperature evolution for 2D case
-        elif self.temperature == "spatial_2D":
+        elif self.dimensionality == "spatial_2D":
             # colors
             colors, my_cmap, norm = Utils.colormap(self._domain[0])
             # colorbar

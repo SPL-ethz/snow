@@ -142,7 +142,7 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
     height = float(config["vial"]["geometry"]["height"])
     diameter = float(config["vial"]["geometry"]["diameter"])
 
-    dimensionality = str(config["temperature"])
+    dimensionality = str(config["dimensionality"])
 
     # derived properties of vial
     if config["vial"]["geometry"]["shape"].startswith("cub"):
@@ -236,7 +236,7 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
     ]
 
     if config["configuration"] == "VISF":
-        if config["temperature"] == "homogeneous":
+        if config["dimensionality"] == "homogeneous":
             raise NotImplementedError(
                 (
                     f'For simulating "{config["configuration"]}" '
@@ -264,7 +264,7 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         )
 
     elif config["configuration"] == "jacket":
-        if config["temperature"] != "spatial_2D":
+        if config["dimensionality"] != "spatial_2D":
             raise NotImplementedError(
                 (
                     f'For simulating "{config["configuration"]}" '
@@ -278,11 +278,11 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
 
         constVars.extend(["lambda_air", "air_gap"])
 
-    if config["temperature"] != "homogeneous":
+    if config["dimensionality"] != "homogeneous":
         if config["vial"]["geometry"]["shape"] != "cylinder":
             raise NotImplementedError(
                 (
-                    f'For simulating "{config["temperature"]}" '
+                    f'For simulating "{config["dimensionality"]}" '
                     + "a cylindrical geometry is required."
                 )
             )
