@@ -145,6 +145,25 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
     diameter = float(config["vial"]["geometry"]["diameter"])
 
     dimensionality = str(config["dimensionality"])
+    configuration = str(config["configuration"])
+
+    # check configuration
+    if configuration not in {"shelf", "VISF", "jacket"}:
+        raise NotImplementedError(
+            (
+                f'Configuration "{configuration}" '
+                + 'not correctly specified, use "shelf", "jacket" or "VISF".'
+            )
+        )
+
+    # check model dimensionality
+    if dimensionality not in {"homogeneous", "spatial_1D", "spatial_2D"}:
+        raise NotImplementedError(
+            (
+                f'Model dimensionality "{dimensionality}" '
+                + "not correctly specified, use homogeneous, spatial_1D or spatial_2D."
+            )
+        )
 
     # derived properties of vial for cubic shape
     if config["vial"]["geometry"]["shape"].startswith("cub"):
@@ -188,6 +207,7 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
             )
         )
 
+    # volume
     V = A * height
 
     # derived properties of solution
