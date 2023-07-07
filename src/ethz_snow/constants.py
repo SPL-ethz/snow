@@ -281,13 +281,12 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         constVars.extend(["lambda_air", "air_gap"])
 
     if config["dimensionality"] != "homogeneous":
-        if config["vial"]["geometry"]["shape"] != "cylinder":
-            raise NotImplementedError(
-                (
-                    f'For simulating "{config["dimensionality"]}" '
-                    + "a cylindrical geometry is required."
-                )
+        print(
+            (
+                f'WARNING: For simulating a "{config["dimensionality"]}" '
+                + "model a cylindrical geometry is required."
             )
+        )
 
         # this is not a lumped capacitance model
         # effective heat conductivity (for non-homog. vial temps)
