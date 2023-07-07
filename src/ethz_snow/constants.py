@@ -184,7 +184,7 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         raise NotImplementedError(
             (
                 f'Cannot handle shape "{config["vial"]["geometry"]["shape"]}". '
-                + 'Only "cubic" shapes is supported. In Snowing, the shape is automatically rewritten to "cylinder".'
+                + 'Only "cubic" shape is supported. In Snowing, the shape is automatically rewritten to "cylinder".'
             )
         )
 
@@ -238,6 +238,7 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         "beta_solution",
     ]
 
+    # check that spatial model is chosen for VISF
     if config["configuration"] == "VISF":
         if config["dimensionality"] == "homogeneous":
             raise NotImplementedError(
@@ -266,6 +267,7 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
             ]
         )
 
+    # check that spatial model is chosen for jacket
     elif config["configuration"] == "jacket":
         if config["dimensionality"] != "spatial_2D":
             raise NotImplementedError(
@@ -281,11 +283,12 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
 
         constVars.extend(["lambda_air", "air_gap"])
 
+    # warn that cylindrical gemoetry instead of cubic geometry is used for spatial model
     if config["dimensionality"] != "homogeneous":
         print(
             (
                 f'WARNING: For simulating a "{config["dimensionality"]}" '
-                + "model a cylindrical geometry is required."
+                + "model a cylindrical geometry is required. Shape is automatically rewritten to cylinder."
             )
         )
 
