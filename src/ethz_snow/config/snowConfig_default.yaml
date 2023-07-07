@@ -8,11 +8,11 @@ configuration: jacket
 vial:
   # define the geometry
   geometry:
-    # base shape of vial (in the spatial version only cylinder is accepted)
-    shape: cylinder
-    # diameter of the vial for cylindrical geometry [m]
+    # base shape of vial (snow and snowfall only accepts cube, snowing rewrites it to cylinder)
+    shape: cube
+    # diameter of the vial for cylindrical geometry (only spatial model) [m]
     diameter: 0.01
-    # height of the filled product for cylindrical geometry [m]
+    # height of the filled product for cubic (snow/snowfall) and cylindrical geometry (only spatial model) [m]
     height: 0.01
     # length of the vial when shape is cube [m]
     length: 0.01
