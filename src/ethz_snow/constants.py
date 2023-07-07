@@ -146,44 +146,45 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
 
     dimensionality = str(config["dimensionality"])
 
-    # derived properties of vial
+    # derived properties of vial for cubic shape
     if config["vial"]["geometry"]["shape"].startswith("cub"):
         A = float(config["vial"]["geometry"]["length"]) * float(
             config["vial"]["geometry"]["width"]
         )
 
-    elif config["vial"]["geometry"]["shape"].startswith("cyl"):
-        geoKeys = config["vial"]["geometry"].keys()
-        if ("radius" in geoKeys) and (config["vial"]["geometry"]["radius"] is not None):
-            # radius is specified (not in defaults!)
-            cyl_r = float(config["vial"]["geometry"]["radius"])
-        elif ("diameter" in geoKeys) and (
-            config["vial"]["geometry"]["diameter"] is not None
-        ):
-            # diameter is specified
-            cyl_r = float(config["vial"]["geometry"]["diameter"]) / 2
-        elif ("length" in geoKeys) and ("width" in geoKeys):
-            # length and width specified
-            assert float(config["vial"]["geometry"]["length"]) == float(
-                config["vial"]["geometry"]["width"]
-            ), "Length and width must match for cylinders."
+    # vial properties for cylindrical shape, commented out for now
+    # elif config["vial"]["geometry"]["shape"].startswith("cyl"):
+    #     geoKeys = config["vial"]["geometry"].keys()
+    #     if ("radius" in geoKeys) and (config["vial"]["geometry"]["radius"] is not None):
+    #         # radius is specified (not in defaults!)
+    #         cyl_r = float(config["vial"]["geometry"]["radius"])
+    #     elif ("diameter" in geoKeys) and (
+    #         config["vial"]["geometry"]["diameter"] is not None
+    #     ):
+    #         # diameter is specified
+    #         cyl_r = float(config["vial"]["geometry"]["diameter"]) / 2
+    #     elif ("length" in geoKeys) and ("width" in geoKeys):
+    #         # length and width specified
+    #         assert float(config["vial"]["geometry"]["length"]) == float(
+    #             config["vial"]["geometry"]["width"]
+    #         ), "Length and width must match for cylinders."
 
-            # interpret as diameter
-            cyl_r = float(config["vial"]["geometry"]["length"]) / 2
-        elif "length" in geoKeys:
-            # only length specified
-            cyl_r = float(config["vial"]["geometry"]["length"]) / 2
-        elif "width" in geoKeys:
-            # only width specified
-            cyl_r = float(config["vial"]["geometry"]["width"]) / 2
+    #         # interpret as diameter
+    #         cyl_r = float(config["vial"]["geometry"]["length"]) / 2
+    #     elif "length" in geoKeys:
+    #         # only length specified
+    #         cyl_r = float(config["vial"]["geometry"]["length"]) / 2
+    #     elif "width" in geoKeys:
+    #         # only width specified
+    #         cyl_r = float(config["vial"]["geometry"]["width"]) / 2
 
-        A = pi * cyl_r**2
+    #     A = pi * cyl_r**2
 
     else:
         raise NotImplementedError(
             (
                 f'Cannot handle shape "{config["vial"]["geometry"]["shape"]}". '
-                + 'Only "cubic" and "cylinder" shapes are supported.'
+                + 'Only "cubic" shapes is supported. In Snowing, the shape is automatically rewritten to "cylinder".'
             )
         )
 
