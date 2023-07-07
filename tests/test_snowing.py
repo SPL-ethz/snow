@@ -34,3 +34,43 @@ def test_IncorrectlySpecifiedInputConfiguration():
     """Test to make sure that incorrectly specified Snowing inputs raise error."""
     with pytest.raises(NotImplementedError):
         S = Snowing(configuration="random")
+
+
+def test_k_must_be_fine():
+    """Test that k is checked properly."""
+    with pytest.raises(TypeError):
+        S = Snowing(k=[1, 2, 3])
+
+    # make sure k is checked w.r.t. its keys
+    with pytest.raises(ValueError):
+        S = Snowing(k={"int": 1, "ext": 1, "s0f": 1})
+
+    # in Snowing only s0 is required, make sure it raises error if not there
+    with pytest.raises(ValueError):
+        S = Snowing(k=dict(int=1, ext=1))
+
+
+def test_opcond_must_be_operatingcondition():
+    """Check that opcond type is verified."""
+    with pytest.raises(TypeError):
+        S = Snowing(opcond=dict(a=1))
+
+
+def test_mustRunFirst():
+    """Check that value error is raised if results requested before simulation is carried out."""
+    S = Snowing()
+
+    with pytest.raises(AssertionError):
+        S.getResults
+
+
+def test_totalTimeTooShort():
+    """Check that total time of simulation is long enough for nucleation to occur."""
+    d = {"int": 0, "ext": 0, "s0": 20, "s_sigma_rel": 0}
+    c = {"rate": 1 / 60, "start": 20, "end": 19}
+    h = []
+    op = OperatingConditions(t_tot=10, cooling=c)
+    S = Snowing(k=d, opcond=op)
+
+    with pytest.raises(ValueError):
+        S.run()

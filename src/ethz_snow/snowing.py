@@ -272,15 +272,16 @@ class Snowing:
             dict: 4 values of nucleation temperature (minimum, kinetic mean,
             mean and maximum). Irrelevant for homogeneous model simulation.
         """
-        if self.Nrep == 1:
-            self._stats_df = pd.DataFrame.from_dict(self._stats, orient="index").T
-            return self._stats_df
-        elif self.Nrep > 1:
-            self._statsMultiple_df = pd.DataFrame.from_dict(
-                self._statsMultiple, orient="index"
-            )
-            self._statsMultiple_df.columns = list(self._keys)
-            return self._statsMultiple_df
+        if self._simulationStatus == 1:
+            if self.Nrep == 1:
+                self._stats_df = pd.DataFrame.from_dict(self._stats, orient="index").T
+                return self._stats_df
+            elif self.Nrep > 1:
+                self._statsMultiple_df = pd.DataFrame.from_dict(
+                    self._statsMultiple, orient="index"
+                )
+                self._statsMultiple_df.columns = list(self._keys)
+                return self._statsMultiple_df
         else:
             raise AssertionError("Simulation not yet carried out or completed.")
 
@@ -589,6 +590,9 @@ class Snowing:
         self._shelf = shelf_results
         self._temp = temp_results
         self._ice = ice_results
+
+        # complete simulation
+        self._simulationStatus = 1
 
         return [
             self._stats["T_nuc"],
@@ -1055,6 +1059,9 @@ class Snowing:
         self._shelf = shelf_results
         self._temp = temp_results
         self._ice = ice_results
+
+        # complete simulation
+        self._simulationStatus = 1
 
         return [
             self._stats["T_nuc_min"],
@@ -1848,6 +1855,9 @@ class Snowing:
         self._shelf = shelf_results
         self._temp = temp_results
         self._ice = ice_results
+
+        # complete simulation
+        self._simulationStatus = 1
 
         return [
             self._stats["T_nuc_min"],
