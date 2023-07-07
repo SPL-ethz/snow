@@ -274,7 +274,7 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
                 )
             )
 
-        # set up additional parameters for VISF
+        # set up additional parameters for jacket-ramped freezing
         air_gap = float(config["jacket"]["air_gap"])
         lambda_air = float(config["jacket"]["lambda_air"])
 
@@ -295,6 +295,9 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         lambda_w = float(config["water"]["lambda_w"])
         lambda_i = float(config["water"]["lambda_i"])
 
+        # effective heat conductivity of solution
+        lambda_solution = solid_fraction * lambda_s + (1 - solid_fraction) * lambda_w
+
         # latent heat of fusion
         Dh = float(config["water"]["Dh"])
 
@@ -302,20 +305,18 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         k_f = float(config["solution"]["k_f"])
         M_s = float(config["solution"]["M_s"])
 
-        # heat conductivity
-        lambda_solution = (
-            solid_fraction * lambda_s + (1 - solid_fraction) * lambda_w
-        )  # heat capacity of solution
-
+        # general constants
         sigma_B = float(config["general"]["sigma_B"])
         k_B = float(config["general"]["k_B"])
 
+        # mass of solute and water in the solution
         mass_solute = mass * solid_fraction
         mass_water = mass * (1 - solid_fraction)
 
-        # configuration
+        # freezing configuration
         configuration = str(config["configuration"])
 
+        # extend the list of constant variables
         constVars.extend(
             [
                 "lambda_s",
