@@ -2,7 +2,7 @@
 dimensionality: spatial_1D
 
 # freezing configuration to be simulated (shelf, VISF, jacket)
-configuration: shelf
+configuration: VISF
 
 # all vial-related parameters
 vial:

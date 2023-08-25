@@ -238,6 +238,24 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
 
     T_eq_l = T_eq - depression
 
+    # latent heat of fusion
+    Dh = float(config["water"]["Dh"])
+
+    # needed for solving nucleation
+    k_f = float(config["solution"]["k_f"])
+    M_s = float(config["solution"]["M_s"])
+
+    # general constants
+    sigma_B = float(config["general"]["sigma_B"])
+    k_B = float(config["general"]["k_B"])
+
+    # mass of solute and water in the solution
+    mass_solute = mass * solid_fraction
+    mass_water = mass * (1 - solid_fraction)
+
+    # freezing configuration
+    configuration = str(config["configuration"])
+
     constVars = [
         "dimensionality",
         "T_eq",
@@ -247,6 +265,7 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         "A",
         "V",
         "cp_s",
+        "rho_l",
         "solid_fraction",
         "cp_w",
         "cp_i",
@@ -256,6 +275,16 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         "depression",
         "alpha",
         "beta_solution",
+        "Dh",
+        "k_f",
+        "M_s",
+        "sigma_B",
+        "k_B",
+        "mass_solute",
+        "mass_water",
+        "height",
+        "diameter",
+        "configuration",
     ]
 
     # check that spatial model is chosen for VISF
@@ -321,42 +350,13 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         # effective heat conductivity of solution
         lambda_solution = solid_fraction * lambda_s + (1 - solid_fraction) * lambda_w
 
-        # latent heat of fusion
-        Dh = float(config["water"]["Dh"])
-
-        # needed for solving nucleation
-        k_f = float(config["solution"]["k_f"])
-        M_s = float(config["solution"]["M_s"])
-
-        # general constants
-        sigma_B = float(config["general"]["sigma_B"])
-        k_B = float(config["general"]["k_B"])
-
-        # mass of solute and water in the solution
-        mass_solute = mass * solid_fraction
-        mass_water = mass * (1 - solid_fraction)
-
-        # freezing configuration
-        configuration = str(config["configuration"])
-
         # extend the list of constant variables
         constVars.extend(
             [
                 "lambda_s",
                 "lambda_i",
                 "lambda_w",
-                "sigma_B",
-                "k_B",
-                "rho_l",
-                "height",
-                "mass_solute",
-                "mass_water",
-                "Dh",
-                "k_f",
-                "M_s",
                 "lambda_solution",
-                "configuration",
-                "diameter",
             ]
         )
 

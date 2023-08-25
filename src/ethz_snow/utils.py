@@ -82,7 +82,7 @@ def vapour_flux(kappa, m_water, k_B, p_vac, p_vap, T_l, T_v):
         T_v (np.ndarray): Vapour temperature.
 
     Returns:
-        np.ndarray: FLux of water vapour at the top surface of the frozen
+        np.ndarray: Flux of water vapour at the top surface of the frozen
         or liquid product
     """
     # calculate flux

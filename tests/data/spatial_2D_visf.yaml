@@ -1,8 +1,8 @@
 # model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
-dimensionality: spatial_1D
+dimensionality: spatial_2D
 
 # freezing configuration to be simulated (shelf, VISF, jacket)
-configuration: shelf
+configuration: VISF
 
 # all vial-related parameters
 vial:

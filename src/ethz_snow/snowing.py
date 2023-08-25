@@ -48,9 +48,6 @@ class Snowing:
         self,
         k: dict = {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0},
         opcond: OperatingConditions = OperatingConditions(),
-        dimensionality: str = "spatial_1D",
-        configuration: str = "shelf",
-        plotting: bool = True,
         Nrep: int = 1,
         configPath: Optional[str] = None,
     ):
@@ -61,10 +58,6 @@ class Snowing:
                 Defaults to {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0}.
             opcond (OperatingConditions, optional):
                 Operating conditions of the run. Defaults to OperatingConditions().
-            dimensionality (str, optional): Model dimensionality. Defaults to None.
-            configuration (str, optional): Freezing configuration. Defaults to None.
-            plotting (bool, optional): Whether evolutions are plotted or not.
-                Defaults to None.
             Nrep (int, optional): Number of repetitions. Defaults to 1.
             configPath (Optional[str], optional): The path of the (optional)
                 custom config yaml. Defaults to None.
@@ -72,8 +65,6 @@ class Snowing:
         Raises:
             TypeError: If k is not a dict.
             ValueError: If a aspecific key is missing in dict k.
-            NotImplementedError: If freezing configuration is not correctly specified.
-            NotImplementedError: If model dimensionality is not correctly specified.
             TypeError: If opcond is not of type operatingConditions.
 
         Examples:
@@ -82,7 +73,7 @@ class Snowing:
 
             >>> S = Snowing()
 
-            TO customize the operating conditions, first define the operating conditions
+            To customize the operating conditions, first define the operating conditions
             and the heat transfer parameters:
 
             >>> d = {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0}
@@ -90,18 +81,9 @@ class Snowing:
             >>> h = [dict(duration=60*60, temp=-10)]
             >>> op = OperatingConditions(t_tot=5*3600, cooling=c, holding=h)
 
-            Then an instance of the Sowing class can be created in multiple ways, while
-            also specifying model dimensionality and freezing configuration:
+            Then an instance of the Snowing class can be created:
 
             >>> S = Snowing(k=d, opcond=op)
-            >>> S = Snowing(k=d,
-                opcond=op,
-                dimensionality="spatial_1D",
-                configuration="shelf",
-                plotting=True)
-            >>> S = Snowing(k=d, opcond=op, dimensionality="spatial_1D", configuration="shelf", plotting=False))
-            >>> S = Snowing(k=d, opcond=op, dimensionality="spatial_1D", configuration="visf", plotting=True))
-            >>> S = Snowing(k=d, opcond=op, dimensionality="spatial_2D", configuration="jacket"))
 
             See tutorial for more information on how to use the spatial model functionalities.
         """
@@ -142,45 +124,7 @@ class Snowing:
         # simulation progress
         self._simulationStatus = 0
 
-        # model complexity
-        if dimensionality is not None:
-            self.dimensionality = dimensionality
-            self.const["dimensionality"] = dimensionality
-        else:
-            self.dimensionality = self.const["dimensionality"]
-
-        # freezing configuration (shelf, VISF, etc.)
-        if configuration is not None:
-            self.configuration = configuration
-            self.const["configuration"] = configuration
-        else:
-            self.configuration = self.const["configuration"]
-
-        # check configuration
-        if self.configuration not in {"shelf", "VISF", "jacket"}:
-            raise NotImplementedError(
-                (
-                    f'Configuration "{self.configuration}" '
-                    + 'not correctly specified, use "shelf", "jacket" or "VISF".'
-                )
-            )
-
-        # check model dimensionality
-        if self.dimensionality not in {"homogeneous", "spatial_1D", "spatial_2D"}:
-            raise NotImplementedError(
-                (
-                    f'Model dimensionality "{self.dimensionality}" '
-                    + "not correctly specified, use homogeneous, spatial_1D or spatial_2D."
-                )
-            )
-
-        # plotting
-        if plotting is not None:
-            self.plotting = plotting
-        else:
-            self.plotting = True
-
-        # oeprating conditions
+        # operating conditions
         if not isinstance(opcond, OperatingConditions):
             raise TypeError(
                 "Input opcond must be an instance of class OperatingConditions."
@@ -288,12 +232,9 @@ class Snowing:
     # simulate the entire process
     def run(self, how="async"):
         # homogeneous model
-        if self.dimensionality == "homogeneous":
+        if self.const["dimensionality"] == "homogeneous":
             if self.Nrep == 1:
                 self._run_0D()
-                if self.plotting:
-                    self._plot_temperature_evolution()
-                    self._plot_ice_mass_fraction_evolution()
             else:
                 if how == "sequential":
                     for i in range(self.Nrep):
@@ -308,12 +249,9 @@ class Snowing:
                 self._keys = ["T_nuc", "t_nuc", "t_sol", "t_fr"]
 
         # 1D spatial model
-        elif self.dimensionality == "spatial_1D":
+        elif self.const["dimensionality"] == "spatial_1D":
             if self.Nrep == 1:
                 self._run_1D()
-                if self.plotting:
-                    self._plot_temperature_evolution()
-                    self._plot_ice_mass_fraction_evolution()
             else:
                 if how == "sequential":
                     for i in range(self.Nrep):
@@ -336,12 +274,9 @@ class Snowing:
                 ]
 
         # 2D spatial model
-        elif self.dimensionality == "spatial_2D":
+        elif self.const["dimensionality"] == "spatial_2D":
             if self.Nrep == 1:
                 self._run_2D()
-                if self.plotting:
-                    self._plot_temperature_evolution()
-                    self._plot_ice_mass_fraction_evolution()
             else:
                 if how == "sequential":
                     for i in range(self.Nrep):
@@ -362,12 +297,8 @@ class Snowing:
                     "t_sol",
                     "t_fr",
                 ]
-
-        # dimensionality not correctly specified
-        else:
-            raise ValueError(
-                "Model complexity not correctly specified. Should be: homogeneous, spatial_1D or spatial_2D."
-            )
+        # update simulation status
+        self._simulationStatus = 1
 
     # -------------------------------------------------------------------------- #
     # 0D implementation of the freezing model
@@ -422,24 +353,6 @@ class Snowing:
         T_k = T_0  # [K] temperature profile at t = T_old
         T_new = T_k
 
-        # VISF
-        if self.configuration == "VISF":
-            raise NotImplementedError(
-                (
-                    f'For simulating "{self.configuration}" '
-                    + 'a spatial model is required. Use "spatial_1D" or "spatial_2D" models.'
-                )
-            )
-
-        # jacket
-        if self.configuration == "jacket":
-            raise NotImplementedError(
-                (
-                    f'For simulating "{self.configuration}" '
-                    + 'a spatial model is required. Use "spatial_2D" model.'
-                )
-            )
-
         # shelf temperature and coooling rate
         T_shelf_cool = self.opcond.tempProfile(dt) + 273.15
 
@@ -476,10 +389,16 @@ class Snowing:
             E_t += K_v * dt
             # CDF of probability
             F_nuc = 1 - np.exp(-E_t)
-            # Monte-Carlo approach
-            if F_nuc > F_rand:
-                Nt_cool_end = i
-                break
+            if self.opcond.cnTemp == None:
+                # Monte-Carlo approach
+                if F_nuc > F_rand:
+                    Nt_cool_end = i
+                    break
+            else:
+                # controlled nucleation
+                if T_new <= (self.opcond.cnTemp + 273.15):
+                    Nt_cool_end = i
+                    break
 
         # check if nucleation occured
         if Nt_cool_end is None:
@@ -591,9 +510,6 @@ class Snowing:
         self._temp = temp_results
         self._ice = ice_results
 
-        # complete simulation
-        self._simulationStatus = 1
-
         return [
             self._stats["T_nuc"],
             self._stats["t_nuc"],
@@ -654,7 +570,7 @@ class Snowing:
         K_shelf = self.k["s0"]
 
         # additional VISF parameters
-        if self.configuration == "VISF":
+        if self.const["configuration"] == "VISF":
             # vacuum pressure
             p_vac = self.const["p_vac"]
             # evaporation coefficient
@@ -667,16 +583,6 @@ class Snowing:
             t_vac_start = self.const["t_vac_start"]
             # duration of the vacuum [h]
             t_vac_duration = self.const["t_vac_duration"]
-
-        # jacket
-        if self.configuration == "jacket":
-            raise NotImplementedError(
-                (
-                    f'For simulating "{self.configuration}" '
-                    + 'a 2D spatial model is required. Use temperature = "spatial_2D" '
-                    + "as input parameter."
-                )
-            )
 
         # [W/mK] effective heat conductivity
         lambda_eff = solid_fraction * lambda_s + (1 - solid_fraction) * lambda_w
@@ -727,7 +633,7 @@ class Snowing:
             # boundary condition on the bottom of the vial: ghost grid point
             T_bottom_BC = T_k[0] + q_overall * dz / lambda_eff
 
-            if self.configuration == "VISF":
+            if self.const["configuration"] == "VISF":
                 # temperature at the top of the liquid
                 T_l = T_k[-1]
                 # vapour temperature
@@ -801,12 +707,20 @@ class Snowing:
             E_t += K_v * dt
             # CDF of probability
             F_nuc = 1 - np.exp(-E_t)
-            # Monte-Carlo approach
-            if F_nuc > F_rand:
-                Nt_cool_end = i
-                t_nuc = dt * i
-                T_nuc = T_k
-                break
+            if self.opcond.cnTemp == None:
+                # Monte-Carlo approach
+                if F_nuc > F_rand:
+                    Nt_cool_end = i
+                    t_nuc = dt * i
+                    T_nuc = T_k
+                    break
+            else:
+                # controlled nucleation
+                if T_k.any() <= (self.opcond.cnTemp + 273.15):
+                    Nt_cool_end = i
+                    t_nuc = dt * i
+                    T_nuc = T_k
+                    break
 
         # check if nucleation occured
         if Nt_cool_end is None:
@@ -911,7 +825,7 @@ class Snowing:
             # boundary condition on the bottom of the vial: ghost grid point
             T_bottom_BC = T_k[0] + q_overall * dz / lambda_eff[0]
 
-            if self.configuration == "VISF":
+            if self.const["configuration"] == "VISF":
                 # temperature at the top of the liquid
                 T_l = T_k[-1]
                 # vapour temperature
@@ -1060,9 +974,6 @@ class Snowing:
         self._temp = temp_results
         self._ice = ice_results
 
-        # complete simulation
-        self._simulationStatus = 1
-
         return [
             self._stats["T_nuc_min"],
             self._stats["T_nuc_kin"],
@@ -1127,7 +1038,7 @@ class Snowing:
         K_shelf = self.k["s0"]
 
         # additional VISF parameters
-        if self.configuration == "VISF":
+        if self.const["configuration"] == "VISF":
             # vacuum pressure
             p_vac = self.const["p_vac"]
             # evaporation coefficient
@@ -1142,7 +1053,7 @@ class Snowing:
             t_vac_duration = self.const["t_vac_duration"]
 
         # additional jacket-ramped freezing parameters
-        if self.configuration == "jacket":
+        if self.const["configuration"] == "jacket":
             # vacuum pressure
             air_gap = self.const["air_gap"]
             # evaporation coefficient
@@ -1208,7 +1119,7 @@ class Snowing:
             # boundary condition on the bottom of the vial: ghost grid point
             T_bottom = T_k[0, :] + q_overall * dz / k_eff
 
-            if self.configuration == "VISF":
+            if self.const["configuration"] == "VISF":
                 # temperature at the top of the liquid
                 T_l = T_k[-1, :]
                 # vapour temperature
@@ -1235,7 +1146,7 @@ class Snowing:
 
             " Boundary conditions at the edge, r = R. "
 
-            if self.configuration == "jacket":
+            if self.const["configuration"] == "jacket":
                 # jacket heat flux
                 q_jacket = K_wall * (T_shelf - T_k[:, Nr - 1])
 
@@ -1395,12 +1306,20 @@ class Snowing:
             E_t += K_v * dt
             # CDF of probability
             F_nuc = 1 - np.exp(-E_t)
-            # Monte-Carlo approach
-            if F_nuc > F_rand:
-                Nt_cool_end = i
-                t_nuc = dt * i
-                T_nuc = T_k
-                break
+            if self.opcond.cnTemp == None:
+                # Monte-Carlo approach
+                if F_nuc > F_rand:
+                    Nt_cool_end = i
+                    t_nuc = dt * i
+                    T_nuc = T_k
+                    break
+            else:
+                # controlled nucleation
+                if T_k.any() <= (self.opcond.cnTemp + 273.15):
+                    Nt_cool_end = i
+                    t_nuc = dt * i
+                    T_nuc = T_k
+                    break
 
         # check if nucleation occured
         if Nt_cool_end is None:
@@ -1498,7 +1417,7 @@ class Snowing:
             # boundary condition on the bottom of the vial: ghost grid point
             T_bottom = T_k[0, :] + q_overall * dz / k_eff[0, :]
 
-            if self.configuration == "VISF":
+            if self.const["configuration"] == "VISF":
                 # temperature at the top of the liquid
                 T_l = T_k[-1, :]
                 # vapour temperature
@@ -1524,7 +1443,7 @@ class Snowing:
             T_top = T_k[Nz - 1, :] + q_e * dz / k_eff[Nz - 1, :]
 
             # boundary condition at the side of the vial
-            if self.configuration == "jacket":
+            if self.const["configuration"] == "jacket":
                 # jacket heat flux
                 q_jacket = K_wall * (T_shelf - T_k[:, Nr - 1])
 
@@ -1856,9 +1775,6 @@ class Snowing:
         self._temp = temp_results
         self._ice = ice_results
 
-        # complete simulation
-        self._simulationStatus = 1
-
         return [
             self._stats["T_nuc_min"],
             self._stats["T_nuc_kin"],
@@ -1959,7 +1875,7 @@ class Snowing:
             plt.ylabel("frrozen product time CDF, $F_{fr}$ [min$^{-1}$]")
 
         # plot data in the requested plot (default: boxplot)
-        if (self.dimensionality != "homogeneous") & (what == "T_nuc"):
+        if (self.const["dimensionality"] != "homogeneous") & (what == "T_nuc"):
             self._data_df_Tnuc = self._statsMultiple_df[
                 ["T_nuc_min", "T_nuc_kin", "T_nuc_mean", "T_nuc_max"]
             ]
@@ -1971,7 +1887,7 @@ class Snowing:
         plt.ylim(-0.05, 1.05)
         plt.show()
 
-    # plot the stats (categorical pltos) of whichever desired variable
+    # plot the stats (categorical plots) of whichever desired variable
     def plot(self, what: str = "t_nuc", kind: str = "box"):
         """Create categorical plots for Snowing object.
 
@@ -1987,7 +1903,7 @@ class Snowing:
         # enable this plot only for Nrep > 1
         if self.Nrep <= 1:
             raise NotImplementedError(
-                "This plot only available for multiple simulations. "
+                "This plot is only available for multiple simulations. "
                 + "Run with Nrep > 1."
             )
 
@@ -2016,7 +1932,7 @@ class Snowing:
         self._statsMultiple_df = self.getResults
 
         # plot data in the requested plot (default: boxplot)
-        if (self.dimensionality != "homogeneous") & (what == "T_nuc"):
+        if (self.const["dimensionality"] != "homogeneous") & (what == "T_nuc"):
             self._data_df_Tnuc = self._statsMultiple_df[
                 ["T_nuc_min", "T_nuc_kin", "T_nuc_mean", "T_nuc_max"]
             ]
@@ -2077,7 +1993,7 @@ class Snowing:
         # plot shelf temperature evolution
         plt.plot(self._time, self._shelf, "b-", linewidth=2.5, label="shelf T")
 
-        if self.dimensionality == "homogeneous":
+        if self.const["dimensionality"] == "homogeneous":
             # plot temperature evolution for homogeneous model
             plt.plot(self._time, self._temp, "k-", linewidth=2.5, label="product T")
 
@@ -2085,7 +2001,7 @@ class Snowing:
         handles, labels = plt.gca().get_legend_handles_labels()
 
         # plot product temperature evolution for 1D case
-        if self.dimensionality == "spatial_1D":
+        if self.const["dimensionality"] == "spatial_1D":
             # colors
             colors, my_cmap, norm = Utils.colormap(self._domain)
             # plot temperature evolution for different vertical positions
@@ -2105,7 +2021,7 @@ class Snowing:
             labels.append("product T")
 
         # plot product temperature evolution for 2D case
-        elif self.dimensionality == "spatial_2D":
+        elif self.const["dimensionality"] == "spatial_2D":
             # colors
             colors, my_cmap, norm = Utils.colormap(self._domain[0])
             # plot temperature evolution for different vertical positions
@@ -2193,7 +2109,7 @@ class Snowing:
             label="$w_{i} = 1 - w_{s}$",
         )
 
-        if self.dimensionality == "homogeneous":
+        if self.const["dimensionality"] == "homogeneous":
             # plot temperature evolution for homogeneous model
             plt.plot(
                 self._time, self._ice, "k-", linewidth=2.5, label="product $w_{i}$"
@@ -2203,7 +2119,7 @@ class Snowing:
         handles, labels = plt.gca().get_legend_handles_labels()
 
         # plot product temperature evolution for 1D case
-        if self.dimensionality == "spatial_1D":
+        if self.const["dimensionality"] == "spatial_1D":
             # colors
             colors, my_cmap, norm = Utils.colormap(self._domain)
             # colorbar
@@ -2223,7 +2139,7 @@ class Snowing:
             labels.append("product $w_{i}$")
 
         # plot product temperature evolution for 2D case
-        elif self.dimensionality == "spatial_2D":
+        elif self.const["dimensionality"] == "spatial_2D":
             # colors
             colors, my_cmap, norm = Utils.colormap(self._domain[0])
             # colorbar
@@ -2261,6 +2177,33 @@ class Snowing:
         )
         plt.show()
 
+    # plot evolution function
+    def plot_evolution(self, what: str = "temperature"):
+        """Function to plot the spatial evolution of temperature or ice mass fractions.
+
+        Args:
+            what (str, optional): Quantity to be plotted. Defaults to "temperature".
+
+        Raises:
+            NotImplementedError: This plotting functionality is only implemented for single simulations (when Nrep = 1), otherwise, an error is raised.
+            ValueError: Raises error if quantity for plotting is incorrectly specified.
+        """
+        if self.Nrep > 1:
+            raise NotImplementedError(
+                "This plot only available for single simulations. "
+                + "Run with Nrep = 1."
+            )
+
+        if what == "temperature":
+            self._plot_temperature_evolution()
+        elif what == "ice_mass_fraction":
+            self._plot_ice_mass_fraction_evolution()
+        else:
+            raise ValueError(
+                'Property to plot incorrectly specified. Use "temperature" or "ice_mass_fraction" instead.'
+            )
+
+    # repr function
     def __repr__(self) -> str:
         """Return string representation of the Snowing class.
 
@@ -2269,6 +2212,6 @@ class Snowing:
         """
         return (
             f"Snowing([{self.Nrep} Snowing{'s' if self.Nrep > 1 else ''}, "
-            + f"dimensionality: {self.dimensionality}, "
-            + f"configuration: {self.configuration}])"
+            + f"dimensionality: {self.const['dimensionality']}, "
+            + f"configuration: {self.const['configuration']}])"
         )
