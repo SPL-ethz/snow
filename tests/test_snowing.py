@@ -82,12 +82,12 @@ def test_totalTimeTooShort_for_nucleation():
         S.run()
 
     with pytest.raises(ValueError):
-        config = THIS_DIR + "/data/spatial_1D_shelf.yaml"
+        config = THIS_DIR + "/data/spatial_1D_visf.yaml"
         S = Snowing(k=d, opcond=op, configPath=config)
         S.run()
 
     with pytest.raises(ValueError):
-        config = THIS_DIR + "/data/spatial_2D_shelf.yaml"
+        config = THIS_DIR + "/data/spatial_2D_visf.yaml"
         S = Snowing(k=d, opcond=op, configPath=config)
         S.run()
 
@@ -139,7 +139,7 @@ def test_final_values_1D():
     c = {"rate": 10 / 60, "start": 20, "end": -50}
     op = OperatingConditions(t_tot=100 * 3600, cooling=c)
 
-    config = THIS_DIR + "/data/spatial_1D_shelf.yaml"
+    config = THIS_DIR + "/data/spatial_1D_visf.yaml"
     S = Snowing(k=d, opcond=op, configPath=config)
     S.run()
     assert S.shelfTemp[-1] == -50
@@ -210,16 +210,34 @@ def test_incorrect_key_plot_cdf():
 
 def test_correct_plots():
     """Check that plot_evolution is correct."""
+
+    d = {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0}
+    c = {"rate": 1 / 60, "start": 20, "end": -50}
+    h = []
+    op = OperatingConditions(t_tot=3 * 3600, cooling=c, holding=h)
+
     config = THIS_DIR + "/data/homogeneous_shelf.yaml"
-    S = Snowing(configPath=config)
+    S = Snowing(k=d, opcond=op, configPath=config)
     S.run()
     S._plot_temperature_evolution()
     S._plot_ice_mass_fraction_evolution()
 
-    S = Snowing(configPath=config, Nrep=100)
+    S = Snowing(k=d, opcond=op, configPath=config, Nrep=100)
     S.run()
     S.plot_cdf()
     S.plot()
+
+    config = THIS_DIR + "/data/spatial_1D_shelf.yaml"
+    S = Snowing(k=d, opcond=op, configPath=config)
+    S.run()
+    S._plot_temperature_evolution()
+    S._plot_ice_mass_fraction_evolution()
+
+    config = THIS_DIR + "/data/spatial_2D_shelf.yaml"
+    S = Snowing(k=d, opcond=op, configPath=config)
+    S.run()
+    S._plot_temperature_evolution()
+    S._plot_ice_mass_fraction_evolution()
 
 
 """ Unit tests for Utils class containing helper functins for Snowing. """
