@@ -158,7 +158,97 @@ Version 2.0. Freezing simulations with internal gradients
 
 In version 2.0. new functionalities related to spatial phenomena during freezing are integrated into the package: when simulating the freezing process in a single container of arbitrary size, the model considers gradients of temperature and of ice mass fraction within the container. Such spatial simulation of freezing is currently only available for a single container, i.e., it does not consider thermal interactions with potential neighboring containers. Hence the spatial freezing model in version 2.0. provides complimentary information to the process-scale freezing models introduced earlier. An upcoming scientific publication will discuss the model development, validation, and relevant use cases in detail. 
 
-The spatial model (termed Snowing) accounts for different **dimensionalities (0D, 1D and 2D)** of the vial and for different **freezing configurations (shelf-ramped freezing, vacuum-induced surface freezing (VISF) and jacket-ramped freezing)**. These three configurations represent common freezing conditions employed in both commercial manufacturing and in academia. Vial geometry, other constants and operating conditions are specified as established in previous versions. We start by importing the new **Snowing** module:
+The spatial model (termed Snowing) accounts for different **dimensionalities (0D, 1D and 2D)** of the vial and for different **freezing configurations (shelf-ramped freezing, vacuum-induced surface freezing (VISF) and jacket-ramped freezing)**. These three configurations represent common freezing conditions employed in both commercial manufacturing and in academia. Both model dimensionality and freezing configuration are specified in the yaml file used to specify the constants. To this end, we add additional blocks of parameters used for the spatial simulation to the yaml. An example of the updated yaml file is provided below:
+
+.. code-block:: yaml
+
+   # model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
+   dimensionality: spatial_1D
+
+   # freezing configuration to be simulated (shelf, VISF, jacket)
+   configuration: shelf
+   
+   # all vial-related parameters
+   vial:
+     # define the geometry
+     geometry:
+       # base shape of vial (snow and snowfall only accepts cube, snowing rewrites it to cylinder)
+       shape: cube
+       # diameter of the vial for cylindrical geometry (only spatial model) [m]
+       diameter: 0.01
+       # height of the filled product for cubic (snow/snowfall) and cylindrical geometry (only spatial model) [m]
+       height: 0.01
+       # length of the vial when shape is cube [m]
+       length: 0.01
+       # width of the vial when shape is cube [m]
+       width: 0.01
+   
+   # parameters used in VISF simulation
+   VISF:
+     # vacuum pressure [Pa]
+     p_vac: 100
+     # evaporation coefficient [-]
+     kappa: 0.01
+     # latent heat of vaporization for water [J/kg]
+     Dh_evaporation: 2500.9e3
+     # mass of water molecule [kg]
+     m_water: 2.99e-26
+     # time for vacuum start [h]
+     t_vac_start: 0.75
+     # duration of the vacuum [h]
+     t_vac_duration: 0.1
+   
+   # parameters for jacket-ramped freezing
+   jacket:
+     # air gap between the wall and the vial [m]
+     air_gap: 0.001
+     # heat conductivity of air [W/mK]
+     lambda_air: 0.025
+   
+   # all parameters related to water
+   water:
+     # specific heat capacity of liquid water [J/kgK]
+     cp_w: 4187
+     # specific heat capacity of ice [J/kgK]
+     cp_i: 2108
+     # heat conductivity of liquid water [W/mK]
+     lambda_w: 0.598
+     # heat conductivity of ice [W/mK]
+     lambda_i: 2.25
+     # latent heat of fusion of water [J/kg]
+     Dh: 333550
+   
+   # all solution parameters
+   solution:
+     # solute mass fraction [-]
+     solid_fraction: 0.05
+     # melting temperature of pure water [°C]
+     T_eq: 0
+     # density of liquid water [kg/m3]
+     rho_l: 1000
+     # specific heat capacity of solute [J/kgK]
+     cp_s: 1240
+     # heat conductivity of solute [W/mK]
+     lambda_s: 0.126
+     # cryoscopic constant of water [K/kgmol]
+     k_f: 1.853
+     # molar mass of solute [kg/mol]
+     M_s: 0.3423
+   
+   # nucleation kinetics
+   kinetics:
+     # pre-exponential nucleation parameter [1/m3sKb]
+     kb: 1e-9
+     # exponential nucleation parameter [-]
+     b: 12
+   
+   general:
+     # Stefan-Boltzmann constant [W/m2]
+     sigma_B: 5.67e-8
+     # Boltzmann constant [JK]
+     k_B: 1.38e-23
+
+Vial geometry, other constants and operating conditions are specified as established in previous versions. We start by importing the new **Snowing** module:
 
 .. code-block:: python
 
@@ -168,52 +258,44 @@ Additionally, we also need to import the operatingConditions, define the heat tr
 
 .. code-block:: python
 
-    S = Snowing(k=d, opcond=op, temperature="spatial_1D", configuration="shelf", plotting=True)
+    S = Snowing(k=d, opcond=op)
 
-The line above is used to run a spatial model simulation in 1D (considering heat transfer only in the vertical direction) with the freezing configuration being set to the conventional shelf-ramped freezing. The first two parameters (considering heat transfer and operating conditions are identical to the ones used for Snowfall and Snowflake). Different dimensionalities of the model can be called by varying the **temperature** parameter:
+The simulation is then carried out using: ``S.run()`` In this case, simulation is carried out in 1D (considering heat transfer only in the vertical direction) with the freezing configuration being set to the conventional shelf-ramped freezing. The two parameters ``k=d`` and ``opcond=op`` (considering heat transfer and operating conditions are identical to the ones used for Snowfall and Snowflake). Different dimensionalities of the model can be called by varying the **dimensionality** parameter specified in the yaml file, possible keys are: **homogeneous**, **spatial_1D** or **spatial_2D**, while different freezing configurations can be simulated by modifying the **configuration** parameter, options are: **shelf**, **VISF**, **jacket**.
 
-.. code-block:: python
-
-    S_0D_shelf = Snowing(k=d, opcond=op, temperature="homogeneous", configuration="shelf", plotting=True)
-    S_1D_shelf = Snowing(k=d, opcond=op, temperature="spatial_1D", configuration="shelf", plotting=True)
-    S_2D_shelf = Snowing(k=d, opcond=op, temperature="spatial_2D", configuration="shelf", plotting=True)
-
-Conversely, different configurations (in 2D complexity for instance) may be simulated by choosing the **configuration** parameter:
+In order to evaluate the variability in nucleation times, temperatures and solidification times due to the stochasticity of nucleation a larger number of the single vial simulations may be carried out. This can be achieved by adding an integer parameter **Nrep** denoting the number of repeated independent simulations:
 
 .. code-block:: python
 
-    S_2D_shelf = Snowing(k=d, opcond=op, temperature="spatial_2D", configuration="shelf", plotting=True)
-    S_2D_VISF = Snowing(k=d, opcond=op, temperature="spatial_2D", configuration="VISF", plotting=True)
-    S_2D_jacket = Snowing(k=d, opcond=op, temperature="spatial_2D", configuration="jacket", plotting=True)
+    S = Snowing(k=d, opcond=op, Nrep = 100)
 
-Finally, the last input parameter, **plotting = True**, automatically plots the temperature and the ice mass fraction evolution at different positions in the vial. This can be omitted by setting **plotting = False**, hence no plots will be produced.
-
-In order to evaluate the variability in nucleation times, temperatures and solidification times due to the stochasticity of nucleation a larger number of the single vial simulations may be carried out. This can be achieved by adding an integer parameter **Nrep** denoting the number of repeated simulations:
+When **Nrep > 1**, the user can plot the statistics in a form of a cumulative probability function of a desired variable using:
 
 .. code-block:: python
 
-    S_1D_shelf = Snowing(k=d, opcond=op, temperature="spatial_1D", configuration="shelf", plotting=True, Nrep = 100)
+    S.plot_cdf(what = "T_nuc")
+    S.plot_cdf(what = "t_nuc")
+    S.plot_cdf(what = "t_sol")
+    S.plot_cdf(what = "t_fr")
 
-When **Nrep > 1**, plotting is automatically set to False, hence no evolution plots are produced, instead the user can plot the statistics of a desired variable using:
-
-.. code-block:: python
-
-    S_1D_shelf.plot_cdf(what = "T_nuc")
-    S_1D_shelf.plot_cdf(what = "t_nuc")
-    S_1D_shelf.plot_cdf(what = "t_sol")
-    S_1D_shelf.plot_cdf(what = "t_fr")
-
-If the argument in the lines above is omitted, distrubution of nucleation times will be plotted as the default variable. Besides nucleation times (t_nuc), the user can plot the cumulative distribution functions of nucleation temperatures (T_nuc), solidification times (t_sol) and times of complete freezing (t_fr). In case of 1D or 2D model complexity, temperature at the time of nculeation is a field, hence the choice of nucleation temperature is not straightforward. To this end, ``the S_1D_shelf.plot_cdf(what = "T_nuc")`` plots distributions of 4 different temepratures: minimum, kinetic mean, mean and maximum temperature at nucleation. For more information see the relevant publication regarding the spatial model. Finally, the following command allows the user to get the statistics on all the relevant variables (output is a DataFrame):
+Besides nucleation times (t_nuc), the user can plot the cumulative distribution functions of nucleation temperatures (T_nuc), solidification times (t_sol) and times of complete freezing (t_fr). In case of 1D or 2D model complexity, temperature at the time of nucleation is a field, hence the choice of nucleation temperature is not straightforward. To this end, ``S.plot_cdf(what = "T_nuc")`` plots distributions of 4 different temperatures: minimum, kinetic mean, mean and maximum temperature at nucleation. For more information see the relevant publication regarding the spatial model. Finally, the following command allows the user to get the statistics on all the relevant variables (output is a DataFrame):
 
 .. code-block:: python
 
-    S_1D_shelf.getResults
+    S.getResults
 
-In case of a single simulation, the following commands also provide detailed simulation results (time array, shelf temperature profile, temperature and ice mass fraction field evolution):
+In case of a single simulation (**Nrep = 1**), the following commands also provide detailed simulation results (time array, shelf temperature profile, temperature and ice mass fraction field evolution):
 
 .. code-block:: python
 
-    time = S_1D_shelf.getTime
-    shelf = S_1D_shelf.getShelfTemp
-    temp = S_1D_shelf.getTemp
-    ice = S_1D_shelf.getIceMassFraction
+    time = S.getTime
+    shelf = S.getShelfTemp
+    temp = S.getTemp
+    ice = S.getIceMassFraction
+
+Additionally, the time evolution of product temperature and ice mass fraction may be plotted using:
+
+.. code-block:: python
+   
+   S.plot_evolution(what = "temperature")
+   S.plot_evolution(what = "ice_mass_fraction")
+
