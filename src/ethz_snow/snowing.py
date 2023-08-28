@@ -18,6 +18,8 @@ import multiprocessing as mp
 import matplotlib.pyplot as plt
 from scipy.integrate import simps
 from typing import Optional
+import matplotlib.patches as patches
+from matplotlib.legend_handler import HandlerTuple
 
 import ethz_snow.utils as Utils
 from ethz_snow.constants import calculateDerived
@@ -485,10 +487,10 @@ class Snowing:
         if Nt_sol_end is None:
             raise ValueError("Solidification is not completed, prolong process time.")
 
-        # evolution of ice mass
-        m_i_solid = mass_water - (k_f * mass_solute / M_s) / (T_m - T_product_solid)
         # ice mass fraction evolution
-        w_i_solid = m_i_solid / mass
+        w_i_solid = (
+            mass_water - (k_f * mass_solute / M_s) / (T_m - T_product_solid)
+        ) / mass
 
         # time
         time_results = np.concatenate((time_cooling, time_solid), axis=0) / 3600
@@ -1943,24 +1945,6 @@ class Snowing:
 
     # plot the temperature evolution
     def _plot_temperature_evolution(self):
-        # additional libraries needed for this plot
-        from matplotlib.lines import Line2D
-        import matplotlib.patches as patches
-        from matplotlib.legend_handler import HandlerTuple
-
-        # plot settings
-        plt.rcParams.update(
-            {
-                "axes.axisbelow": True,
-                "xtick.direction": "in",
-                "ytick.direction": "in",
-                "xtick.bottom": True,
-                "xtick.top": True,
-                "ytick.left": True,
-                "ytick.right": True,
-            }
-        )
-
         # temperature evolution plot
         plt.figure()
         # plot nucleation time and equilibrum temperature
@@ -2061,24 +2045,6 @@ class Snowing:
 
     # plot ice mass fraction evolution
     def _plot_ice_mass_fraction_evolution(self):
-        # additional libraries needed for this plot
-        from matplotlib.lines import Line2D
-        import matplotlib.patches as patches
-        from matplotlib.legend_handler import HandlerTuple
-
-        # plot settings
-        plt.rcParams.update(
-            {
-                "axes.axisbelow": True,
-                "xtick.direction": "in",
-                "ytick.direction": "in",
-                "xtick.bottom": True,
-                "xtick.top": True,
-                "ytick.left": True,
-                "ytick.right": True,
-            }
-        )
-
         # ice mass fraction plot
         plt.figure()
         # plot lines for nucleation time and maximum ice mass fraction
@@ -2188,6 +2154,20 @@ class Snowing:
             NotImplementedError: This plotting functionality is only implemented for single simulations (when Nrep = 1), otherwise, an error is raised.
             ValueError: Raises error if quantity for plotting is incorrectly specified.
         """
+
+        # plot settings
+        plt.rcParams.update(
+            {
+                "axes.axisbelow": True,
+                "xtick.direction": "in",
+                "ytick.direction": "in",
+                "xtick.bottom": True,
+                "xtick.top": True,
+                "ytick.left": True,
+                "ytick.right": True,
+            }
+        )
+
         if self.Nrep > 1:
             raise NotImplementedError(
                 "This plot only available for single simulations. "

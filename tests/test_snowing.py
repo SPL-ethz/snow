@@ -74,30 +74,7 @@ def test_totalTimeTooShort_for_nucleation():
     nucleation to occur."""
     d = {"int": 0, "ext": 0, "s0": 20, "s_sigma_rel": 0}
     c = {"rate": 1 / 60, "start": 20, "end": 19}
-    op = OperatingConditions(t_tot=10, cooling=c)
-
-    with pytest.raises(ValueError):
-        config = THIS_DIR + "/data/homogeneous_shelf.yaml"
-        S = Snowing(k=d, opcond=op, configPath=config)
-        S.run()
-
-    with pytest.raises(ValueError):
-        config = THIS_DIR + "/data/spatial_1D_visf.yaml"
-        S = Snowing(k=d, opcond=op, configPath=config)
-        S.run()
-
-    with pytest.raises(ValueError):
-        config = THIS_DIR + "/data/spatial_2D_visf.yaml"
-        S = Snowing(k=d, opcond=op, configPath=config)
-        S.run()
-
-
-def test_totalTimeTooShort_for_complete_solidification():
-    """Check that total time of simulation is long enough for
-    complete solidification."""
-    d = {"int": 0, "ext": 0, "s0": 20, "s_sigma_rel": 0}
-    c = {"rate": 10 / 60, "start": 20, "end": -10}
-    op = OperatingConditions(t_tot=3600, cooling=c, cnTemp=-2)
+    op = OperatingConditions(t_tot=200, cooling=c)
 
     with pytest.raises(ValueError):
         config = THIS_DIR + "/data/homogeneous_shelf.yaml"
@@ -115,9 +92,81 @@ def test_totalTimeTooShort_for_complete_solidification():
         S.run()
 
 
+def test_totalTimeTooShort_for_complete_solidification():
+    """Check that total time of simulation is long enough for
+    complete solidification."""
+    d = {"int": 0, "ext": 0, "s0": 20, "s_sigma_rel": 0}
+    c = {"rate": 10 / 60, "start": 20, "end": -10}
+    op = OperatingConditions(t_tot=3600, cooling=c, cnTemp=-2)
+
+    with pytest.raises(ValueError):
+        config = THIS_DIR + "/data/homogeneous_shelf.yaml"
+        S = Snowing(k=d, opcond=op, configPath=config)
+        S.run()
+
+    with pytest.raises(ValueError):
+        config = THIS_DIR + "/data/spatial_1D_visf.yaml"
+        S = Snowing(k=d, opcond=op, configPath=config)
+        S.run()
+
+    with pytest.raises(ValueError):
+        config = THIS_DIR + "/data/spatial_2D_visf.yaml"
+        S = Snowing(k=d, opcond=op, configPath=config)
+        S.run()
+
+
+def test_final_values_homogeneous():
+    """Check that the final values of temperature and ice mass
+    fraction make sense."""
+
+    d = {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0}
+    c = {"rate": 10 / 60, "start": 20, "end": -50}
+    op = OperatingConditions(t_tot=10 * 3600, cooling=c)
+
+    config = THIS_DIR + "/data/homogeneous_shelf.yaml"
+    S = Snowing(k=d, opcond=op, configPath=config)
+    S.run()
+    assert S.getShelfTemp[-1] == -50
+    assert np.round(S.getTemp[-1], 1) == -50
+    assert np.round(S.getTime[-1], 1) == 10
+
+
+def test_final_values_1D():
+    """Check that the final values of temperature and ice mass
+    fraction make sense."""
+
+    d = {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0}
+    c = {"rate": 10 / 60, "start": 20, "end": -50}
+    op = OperatingConditions(t_tot=100 * 3600, cooling=c)
+
+    config = THIS_DIR + "/data/spatial_1D_shelf.yaml"
+    S = Snowing(k=d, opcond=op, configPath=config)
+    S.run()
+    assert S.getShelfTemp[-1] == -50
+    assert np.round(S.getTemp[-1], 1).min() == -50
+    assert np.round(S.getTime[-1], 1) == 100
+
+
+def test_final_values_2D():
+    """Check that the final values of temperature and ice mass
+    fraction make sense."""
+
+    d = {"int": 0, "ext": 0, "s0": 50, "s_sigma_rel": 0}
+    c = {"rate": 10 / 60, "start": 20, "end": -50}
+    op = OperatingConditions(t_tot=1000 * 3600, cooling=c)
+
+    config = THIS_DIR + "/data/spatial_2D_jacket.yaml"
+    S = Snowing(k=d, opcond=op, configPath=config)
+    S.run()
+    assert S.getShelfTemp[-1] == -50
+    assert np.round(S.getTemp[-1], 1).min() == -50
+    assert np.round(S.getTime[-1], 0) == 1000
+
+
 def test_single_simulation_plot_cdf():
     """Check that plot_cdf doesn't work for single simulations."""
-    S = Snowing()
+    config = THIS_DIR + "/data/homogeneous_shelf.yaml"
+    S = Snowing(configPath=config)
 
     with pytest.raises(NotImplementedError):
         S.run()
@@ -126,7 +175,8 @@ def test_single_simulation_plot_cdf():
 
 def test_single_simulation_categorical_plot():
     """Check that plot doesn't work for single simulations."""
-    S = Snowing()
+    config = THIS_DIR + "/data/homogeneous_shelf.yaml"
+    S = Snowing(configPath=config)
 
     with pytest.raises(NotImplementedError):
         S.run()
@@ -135,7 +185,8 @@ def test_single_simulation_categorical_plot():
 
 def test_multiple_simulation_plot_evolution():
     """Check that plot_evolution doesn't work for multiple simulations."""
-    S = Snowing(Nrep=2)
+    config = THIS_DIR + "/data/homogeneous_shelf.yaml"
+    S = Snowing(configPath=config, Nrep=2)
 
     with pytest.raises(NotImplementedError):
         S.run()
@@ -144,7 +195,8 @@ def test_multiple_simulation_plot_evolution():
 
 def test_incorrect_key_plot_evolution():
     """Check that plot_evolution doesn't work for incorrect key."""
-    S = Snowing()
+    config = THIS_DIR + "/data/homogeneous_shelf.yaml"
+    S = Snowing(configPath=config)
 
     with pytest.raises(ValueError):
         S.run()
