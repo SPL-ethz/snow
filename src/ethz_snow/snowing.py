@@ -106,9 +106,9 @@ class Snowing:
         self._domain = None
         self._prop = None
         self._time = None
-        self._shelf = None
+        self._shelfTemp = None
         self._temp = None
-        self._ice = None
+        self._iceMassFraction = None
 
         # dictionary of results
         self._stats = {}
@@ -158,59 +158,55 @@ class Snowing:
         return self._simulationStatus
 
     @property
-    def getTime(self) -> np.ndarray:
+    def time(self) -> np.ndarray:
         """Return time array in the simulation of instance.
 
         Returns:
             np.ndarray: Time array in hours.
         """
-        if (self._simulationStatus == 1) or (self._time is not None):
-            return self._time
-
-        else:
-            raise AssertionError("Simulation not yet carried out or completed.")
+        assert (self._simulationStatus == 1) or (
+            self._time is not None
+        ), "Simulation not yet carried out or completed."
+        return self._time
 
     @property
-    def getTemp(self) -> np.ndarray:
+    def temp(self) -> np.ndarray:
         """Return temperature evolution in the simulation of instance.
 
         Returns:
             np.ndarray: Temperature evolution in °C.
         """
-        if (self._simulationStatus == 1) or (self._temp is not None):
-            return self._temp
-
-        else:
-            raise AssertionError("Simulation not yet carried out or completed.")
+        assert (self._simulationStatus == 1) or (
+            self._temp is not None
+        ), "Simulation not yet carried out or completed."
+        return self._temp
 
     @property
-    def getShelfTemp(self) -> np.ndarray:
+    def shelfTemp(self) -> np.ndarray:
         """Return shelf temperature evolution in the simulation of instance.
 
         Returns:
             np.ndarray: Shelf temperature evolution in °C.
         """
-        if (self._simulationStatus == 1) or (self._shelf is not None):
-            return self._shelf
-
-        else:
-            raise AssertionError("Simulation not yet carried out or completed.")
+        assert (self._simulationStatus == 1) or (
+            self._shelfTemp is not None
+        ), "Simulation not yet carried out or completed."
+        return self._shelfTemp
 
     @property
-    def getIceMassFraction(self) -> np.ndarray:
+    def iceMassFraction(self) -> np.ndarray:
         """Return ice mass fraction evolution in simulation of instance.
 
         Returns:
             np.ndarray: Ice mass fraction evolution (no units).
         """
-        if (self._simulationStatus == 1) or (self._ice is not None):
-            return self._ice
-
-        else:
-            raise AssertionError("Simulation not yet carried out or completed.")
+        assert (self._simulationStatus == 1) or (
+            self._iceMassFraction is not None
+        ), "Simulation not yet carried out or completed."
+        return self._iceMassFraction
 
     @property
-    def getResults(self) -> dict:
+    def results(self) -> dict:
         """Return minimum, mean, kinetic mean and maximum nucleation temperature
             in simulation of instance.
 
@@ -218,18 +214,18 @@ class Snowing:
             dict: 4 values of nucleation temperature (minimum, kinetic mean,
             mean and maximum). Irrelevant for homogeneous model simulation.
         """
-        if self._simulationStatus == 1:
-            if self.Nrep == 1:
-                self._stats_df = pd.DataFrame.from_dict(self._stats, orient="index").T
-                return self._stats_df
-            elif self.Nrep > 1:
-                self._statsMultiple_df = pd.DataFrame.from_dict(
-                    self._statsMultiple, orient="index"
-                )
-                self._statsMultiple_df.columns = list(self._keys)
-                return self._statsMultiple_df
-        else:
-            raise AssertionError("Simulation not yet carried out or completed.")
+        assert (
+            self._simulationStatus == 1
+        ), "Simulation not yet carried out or completed."
+        if self.Nrep == 1:
+            self._stats_df = pd.DataFrame.from_dict(self._stats, orient="index").T
+            return self._stats_df
+        elif self.Nrep > 1:
+            self._statsMultiple_df = pd.DataFrame.from_dict(
+                self._statsMultiple, orient="index"
+            )
+            self._statsMultiple_df.columns = list(self._keys)
+            return self._statsMultiple_df
 
     # simulate the entire process
     def run(self, how="async"):
@@ -508,9 +504,9 @@ class Snowing:
         self._domain = 0
         self._prop = (T_eq_l, w_s)
         self._time = time_results
-        self._shelf = shelf_results
+        self._shelfTemp = shelf_results
         self._temp = temp_results
-        self._ice = ice_results
+        self._iceMassFraction = ice_results
 
         return [
             self._stats["T_nuc"],
@@ -972,9 +968,9 @@ class Snowing:
         self._nuc = (t_nuc, T_nuc)
         self._prop = (T_eq_l, w_s)
         self._time = time_results
-        self._shelf = shelf_results
+        self._shelfTemp = shelf_results
         self._temp = temp_results
-        self._ice = ice_results
+        self._iceMassFraction = ice_results
 
         return [
             self._stats["T_nuc_min"],
@@ -1773,9 +1769,9 @@ class Snowing:
         self._prop = (T_eq_l, w_s)
         self._nuc = (t_nuc, T_nuc)
         self._time = time_results
-        self._shelf = shelf_results
+        self._shelfTemp = shelf_results
         self._temp = temp_results
-        self._ice = ice_results
+        self._iceMassFraction = ice_results
 
         return [
             self._stats["T_nuc_min"],
@@ -1859,7 +1855,7 @@ class Snowing:
             comp = True
 
         # get data
-        self._statsMultiple_df = self.getResults
+        self._statsMultiple_df = self.results
 
         # plot attributes
         plt.figure()
@@ -1931,7 +1927,7 @@ class Snowing:
             what = "t_sol"
 
         # get data
-        self._statsMultiple_df = self.getResults
+        self._statsMultiple_df = self.results
 
         # plot data in the requested plot (default: boxplot)
         if (self.const["dimensionality"] != "homogeneous") & (what == "T_nuc"):
@@ -1950,7 +1946,7 @@ class Snowing:
         # plot nucleation time and equilibrum temperature
         plt.plot(
             [self._stats["t_nuc"] / 60, self._stats["t_nuc"] / 60],
-            [self._shelf.min() - 5, self._shelf.max() + 5],
+            [self._shelfTemp.min() - 5, self._shelfTemp.max() + 5],
             "--",
             color="red",
             linewidth=1,
@@ -1960,7 +1956,7 @@ class Snowing:
         if self._stats["t_fr"] is not None:
             plt.plot(
                 [self._stats["t_fr"] / 60, self._stats["t_fr"] / 60],
-                [self._shelf.min() - 5, self._shelf.max() + 5],
+                [self._shelfTemp.min() - 5, self._shelfTemp.max() + 5],
                 "--",
                 color="indigo",
                 linewidth=1,
@@ -1975,7 +1971,7 @@ class Snowing:
             label="$T = T^{eq}_{l}$",
         )
         # plot shelf temperature evolution
-        plt.plot(self._time, self._shelf, "b-", linewidth=2.5, label="shelf T")
+        plt.plot(self._time, self._shelfTemp, "b-", linewidth=2.5, label="shelf T")
 
         if self.const["dimensionality"] == "homogeneous":
             # plot temperature evolution for homogeneous model
@@ -2033,7 +2029,7 @@ class Snowing:
         plt.ylabel("temperature, $T$ [°C]", labelpad=8)
         plt.grid(axis="both", color="lightgray", linestyle="solid")
         plt.xlim(-0.05 * self._time.max(), 1.05 * self._time.max())
-        plt.ylim(self._shelf.min() - 5, self._shelf.max() + 5)
+        plt.ylim(self._shelfTemp.min() - 5, self._shelfTemp.max() + 5)
         plt.title("Product temperature evolution")
         plt.legend(
             handles=handles,
@@ -2078,7 +2074,11 @@ class Snowing:
         if self.const["dimensionality"] == "homogeneous":
             # plot temperature evolution for homogeneous model
             plt.plot(
-                self._time, self._ice, "k-", linewidth=2.5, label="product $w_{i}$"
+                self._time,
+                self._iceMassFraction,
+                "k-",
+                linewidth=2.5,
+                label="product $w_{i}$",
             )
 
         # access legend objects automatically created from data
@@ -2094,7 +2094,12 @@ class Snowing:
             cbar.set_label("dimensionless vertical position, z/H [-]", rotation=90)
             # plot temperature evolution for different vertical positions
             for i in range(0, len(self._domain), round(len(self._domain) / 11)):
-                plt.plot(self._time, self._ice[:, i], color=colors[i], linewidth=2.5)
+                plt.plot(
+                    self._time,
+                    self._iceMassFraction[:, i],
+                    color=colors[i],
+                    linewidth=2.5,
+                )
             # add colormap to the legend entries
             cmaps_gradients = my_cmap(np.linspace(0, 1, 30))
             # combine patches into a list and add to the handles and labels
@@ -2117,7 +2122,10 @@ class Snowing:
             # plot temperature evolution for different vertical positions
             for i in range(0, len(self._domain[0]), round(len(self._domain[0]) / 11)):
                 plt.plot(
-                    self._time, self._ice[:, i, -1], color=colors[i], linewidth=2.5
+                    self._time,
+                    self._iceMassFraction[:, i, -1],
+                    color=colors[i],
+                    linewidth=2.5,
                 )
             # add colormap to the legend entries
             cmaps_gradients = my_cmap(np.linspace(0, 1, 30))

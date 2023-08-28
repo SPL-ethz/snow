@@ -54,19 +54,19 @@ def test_mustRunFirst():
     S = Snowing()
 
     with pytest.raises(AssertionError):
-        S.getResults
+        S.results
 
     with pytest.raises(AssertionError):
-        S.getIceMassFraction
+        S.iceMassFraction
 
     with pytest.raises(AssertionError):
-        S.getTemp
+        S.temp
 
     with pytest.raises(AssertionError):
-        S.getTime
+        S.time
 
     with pytest.raises(AssertionError):
-        S.getShelfTemp
+        S.shelfTemp
 
 
 def test_totalTimeTooShort_for_nucleation():
@@ -126,9 +126,9 @@ def test_final_values_homogeneous():
     config = THIS_DIR + "/data/homogeneous_shelf.yaml"
     S = Snowing(k=d, opcond=op, configPath=config)
     S.run()
-    assert S.getShelfTemp[-1] == -50
-    assert np.round(S.getTemp[-1], 1) == -50
-    assert np.round(S.getTime[-1], 1) == 10
+    assert S.shelfTemp[-1] == -50
+    assert np.round(S.temp[-1], 1) == -50
+    assert np.round(S.time[-1], 1) == 10
 
 
 def test_final_values_1D():
@@ -142,9 +142,9 @@ def test_final_values_1D():
     config = THIS_DIR + "/data/spatial_1D_shelf.yaml"
     S = Snowing(k=d, opcond=op, configPath=config)
     S.run()
-    assert S.getShelfTemp[-1] == -50
-    assert np.round(S.getTemp[-1], 1).min() == -50
-    assert np.round(S.getTime[-1], 1) == 100
+    assert S.shelfTemp[-1] == -50
+    assert np.round(S.temp[-1], 1).min() == -50
+    assert np.round(S.time[-1], 1) == 100
 
 
 def test_final_values_2D():
@@ -158,9 +158,9 @@ def test_final_values_2D():
     config = THIS_DIR + "/data/spatial_2D_jacket.yaml"
     S = Snowing(k=d, opcond=op, configPath=config)
     S.run()
-    assert S.getShelfTemp[-1] == -50
-    assert np.round(S.getTemp[-1], 1).min() == -50
-    assert np.round(S.getTime[-1], 0) == 1000
+    assert S.shelfTemp[-1] == -50
+    assert np.round(S.temp[-1], 1).min() == -50
+    assert np.round(S.time[-1], 0) == 1000
 
 
 def test_single_simulation_plot_cdf():
