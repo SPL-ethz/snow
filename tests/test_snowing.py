@@ -208,6 +208,20 @@ def test_incorrect_key_plot_cdf():
         S.plot_cdf(what="random")
 
 
+def test_correct_plots():
+    """Check that plot_evolution is correct."""
+    config = THIS_DIR + "/data/homogeneous_shelf.yaml"
+    S = Snowing(configPath=config)
+    S.run()
+    S._plot_temperature_evolution()
+    S._plot_ice_mass_fraction_evolution()
+
+    S = Snowing(configPath=config, Nrep=100)
+    S.run()
+    S.plot_cdf()
+    S.plot()
+
+
 """ Unit tests for Utils class containing helper functins for Snowing. """
 
 
