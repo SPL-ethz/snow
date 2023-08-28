@@ -1871,8 +1871,12 @@ class Snowing:
         elif what == "t_fr":
             plt.xlabel("complete freezing time, $t^{fr}$ [min]")
             plt.ylabel("frrozen product time CDF, $F_{fr}$ [min$^{-1}$]")
+        else:
+            raise ValueError(
+                'Property to plot incorrectly specified. Use "T_nuc", "t_nuc", "t_sol" or "t_fr" instead.'
+            )
 
-        # plot data in the requested plot (default: boxplot)
+        # plot different nucleation temperatures for spatial models
         if (self.const["dimensionality"] != "homogeneous") & (what == "T_nuc"):
             self._data_df_Tnuc = self._statsMultiple_df[
                 ["T_nuc_min", "T_nuc_kin", "T_nuc_mean", "T_nuc_max"]
@@ -1929,7 +1933,7 @@ class Snowing:
         # get data
         self._statsMultiple_df = self.results
 
-        # plot data in the requested plot (default: boxplot)
+        # plot different nucleation temperatures for spatial models
         if (self.const["dimensionality"] != "homogeneous") & (what == "T_nuc"):
             self._data_df_Tnuc = self._statsMultiple_df[
                 ["T_nuc_min", "T_nuc_kin", "T_nuc_mean", "T_nuc_max"]

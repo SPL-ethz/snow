@@ -167,7 +167,6 @@ def test_single_simulation_plot_cdf():
     """Check that plot_cdf doesn't work for single simulations."""
     config = THIS_DIR + "/data/homogeneous_shelf.yaml"
     S = Snowing(configPath=config)
-
     with pytest.raises(NotImplementedError):
         S.run()
         S.plot_cdf()
@@ -177,7 +176,6 @@ def test_single_simulation_categorical_plot():
     """Check that plot doesn't work for single simulations."""
     config = THIS_DIR + "/data/homogeneous_shelf.yaml"
     S = Snowing(configPath=config)
-
     with pytest.raises(NotImplementedError):
         S.run()
         S.plot()
@@ -187,7 +185,6 @@ def test_multiple_simulation_plot_evolution():
     """Check that plot_evolution doesn't work for multiple simulations."""
     config = THIS_DIR + "/data/homogeneous_shelf.yaml"
     S = Snowing(configPath=config, Nrep=2)
-
     with pytest.raises(NotImplementedError):
         S.run()
         S.plot_evolution()
@@ -197,10 +194,18 @@ def test_incorrect_key_plot_evolution():
     """Check that plot_evolution doesn't work for incorrect key."""
     config = THIS_DIR + "/data/homogeneous_shelf.yaml"
     S = Snowing(configPath=config)
-
     with pytest.raises(ValueError):
         S.run()
         S.plot_evolution(what="random")
+
+
+def test_incorrect_key_plot_cdf():
+    """Check that plot_cdf doesn't work for incorrect key."""
+    config = THIS_DIR + "/data/homogeneous_shelf.yaml"
+    S = Snowing(configPath=config, Nrep=10)
+    with pytest.raises(ValueError):
+        S.run()
+        S.plot_cdf(what="random")
 
 
 """ Unit tests for Utils class containing helper functins for Snowing. """
