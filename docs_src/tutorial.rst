@@ -281,16 +281,16 @@ Besides nucleation times (t_nuc), the user can plot the cumulative distribution 
 
 .. code-block:: python
 
-    S.getResults
+    S.results
 
 In case of a single simulation (**Nrep = 1**), the following commands also provide detailed simulation results (time array, shelf temperature profile, temperature and ice mass fraction field evolution):
 
 .. code-block:: python
 
-    time = S.getTime
-    shelf = S.getShelfTemp
-    temp = S.getTemp
-    ice = S.getIceMassFraction
+    time = S.time
+    shelf = S.shelfTemp
+    temp = S.temp
+    ice = S.iceMassFraction
 
 Additionally, the time evolution of product temperature and ice mass fraction may be plotted using:
 
