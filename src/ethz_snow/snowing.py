@@ -1460,12 +1460,8 @@ class Snowing:
             # bottom-centre: r = 0
             T_new[0, 0] = T_k[0, 0] + (dt / (cp_eff[0, 0] * rho_l)) * (
                 2 * k_eff[0, 0] * (T_k[0, 1] - 2 * T_k[0, 0] + T_center[0]) / dr**2
-                + (k_eff[0, 1] - k_eff[0, 0])
-                * (T_k[0, 1] - T_center[0])
-                / (4 * dr**2)
-                + (k_eff[1, 0] - k_eff[0, 0])
-                * (T_k[1, 0] - T_bottom[0])
-                / (4 * dz**2)
+                + (k_eff[0, 1] - k_eff[0, 0]) * (T_k[0, 1] - T_center[0]) / (4 * dr**2)
+                + (k_eff[1, 0] - k_eff[0, 0]) * (T_k[1, 0] - T_bottom[0]) / (4 * dz**2)
                 + k_eff[0, 0] * (T_k[1, 0] - 2 * T_k[0, 0] + T_bottom[0]) / dz**2
             ) * BETA[0, 0] ** (-1)
 
@@ -1993,7 +1989,7 @@ class Snowing:
                 plt.plot(self._time, self._temp[:, i], color=colors[i], linewidth=2.5)
             # colorbar
             sm = plt.cm.ScalarMappable(cmap=my_cmap, norm=norm)
-            cbar = plt.colorbar(sm, aspect=35)
+            cbar = plt.colorbar(sm, ax=plt.gca(), aspect=35)
             cbar.set_label("dimensionless vertical position, z/H [-]", rotation=90)
             # add colormap to the legend entries
             cmaps_gradients = my_cmap(np.linspace(0, 1, 30))
@@ -2015,7 +2011,7 @@ class Snowing:
                 )
             # colorbar
             sm = plt.cm.ScalarMappable(cmap=my_cmap, norm=norm)
-            cbar = plt.colorbar(sm, aspect=35)
+            cbar = plt.colorbar(sm, ax=plt.gca(), aspect=35)
             cbar.set_label(
                 "dimensionless vertical position (at r = 0), z/H [-]", rotation=90
             )
@@ -2094,7 +2090,7 @@ class Snowing:
             colors, my_cmap, norm = Utils.colormap(self._domain)
             # colorbar
             sm = plt.cm.ScalarMappable(cmap=my_cmap, norm=norm)
-            cbar = plt.colorbar(sm, aspect=35)
+            cbar = plt.colorbar(sm, ax=plt.gca(), aspect=35)
             cbar.set_label("dimensionless vertical position, z/H [-]", rotation=90)
             # plot temperature evolution for different vertical positions
             for i in range(0, len(self._domain), round(len(self._domain) / 11)):
@@ -2119,7 +2115,7 @@ class Snowing:
             colors, my_cmap, norm = Utils.colormap(self._domain[0])
             # colorbar
             sm = plt.cm.ScalarMappable(cmap=my_cmap, norm=norm)
-            cbar = plt.colorbar(sm, aspect=35)
+            cbar = plt.colorbar(sm, ax=plt.gca(), aspect=35)
             cbar.set_label(
                 "dimensionless vertical position (at r = 0), z/H [-]", rotation=90
             )
