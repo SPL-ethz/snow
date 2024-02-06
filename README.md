@@ -13,7 +13,7 @@ In addition to the simulation of the thermal evolution of vials during freezing,
 
 A more detailed description of the modeling framework is presented in a recent publication, which is publicly accessible under https://doi.org/10.1016/j.ijpharm.2021.121276 While version 1.0 is tailored towards simulations of the freezing stage in freeze-drying, version 1.1. was developed for pallet freezing; pallet freezing is for example used in the manufacturing of the Janssen COVID-19 vaccine, which served as case study for the model. Version 1.1 and the case study on the COVID-vaccine are discussed in detail in a recent scientific publication: https://doi.org/10.1016/j.ijpharm.2022.122051
 
-An extension of the modeling framework for the simulation of the freezing process with spatial resolution within individual containers has been implemented in version 2.0 and will be discussed in detail within the scope of a scientific publication.
+An extension of the modeling framework for the simulation of the freezing process with spatial resolution within individual containers has been implemented in version 2.0 and is discussed in detail within the scope of a recent scientific publication: https://doi.org/10.1016/j.cej.2024.148660.
 
 ### Additional features supported by version 2.0
 - Spatial simulation of freezing within individual containers with different dimensionalities (0D, 1D, 2D)
