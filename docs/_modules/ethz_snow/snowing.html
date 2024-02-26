@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ethz_snow.snowing &mdash; ethz_snow 1.1.0.post1.dev34+ga1dec07.d20230707 documentation</title>
+  <title>ethz_snow.snowing &mdash; ethz_snow 2.0.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="ethz_snow 1.1.0.post1.dev34+ga1dec07.d20230707 documentation" href="../../index.html"/>
+    <link rel="top" title="ethz_snow 2.0.0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                1.1.0.post1.dev34+ga1dec07.d20230707
+                2.0.0
               </div>
             
           
@@ -192,11 +192,11 @@
 
 
 <div class="viewcode-block" id="Snowing"><a class="viewcode-back" href="../../api/ethz_snow.html#ethz_snow.snowing.Snowing">[docs]</a><span class="k">class</span> <span class="nc">Snowing</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;A class to handle a single SNOWing (Stochastic Nucleation of Water</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class to handle a single SNOWing (Stochastic Nucleation of Water</span>
 <span class="sd">     with INternal Gradients) simulation.</span>
 
 <span class="sd">    More information regarding the equations and their derivation can be found in</span>
-<span class="sd">    XXX, Deck et al. (2023).</span>
+<span class="sd">    https://doi.org/10.1016/j.cej.2024.148660, Deck et al. (2024).</span>
 
 <span class="sd">    Parameters:</span>
 <span class="sd">        k (dict): Heat transfer coefficients.</span>
@@ -215,7 +215,7 @@
         <span class="n">Nrep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">configPath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Construct a Snowing object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a Snowing object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            k (dict, optional): Heat transfer coefficients.</span>
@@ -258,7 +258,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;A required key was missing from dictionary k, specifically &quot;</span>
-                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">HEATFLOW_REQUIREDKEYS</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">HEATFLOW_REQUIREDKEYS</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">set</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
                 <span class="p">)</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -298,18 +298,18 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">configPath</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Get configPath property.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get configPath property.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configPath</span>
 
     <span class="nd">@configPath</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">configPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set configPath property.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set configPath property.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">const</span> <span class="o">=</span> <span class="n">calculateDerived</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_configPath</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">simulationStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return simulation status of instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return simulation status of instance.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: Simulation status. 0 = not run, 1 = run.</span>
@@ -321,7 +321,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return time array in the simulation of instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return time array in the simulation of instance.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            np.ndarray: Time array in hours.</span>
@@ -333,7 +333,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">temp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return temperature evolution in the simulation of instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return temperature evolution in the simulation of instance.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            np.ndarray: Temperature evolution in °C.</span>
@@ -345,7 +345,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shelfTemp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return shelf temperature evolution in the simulation of instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return shelf temperature evolution in the simulation of instance.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            np.ndarray: Shelf temperature evolution in °C.</span>
@@ -357,7 +357,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">iceMassFraction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return ice mass fraction evolution in simulation of instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return ice mass fraction evolution in simulation of instance.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            np.ndarray: Ice mass fraction evolution (no units).</span>
@@ -369,7 +369,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return minimum, mean, kinetic mean and maximum nucleation temperature</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return minimum, mean, kinetic mean and maximum nucleation temperature</span>
 <span class="sd">            in simulation of instance.</span>
 
 <span class="sd">        Returns:</span>
@@ -1947,7 +1947,7 @@
 
     <span class="c1"># plot distribution of the desired variable</span>
 <div class="viewcode-block" id="Snowing.plot_cdf"><a class="viewcode-back" href="../../api/ethz_snow.html#ethz_snow.snowing.Snowing.plot_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">plot_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;t_nuc&quot;</span><span class="p">,</span> <span class="n">comp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create CDF plots for Snowing object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create CDF plots for Snowing object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            what (str, optional): What to plot, i.e., keys of the stats dict.</span>
@@ -2049,7 +2049,7 @@
 
     <span class="c1"># plot the stats (categorical plots) of whichever desired variable</span>
 <div class="viewcode-block" id="Snowing.plot"><a class="viewcode-back" href="../../api/ethz_snow.html#ethz_snow.snowing.Snowing.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;t_nuc&quot;</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;box&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create categorical plots for Snowing object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create categorical plots for Snowing object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            what (str, optional): What to plot, i.e., keys of the stats dict.</span>
@@ -2315,7 +2315,7 @@
 
     <span class="c1"># plot evolution function</span>
 <div class="viewcode-block" id="Snowing.plot_evolution"><a class="viewcode-back" href="../../api/ethz_snow.html#ethz_snow.snowing.Snowing.plot_evolution">[docs]</a>    <span class="k">def</span> <span class="nf">plot_evolution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;temperature&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Function to plot the spatial evolution of temperature or ice mass fractions.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function to plot the spatial evolution of temperature or ice mass fractions.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            what (str, optional): Quantity to be plotted. Defaults to &quot;temperature&quot;.</span>
@@ -2355,13 +2355,13 @@
 
     <span class="c1"># repr function</span>
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return string representation of the Snowing class.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return string representation of the Snowing class.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: The Snowing class string representation giving some basic info.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Snowing([</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Nrep</span><span class="si">}</span><span class="s2"> Snowing</span><span class="si">{</span><span class="s1">&#39;s&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nrep</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Snowing([</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Nrep</span><span class="si">}</span><span class="s2"> Snowing</span><span class="si">{</span><span class="s1">&#39;s&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">Nrep</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;dimensionality: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s1">&#39;dimensionality&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;configuration: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">const</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">])&quot;</span>
         <span class="p">)</span></div>
@@ -2398,7 +2398,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.1.0.post1.dev34+ga1dec07.d20230707',
+            VERSION:'2.0.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

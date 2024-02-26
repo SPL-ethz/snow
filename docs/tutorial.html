@@ -191,41 +191,41 @@
 <p>Below is a copy of the yaml file used to configure the constants used in <strong>Snowflake</strong> / <strong>Snowfall</strong>.
 If you wish to modify any (subset) of these constants, simply create a new yaml that follows the same schema in an arbitrary location and link to it via the <strong>configPath</strong> input of Snowflake.
 A partial config is allowed (e.g., one only containing a new water:cp_w entry). The remaining keys will be taken from the default.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="nt">vial</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="nt">geometry</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="c1"># base shape of vial (currently only cube is accepted)</span><span class="w"></span>
-<span class="w">   </span><span class="nt">shape</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cube</span><span class="w"></span>
-<span class="w">   </span><span class="c1"># length [m]</span><span class="w"></span>
-<span class="w">   </span><span class="nt">length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span><span class="w"></span>
-<span class="w">   </span><span class="c1"># width [m]</span><span class="w"></span>
-<span class="w">   </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span><span class="w"></span>
-<span class="w">   </span><span class="c1"># height [m]</span><span class="w"></span>
-<span class="w">   </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span><span class="w"></span>
-<span class="nt">water</span><span class="p">:</span><span class="w"></span>
-<span class="w"> </span><span class="c1"># J/[Kkg] heat capacity liquid water</span><span class="w"></span>
-<span class="w"> </span><span class="nt">cp_w</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4187</span><span class="w"></span>
-<span class="w"> </span><span class="c1"># J/[Kkg] heat capacity ice 0°C</span><span class="w"></span>
-<span class="w"> </span><span class="nt">cp_i</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2108</span><span class="w"></span>
-<span class="w"> </span><span class="c1"># J/kg heat of fusion water</span><span class="w"></span>
-<span class="w"> </span><span class="nt">Dh</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">333550</span><span class="w"></span>
-<span class="nt">solution</span><span class="p">:</span><span class="w"></span>
-<span class="w"> </span><span class="c1"># kg/m^3 density of water / assumed constant for all phases</span><span class="w"></span>
-<span class="w"> </span><span class="nt">rho_l</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span><span class="w"></span>
-<span class="w"> </span><span class="c1"># K kg / mol cryoscopic constant</span><span class="w"></span>
-<span class="w"> </span><span class="nt">k_f</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.853</span><span class="w"></span>
-<span class="w"> </span><span class="c1"># J/Kkg, heat capacity sucrose</span><span class="w"></span>
-<span class="w"> </span><span class="nt">cp_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1240</span><span class="w"></span>
-<span class="w"> </span><span class="c1"># molar mass sucrose [kg/mol]</span><span class="w"></span>
-<span class="w"> </span><span class="nt">M_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3423</span><span class="w"></span>
-<span class="w"> </span><span class="c1"># mass fraction of solute in solution</span><span class="w"></span>
-<span class="w"> </span><span class="nt">solid_fraction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w"></span>
-<span class="w"> </span><span class="c1"># °C equilibrium freezing temperature pure water</span><span class="w"></span>
-<span class="w"> </span><span class="nt">T_eq</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"></span>
-<span class="w"> </span><span class="c1"># initial temperature of the solution</span><span class="w"></span>
-<span class="w"> </span><span class="nt">T_init</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span><span class="w"></span>
-<span class="nt">kinetics</span><span class="p">:</span><span class="w"></span>
-<span class="w"> </span><span class="nt">kb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-9</span><span class="w"> </span><span class="c1"># m−3 s−1 K−b</span><span class="w"></span>
-<span class="w"> </span><span class="nt">b</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="nt">vial</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">geometry</span><span class="p">:</span>
+<span class="w">   </span><span class="c1"># base shape of vial (currently only cube is accepted)</span>
+<span class="w">   </span><span class="nt">shape</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cube</span>
+<span class="w">   </span><span class="c1"># length [m]</span>
+<span class="w">   </span><span class="nt">length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="w">   </span><span class="c1"># width [m]</span>
+<span class="w">   </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="w">   </span><span class="c1"># height [m]</span>
+<span class="w">   </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="nt">water</span><span class="p">:</span>
+<span class="w"> </span><span class="c1"># J/[Kkg] heat capacity liquid water</span>
+<span class="w"> </span><span class="nt">cp_w</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4187</span>
+<span class="w"> </span><span class="c1"># J/[Kkg] heat capacity ice 0°C</span>
+<span class="w"> </span><span class="nt">cp_i</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2108</span>
+<span class="w"> </span><span class="c1"># J/kg heat of fusion water</span>
+<span class="w"> </span><span class="nt">Dh</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">333550</span>
+<span class="nt">solution</span><span class="p">:</span>
+<span class="w"> </span><span class="c1"># kg/m^3 density of water / assumed constant for all phases</span>
+<span class="w"> </span><span class="nt">rho_l</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<span class="w"> </span><span class="c1"># K kg / mol cryoscopic constant</span>
+<span class="w"> </span><span class="nt">k_f</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.853</span>
+<span class="w"> </span><span class="c1"># J/Kkg, heat capacity sucrose</span>
+<span class="w"> </span><span class="nt">cp_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1240</span>
+<span class="w"> </span><span class="c1"># molar mass sucrose [kg/mol]</span>
+<span class="w"> </span><span class="nt">M_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3423</span>
+<span class="w"> </span><span class="c1"># mass fraction of solute in solution</span>
+<span class="w"> </span><span class="nt">solid_fraction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="w"> </span><span class="c1"># °C equilibrium freezing temperature pure water</span>
+<span class="w"> </span><span class="nt">T_eq</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w"> </span><span class="c1"># initial temperature of the solution</span>
+<span class="w"> </span><span class="nt">T_init</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+<span class="nt">kinetics</span><span class="p">:</span>
+<span class="w"> </span><span class="nt">kb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-9</span><span class="w"> </span><span class="c1"># m−3 s−1 K−b</span>
+<span class="w"> </span><span class="nt">b</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span>
 </pre></div>
 </div>
 </section>
@@ -293,91 +293,91 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
 <h2>Version 2.0. Freezing simulations with internal gradients<a class="headerlink" href="#version-2-0-freezing-simulations-with-internal-gradients" title="Permalink to this heading">¶</a></h2>
 <p>In version 2.0. new functionalities related to spatial phenomena during freezing are integrated into the package: when simulating the freezing process in a single container of arbitrary size, the model considers gradients of temperature and of ice mass fraction within the container. Such spatial simulation of freezing is currently only available for a single container, i.e., it does not consider thermal interactions with potential neighboring containers. Hence the spatial freezing model in version 2.0. provides complimentary information to the process-scale freezing models introduced earlier. An upcoming scientific publication will discuss the model development, validation, and relevant use cases in detail.</p>
 <p>The spatial model (termed Snowing) accounts for different <strong>dimensionalities (0D, 1D and 2D)</strong> of the vial and for different <strong>freezing configurations (shelf-ramped freezing, vacuum-induced surface freezing (VISF) and jacket-ramped freezing)</strong>. These three configurations represent common freezing conditions employed in both commercial manufacturing and in academia. Both model dimensionality and freezing configuration are specified in the yaml file used to specify the constants. To this end, we add additional blocks of parameters used for the spatial simulation to the yaml. An example of the updated yaml file is provided below:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)</span><span class="w"></span>
-<span class="nt">dimensionality</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spatial_1D</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)</span>
+<span class="nt">dimensionality</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spatial_1D</span>
 
-<span class="c1"># freezing configuration to be simulated (shelf, VISF, jacket)</span><span class="w"></span>
-<span class="nt">configuration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">shelf</span><span class="w"></span>
+<span class="c1"># freezing configuration to be simulated (shelf, VISF, jacket)</span>
+<span class="nt">configuration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">shelf</span>
 
-<span class="c1"># all vial-related parameters</span><span class="w"></span>
-<span class="nt">vial</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># define the geometry</span><span class="w"></span>
-<span class="w">  </span><span class="nt">geometry</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="c1"># base shape of vial (snow and snowfall only accepts cube, snowing rewrites it to cylinder)</span><span class="w"></span>
-<span class="w">    </span><span class="nt">shape</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cube</span><span class="w"></span>
-<span class="w">    </span><span class="c1"># diameter of the vial for cylindrical geometry (only spatial model) [m]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">diameter</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span><span class="w"></span>
-<span class="w">    </span><span class="c1"># height of the filled product for cubic (snow/snowfall) and cylindrical geometry (only spatial model) [m]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span><span class="w"></span>
-<span class="w">    </span><span class="c1"># length of the vial when shape is cube [m]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span><span class="w"></span>
-<span class="w">    </span><span class="c1"># width of the vial when shape is cube [m]</span><span class="w"></span>
-<span class="w">    </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span><span class="w"></span>
+<span class="c1"># all vial-related parameters</span>
+<span class="nt">vial</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># define the geometry</span>
+<span class="w">  </span><span class="nt">geometry</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># base shape of vial (snow and snowfall only accepts cube, snowing rewrites it to cylinder)</span>
+<span class="w">    </span><span class="nt">shape</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cube</span>
+<span class="w">    </span><span class="c1"># diameter of the vial for cylindrical geometry (only spatial model) [m]</span>
+<span class="w">    </span><span class="nt">diameter</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="w">    </span><span class="c1"># height of the filled product for cubic (snow/snowfall) and cylindrical geometry (only spatial model) [m]</span>
+<span class="w">    </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="w">    </span><span class="c1"># length of the vial when shape is cube [m]</span>
+<span class="w">    </span><span class="nt">length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="w">    </span><span class="c1"># width of the vial when shape is cube [m]</span>
+<span class="w">    </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
 
-<span class="c1"># parameters used in VISF simulation</span><span class="w"></span>
-<span class="nt">VISF</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># vacuum pressure [Pa]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">p_vac</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># evaporation coefficient [-]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">kappa</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># latent heat of vaporization for water [J/kg]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">Dh_evaporation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2500.9e3</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># mass of water molecule [kg]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">m_water</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.99e-26</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># time for vacuum start [h]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">t_vac_start</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.75</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># duration of the vacuum [h]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">t_vac_duration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
+<span class="c1"># parameters used in VISF simulation</span>
+<span class="nt">VISF</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># vacuum pressure [Pa]</span>
+<span class="w">  </span><span class="nt">p_vac</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="w">  </span><span class="c1"># evaporation coefficient [-]</span>
+<span class="w">  </span><span class="nt">kappa</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="w">  </span><span class="c1"># latent heat of vaporization for water [J/kg]</span>
+<span class="w">  </span><span class="nt">Dh_evaporation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2500.9e3</span>
+<span class="w">  </span><span class="c1"># mass of water molecule [kg]</span>
+<span class="w">  </span><span class="nt">m_water</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.99e-26</span>
+<span class="w">  </span><span class="c1"># time for vacuum start [h]</span>
+<span class="w">  </span><span class="nt">t_vac_start</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.75</span>
+<span class="w">  </span><span class="c1"># duration of the vacuum [h]</span>
+<span class="w">  </span><span class="nt">t_vac_duration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
 
-<span class="c1"># parameters for jacket-ramped freezing</span><span class="w"></span>
-<span class="nt">jacket</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># air gap between the wall and the vial [m]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">air_gap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># heat conductivity of air [W/mK]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">lambda_air</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.025</span><span class="w"></span>
+<span class="c1"># parameters for jacket-ramped freezing</span>
+<span class="nt">jacket</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># air gap between the wall and the vial [m]</span>
+<span class="w">  </span><span class="nt">air_gap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
+<span class="w">  </span><span class="c1"># heat conductivity of air [W/mK]</span>
+<span class="w">  </span><span class="nt">lambda_air</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.025</span>
 
-<span class="c1"># all parameters related to water</span><span class="w"></span>
-<span class="nt">water</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># specific heat capacity of liquid water [J/kgK]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">cp_w</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4187</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># specific heat capacity of ice [J/kgK]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">cp_i</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2108</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># heat conductivity of liquid water [W/mK]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">lambda_w</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.598</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># heat conductivity of ice [W/mK]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">lambda_i</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.25</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># latent heat of fusion of water [J/kg]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">Dh</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">333550</span><span class="w"></span>
+<span class="c1"># all parameters related to water</span>
+<span class="nt">water</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># specific heat capacity of liquid water [J/kgK]</span>
+<span class="w">  </span><span class="nt">cp_w</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4187</span>
+<span class="w">  </span><span class="c1"># specific heat capacity of ice [J/kgK]</span>
+<span class="w">  </span><span class="nt">cp_i</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2108</span>
+<span class="w">  </span><span class="c1"># heat conductivity of liquid water [W/mK]</span>
+<span class="w">  </span><span class="nt">lambda_w</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.598</span>
+<span class="w">  </span><span class="c1"># heat conductivity of ice [W/mK]</span>
+<span class="w">  </span><span class="nt">lambda_i</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.25</span>
+<span class="w">  </span><span class="c1"># latent heat of fusion of water [J/kg]</span>
+<span class="w">  </span><span class="nt">Dh</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">333550</span>
 
-<span class="c1"># all solution parameters</span><span class="w"></span>
-<span class="nt">solution</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># solute mass fraction [-]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">solid_fraction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># melting temperature of pure water [°C]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">T_eq</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># density of liquid water [kg/m3]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">rho_l</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># specific heat capacity of solute [J/kgK]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">cp_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1240</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># heat conductivity of solute [W/mK]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">lambda_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.126</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># cryoscopic constant of water [K/kgmol]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">k_f</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.853</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># molar mass of solute [kg/mol]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">M_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3423</span><span class="w"></span>
+<span class="c1"># all solution parameters</span>
+<span class="nt">solution</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># solute mass fraction [-]</span>
+<span class="w">  </span><span class="nt">solid_fraction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="w">  </span><span class="c1"># melting temperature of pure water [°C]</span>
+<span class="w">  </span><span class="nt">T_eq</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">  </span><span class="c1"># density of liquid water [kg/m3]</span>
+<span class="w">  </span><span class="nt">rho_l</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<span class="w">  </span><span class="c1"># specific heat capacity of solute [J/kgK]</span>
+<span class="w">  </span><span class="nt">cp_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1240</span>
+<span class="w">  </span><span class="c1"># heat conductivity of solute [W/mK]</span>
+<span class="w">  </span><span class="nt">lambda_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.126</span>
+<span class="w">  </span><span class="c1"># cryoscopic constant of water [K/kgmol]</span>
+<span class="w">  </span><span class="nt">k_f</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.853</span>
+<span class="w">  </span><span class="c1"># molar mass of solute [kg/mol]</span>
+<span class="w">  </span><span class="nt">M_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3423</span>
 
-<span class="c1"># nucleation kinetics</span><span class="w"></span>
-<span class="nt">kinetics</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># pre-exponential nucleation parameter [1/m3sKb]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">kb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-9</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># exponential nucleation parameter [-]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">b</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span><span class="w"></span>
+<span class="c1"># nucleation kinetics</span>
+<span class="nt">kinetics</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># pre-exponential nucleation parameter [1/m3sKb]</span>
+<span class="w">  </span><span class="nt">kb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-9</span>
+<span class="w">  </span><span class="c1"># exponential nucleation parameter [-]</span>
+<span class="w">  </span><span class="nt">b</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span>
 
-<span class="nt">general</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># Stefan-Boltzmann constant [W/m2]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">sigma_B</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5.67e-8</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># Boltzmann constant [JK]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">k_B</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.38e-23</span><span class="w"></span>
+<span class="nt">general</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Stefan-Boltzmann constant [W/m2]</span>
+<span class="w">  </span><span class="nt">sigma_B</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5.67e-8</span>
+<span class="w">  </span><span class="c1"># Boltzmann constant [JK]</span>
+<span class="w">  </span><span class="nt">k_B</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.38e-23</span>
 </pre></div>
 </div>
 <p>Vial geometry, other constants and operating conditions are specified as established in previous versions. We start by importing the new <strong>Snowing</strong> module:</p>
