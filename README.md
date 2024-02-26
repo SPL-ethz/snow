@@ -35,7 +35,6 @@ An extension of the modeling framework for the simulation of the freezing proces
 - Hexagonal arrangement of vials on the shelf for freeze-drying
 - Additional modes of heat transfer (e.g. thermal radiation)
 - Alternative vial / vessel geometries
-- Spatial simulation of freezing within a single vessel
 
 ## Bug reports
 Please report bugs as [Github issues](https://github.com/SPL-ethz/snow/issues/new?assignees=ltdeck&labels=bug) or via [Email](mailto:deckl@ethz.ch), preferably

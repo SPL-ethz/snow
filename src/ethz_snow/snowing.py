@@ -34,7 +34,7 @@ class Snowing:
      with INternal Gradients) simulation.
 
     More information regarding the equations and their derivation can be found in
-    XXX, Deck et al. (2023).
+    https://doi.org/10.1016/j.cej.2024.148660, Deck et al. (2024).
 
     Parameters:
         k (dict): Heat transfer coefficients.
