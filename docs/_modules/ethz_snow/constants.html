@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ethz_snow.constants &mdash; ethz_snow 1.1.0 documentation</title>
+  <title>ethz_snow.constants &mdash; ethz_snow 1.1.0.post1.dev34+ga1dec07.d20230707 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="ethz_snow 1.1.0 documentation" href="../../index.html"/>
+    <link rel="top" title="ethz_snow 1.1.0.post1.dev34+ga1dec07.d20230707 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.1.0.post1.dev34+ga1dec07.d20230707
               </div>
             
           
@@ -165,6 +165,7 @@
 <span class="c1"># Loading yaml config file</span>
 <span class="kn">import</span> <span class="nn">pkg_resources</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">pi</span>
 
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
 
@@ -248,7 +249,6 @@
         <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">fpath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">customConfig</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
 
@@ -296,23 +296,81 @@
     <span class="n">config</span> <span class="o">=</span> <span class="n">_loadConfig</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
 
     <span class="n">const</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
     <span class="c1"># copy directly from yaml</span>
     <span class="n">T_eq</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;T_eq&quot;</span><span class="p">])</span>
     <span class="n">kb</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;kinetics&quot;</span><span class="p">][</span><span class="s2">&quot;kb&quot;</span><span class="p">])</span>
     <span class="n">b</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;kinetics&quot;</span><span class="p">][</span><span class="s2">&quot;b&quot;</span><span class="p">])</span>
 
-    <span class="c1"># derived properties of vial</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;cub&quot;</span><span class="p">):</span>
+    <span class="n">rho_l</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;rho_l&quot;</span><span class="p">])</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;height&quot;</span><span class="p">])</span>
+    <span class="n">diameter</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;diameter&quot;</span><span class="p">])</span>
+
+    <span class="n">dimensionality</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;dimensionality&quot;</span><span class="p">])</span>
+    <span class="n">configuration</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">])</span>
+
+    <span class="c1"># check configuration</span>
+    <span class="k">if</span> <span class="n">configuration</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;shelf&quot;</span><span class="p">,</span> <span class="s2">&quot;VISF&quot;</span><span class="p">,</span> <span class="s2">&quot;jacket&quot;</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Configuration &quot;</span><span class="si">{</span><span class="n">configuration</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                <span class="o">+</span> <span class="s1">&#39;not correctly specified, use &quot;shelf&quot;, &quot;jacket&quot; or &quot;VISF&quot;.&#39;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># check model dimensionality</span>
+    <span class="k">if</span> <span class="n">dimensionality</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;homogeneous&quot;</span><span class="p">,</span> <span class="s2">&quot;spatial_1D&quot;</span><span class="p">,</span> <span class="s2">&quot;spatial_2D&quot;</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Model dimensionality &quot;</span><span class="si">{</span><span class="n">dimensionality</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                <span class="o">+</span> <span class="s2">&quot;not correctly specified, use homogeneous, spatial_1D or spatial_2D.&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># derived properties of vial for cubic shape</span>
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;cub&quot;</span><span class="p">):</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;length&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span>
+            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;width&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="c1"># vial properties for cylindrical shape, commented out for now</span>
+    <span class="c1"># elif config[&quot;vial&quot;][&quot;geometry&quot;][&quot;shape&quot;].startswith(&quot;cyl&quot;):</span>
+    <span class="c1">#     geoKeys = config[&quot;vial&quot;][&quot;geometry&quot;].keys()</span>
+    <span class="c1">#     if (&quot;radius&quot; in geoKeys) and (config[&quot;vial&quot;][&quot;geometry&quot;][&quot;radius&quot;] is not None):</span>
+    <span class="c1">#         # radius is specified (not in defaults!)</span>
+    <span class="c1">#         cyl_r = float(config[&quot;vial&quot;][&quot;geometry&quot;][&quot;radius&quot;])</span>
+    <span class="c1">#     elif (&quot;diameter&quot; in geoKeys) and (</span>
+    <span class="c1">#         config[&quot;vial&quot;][&quot;geometry&quot;][&quot;diameter&quot;] is not None</span>
+    <span class="c1">#     ):</span>
+    <span class="c1">#         # diameter is specified</span>
+    <span class="c1">#         cyl_r = float(config[&quot;vial&quot;][&quot;geometry&quot;][&quot;diameter&quot;]) / 2</span>
+    <span class="c1">#     elif (&quot;length&quot; in geoKeys) and (&quot;width&quot; in geoKeys):</span>
+    <span class="c1">#         # length and width specified</span>
+    <span class="c1">#         assert float(config[&quot;vial&quot;][&quot;geometry&quot;][&quot;length&quot;]) == float(</span>
+    <span class="c1">#             config[&quot;vial&quot;][&quot;geometry&quot;][&quot;width&quot;]</span>
+    <span class="c1">#         ), &quot;Length and width must match for cylinders.&quot;</span>
+
+    <span class="c1">#         # interpret as diameter</span>
+    <span class="c1">#         cyl_r = float(config[&quot;vial&quot;][&quot;geometry&quot;][&quot;length&quot;]) / 2</span>
+    <span class="c1">#     elif &quot;length&quot; in geoKeys:</span>
+    <span class="c1">#         # only length specified</span>
+    <span class="c1">#         cyl_r = float(config[&quot;vial&quot;][&quot;geometry&quot;][&quot;length&quot;]) / 2</span>
+    <span class="c1">#     elif &quot;width&quot; in geoKeys:</span>
+    <span class="c1">#         # only width specified</span>
+    <span class="c1">#         cyl_r = float(config[&quot;vial&quot;][&quot;geometry&quot;][&quot;width&quot;]) / 2</span>
+
+    <span class="c1">#     A = pi * cyl_r**2</span>
+
+    <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;Cannot handle shape &quot;</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;. &#39;</span>
-                <span class="o">+</span> <span class="s2">&quot;Only cubic shape is supported at this moment.&quot;</span>
+                <span class="o">+</span> <span class="s1">&#39;Only &quot;cubic&quot; shape is supported. In Snowing, the shape is automatically rewritten to &quot;cylinder&quot;.&#39;</span>
             <span class="p">)</span>
         <span class="p">)</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;length&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span>
-        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;width&quot;</span><span class="p">]</span>
-    <span class="p">)</span>
-    <span class="n">V</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vial&quot;</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;height&quot;</span><span class="p">])</span>
+
+    <span class="c1"># volume</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="n">height</span>
 
     <span class="c1"># derived properties of solution</span>
     <span class="n">cp_s</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;cp_s&quot;</span><span class="p">])</span>
@@ -326,7 +384,8 @@
     <span class="p">)</span>  <span class="c1"># heat capacity of solution</span>
 
     <span class="c1"># Shortcut definitions</span>
-    <span class="n">mass</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;rho_l&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">V</span>
+    <span class="n">mass</span> <span class="o">=</span> <span class="n">rho_l</span> <span class="o">*</span> <span class="n">V</span>
+
     <span class="n">hl</span> <span class="o">=</span> <span class="n">mass</span> <span class="o">*</span> <span class="n">cp_solution</span>
     <span class="n">depression</span> <span class="o">=</span> <span class="p">(</span>
         <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;k_f&quot;</span><span class="p">])</span>
@@ -341,9 +400,26 @@
 
     <span class="n">T_eq_l</span> <span class="o">=</span> <span class="n">T_eq</span> <span class="o">-</span> <span class="n">depression</span>
 
-    <span class="c1"># bundle things into a dict now</span>
-    <span class="c1"># don&#39;t do it earlier for readability</span>
+    <span class="c1"># latent heat of fusion</span>
+    <span class="n">Dh</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;water&quot;</span><span class="p">][</span><span class="s2">&quot;Dh&quot;</span><span class="p">])</span>
+
+    <span class="c1"># needed for solving nucleation</span>
+    <span class="n">k_f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;k_f&quot;</span><span class="p">])</span>
+    <span class="n">M_s</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;M_s&quot;</span><span class="p">])</span>
+
+    <span class="c1"># general constants</span>
+    <span class="n">sigma_B</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;sigma_B&quot;</span><span class="p">])</span>
+    <span class="n">k_B</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;k_B&quot;</span><span class="p">])</span>
+
+    <span class="c1"># mass of solute and water in the solution</span>
+    <span class="n">mass_solute</span> <span class="o">=</span> <span class="n">mass</span> <span class="o">*</span> <span class="n">solid_fraction</span>
+    <span class="n">mass_water</span> <span class="o">=</span> <span class="n">mass</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">solid_fraction</span><span class="p">)</span>
+
+    <span class="c1"># freezing configuration</span>
+    <span class="n">configuration</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">])</span>
+
     <span class="n">constVars</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;dimensionality&quot;</span><span class="p">,</span>
         <span class="s2">&quot;T_eq&quot;</span><span class="p">,</span>
         <span class="s2">&quot;T_eq_l&quot;</span><span class="p">,</span>
         <span class="s2">&quot;kb&quot;</span><span class="p">,</span>
@@ -351,6 +427,7 @@
         <span class="s2">&quot;A&quot;</span><span class="p">,</span>
         <span class="s2">&quot;V&quot;</span><span class="p">,</span>
         <span class="s2">&quot;cp_s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rho_l&quot;</span><span class="p">,</span>
         <span class="s2">&quot;solid_fraction&quot;</span><span class="p">,</span>
         <span class="s2">&quot;cp_w&quot;</span><span class="p">,</span>
         <span class="s2">&quot;cp_i&quot;</span><span class="p">,</span>
@@ -360,8 +437,93 @@
         <span class="s2">&quot;depression&quot;</span><span class="p">,</span>
         <span class="s2">&quot;alpha&quot;</span><span class="p">,</span>
         <span class="s2">&quot;beta_solution&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Dh&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;k_f&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;M_s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sigma_B&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;k_B&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mass_solute&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mass_water&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;height&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;diameter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;configuration&quot;</span><span class="p">,</span>
     <span class="p">]</span>
 
+    <span class="c1"># check that spatial model is chosen for VISF</span>
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;VISF&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;dimensionality&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;homogeneous&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;For simulating &quot;</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                    <span class="o">+</span> <span class="s2">&quot;a spatial model is required.&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># set up additional parameters for VISF</span>
+        <span class="n">p_vac</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;VISF&quot;</span><span class="p">][</span><span class="s2">&quot;p_vac&quot;</span><span class="p">])</span>
+        <span class="n">kappa</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;VISF&quot;</span><span class="p">][</span><span class="s2">&quot;kappa&quot;</span><span class="p">])</span>
+        <span class="n">Dh_evaporation</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;VISF&quot;</span><span class="p">][</span><span class="s2">&quot;Dh_evaporation&quot;</span><span class="p">])</span>
+        <span class="n">m_water</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;VISF&quot;</span><span class="p">][</span><span class="s2">&quot;m_water&quot;</span><span class="p">])</span>
+        <span class="n">t_vac_start</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;VISF&quot;</span><span class="p">][</span><span class="s2">&quot;t_vac_start&quot;</span><span class="p">])</span>
+        <span class="n">t_vac_duration</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;VISF&quot;</span><span class="p">][</span><span class="s2">&quot;t_vac_duration&quot;</span><span class="p">])</span>
+
+        <span class="n">constVars</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;p_vac&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;kappa&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Dh_evaporation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;m_water&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;t_vac_start&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;t_vac_duration&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="c1"># check that spatial model is chosen for jacket</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;jacket&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;dimensionality&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;spatial_2D&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;For simulating &quot;</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                    <span class="o">+</span> <span class="s2">&quot;a 2D model is required.&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># set up additional parameters for jacket-ramped freezing</span>
+        <span class="n">air_gap</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;jacket&quot;</span><span class="p">][</span><span class="s2">&quot;air_gap&quot;</span><span class="p">])</span>
+        <span class="n">lambda_air</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;jacket&quot;</span><span class="p">][</span><span class="s2">&quot;lambda_air&quot;</span><span class="p">])</span>
+
+        <span class="n">constVars</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;lambda_air&quot;</span><span class="p">,</span> <span class="s2">&quot;air_gap&quot;</span><span class="p">])</span>
+
+    <span class="c1"># warn that cylindrical gemoetry instead of cubic geometry is used for spatial model</span>
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;dimensionality&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;homogeneous&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;WARNING: For simulating a &quot;</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;dimensionality&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                <span class="o">+</span> <span class="s2">&quot;model a cylindrical geometry is required. Shape is automatically rewritten to cylinder.&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># this is not a lumped capacitance model</span>
+        <span class="c1"># effective heat conductivity (for non-homog. vial temps)</span>
+        <span class="n">lambda_s</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">][</span><span class="s2">&quot;lambda_s&quot;</span><span class="p">])</span>
+        <span class="n">lambda_w</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;water&quot;</span><span class="p">][</span><span class="s2">&quot;lambda_w&quot;</span><span class="p">])</span>
+        <span class="n">lambda_i</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;water&quot;</span><span class="p">][</span><span class="s2">&quot;lambda_i&quot;</span><span class="p">])</span>
+
+        <span class="c1"># effective heat conductivity of solution</span>
+        <span class="n">lambda_solution</span> <span class="o">=</span> <span class="n">solid_fraction</span> <span class="o">*</span> <span class="n">lambda_s</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">solid_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="n">lambda_w</span>
+
+        <span class="c1"># extend the list of constant variables</span>
+        <span class="n">constVars</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;lambda_s&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;lambda_i&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;lambda_w&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;lambda_solution&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="c1"># bundle things into a dict now</span>
+    <span class="c1"># don&#39;t do it earlier for readability</span>
     <span class="k">for</span> <span class="n">myvar</span> <span class="ow">in</span> <span class="n">constVars</span><span class="p">:</span>
         <span class="n">const</span><span class="p">[</span><span class="n">myvar</span><span class="p">]</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()[</span><span class="n">myvar</span><span class="p">]</span>
 
@@ -377,7 +539,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021-2022, Leif-Thore Deck, David Ochsenbein.
+        &copy; Copyright 2021-2024, Leif-Thore Deck, Andraž Košir, David Ochsenbein.
 
     </p>
   </div>
@@ -399,7 +561,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.1.0',
+            VERSION:'1.1.0.post1.dev34+ga1dec07.d20230707',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -409,6 +571,7 @@
       <script type="text/javascript" src="../../_static/documentation_options.js"></script>
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
 
   

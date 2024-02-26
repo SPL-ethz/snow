@@ -36,6 +36,22 @@ ethz\_snow.snowflake module
    :undoc-members:
    :show-inheritance:
 
+ethz\_snow.snowing module
+-------------------------
+
+.. automodule:: ethz_snow.snowing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ethz\_snow.utils module
+-----------------------
+
+.. automodule:: ethz_snow.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

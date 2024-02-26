@@ -1,4 +1,5 @@
 """Setup file for ethz_snow."""
+
 from setuptools import setup
 
 if __name__ == "__main__":

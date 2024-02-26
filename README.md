@@ -41,6 +41,6 @@ An extension of the modeling framework for the simulation of the freezing proces
 Please report bugs as [Github issues](https://github.com/SPL-ethz/snow/issues/new?assignees=ltdeck&labels=bug) or via [Email](mailto:deckl@ethz.ch), preferably
 including a screenshot that illustrates the problem.
 
-Copyright (c) 2021-2023 Leif-Thore Deck, Andraž Košir, David Ochsenbein 
+Copyright (c) 2021-2024 Leif-Thore Deck, Andraž Košir, David Ochsenbein 
 
 <sub>The snow package logo has been designed using resources from Flaticon.com.</sub>
