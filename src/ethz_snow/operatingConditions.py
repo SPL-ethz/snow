@@ -176,7 +176,6 @@ class OperatingConditions:
         T_vec = np.array([])
 
         for hdict in hdicts:
-
             T_hold = hdict["temp"]
             t_hold = (T_start - T_hold) / cr
             duration_hold = hdict["duration"]

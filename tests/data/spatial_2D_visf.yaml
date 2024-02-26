@@ -1,8 +1,8 @@
 # model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
-dimensionality: homogeneous
+dimensionality: spatial_2D
 
 # freezing configuration to be simulated (shelf, VISF, jacket)
-configuration: shelf
+configuration: VISF
 
 # all vial-related parameters
 vial:
@@ -11,9 +11,9 @@ vial:
     # base shape of vial (snow and snowfall only accepts cube, snowing rewrites it to cylinder)
     shape: cube
     # diameter of the vial for cylindrical geometry (only spatial model) [m]
-    diameter: 0.01
+    diameter: 0.5
     # height of the filled product for cubic (snow/snowfall) and cylindrical geometry (only spatial model) [m]
-    height: 0.01
+    height: 0.5
     # length of the vial when shape is cube [m]
     length: 0.01
     # width of the vial when shape is cube [m]

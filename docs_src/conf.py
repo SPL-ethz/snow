@@ -100,7 +100,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "ethz_snow"
-copyright = "2021-2022, Leif-Thore Deck, David Ochsenbein"
+copyright = "2021-2024, Leif-Thore Deck, Andraž Košir, David Ochsenbein"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

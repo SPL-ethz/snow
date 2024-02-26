@@ -5,10 +5,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Development &mdash; ethz_snow 1.1.0 documentation</title>
+  <title>Development &mdash; ethz_snow 1.1.0.post1.dev34+ga1dec07.d20230707 documentation</title>
   
 
   
@@ -37,7 +38,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="ethz_snow 1.1.0 documentation" href="index.html"/>
+    <link rel="top" title="ethz_snow 1.1.0.post1.dev34+ga1dec07.d20230707 documentation" href="index.html"/>
         <link rel="next" title="License" href="license.html"/>
         <link rel="prev" title="Tutorial" href="tutorial.html"/> 
 
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.1.0.post1.dev34+ga1dec07.d20230707
               </div>
             
           
@@ -170,14 +171,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="development">
-<h1>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="numerical-implementation-of-the-initial-amount-of-ice">
-<h2>Numerical implementation of the initial amount of ice<a class="headerlink" href="#numerical-implementation-of-the-initial-amount-of-ice" title="Permalink to this headline">¶</a></h2>
+  <section id="development">
+<h1>Development<a class="headerlink" href="#development" title="Permalink to this heading">¶</a></h1>
+<section id="numerical-implementation-of-the-initial-amount-of-ice">
+<h2>Numerical implementation of the initial amount of ice<a class="headerlink" href="#numerical-implementation-of-the-initial-amount-of-ice" title="Permalink to this heading">¶</a></h2>
 <p>The modeling framework that forms the basis for the SNOW python package
-was derived initially by <span id="id1">Deck <em>et al.</em> [<a class="reference internal" href="#id9" title="Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic shelf-scale modeling framework for the freezing stage in freeze-drying processes. International Journal of Pharmaceutics, 613:121276, 2022. URL: https://www.sciencedirect.com/science/article/pii/S0378517321010826, doi:https://doi.org/10.1016/j.ijpharm.2021.121276.">DOM22a</a>]</span> (version 1.0) for
+was derived initially by <span id="id1">Deck <em>et al.</em> [<a class="reference internal" href="#id9" title="Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic shelf-scale modeling framework for the freezing stage in freeze-drying processes. International Journal of Pharmaceutics, 613:121276, 2022. URL: https://www.sciencedirect.com/science/article/pii/S0378517321010826, doi:https://doi.org/10.1016/j.ijpharm.2021.121276.">DOM22b</a>]</span> (version 1.0) for
 systems comprising vials arranged in two spatial dimensions, and was extended by
-<span id="id2">Deck <em>et al.</em> [<a class="reference internal" href="#id10" title="Leif-Thore Deck, David Richard Ochsenbein, and Marco Mazzotti. Stochastic ice nucleation governs the freezing process of biopharmaceuticals in vials. ChemRxiv, 2022. doi:10.26434/chemrxiv-2022-gnwhf.">DOM22b</a>]</span> (version 1.1) to simulate systems comprising vials
+<span id="id2">Deck <em>et al.</em> [<a class="reference internal" href="#id10" title="Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic ice nucleation governs the freezing process of biopharmaceuticals in vials. International Journal of Pharmaceutics, 625:122051, September 2022. URL: https://doi.org/10.1016/j.ijpharm.2022.122051, doi:10.1016/j.ijpharm.2022.122051.">DOM22a</a>]</span> (version 1.1) to simulate systems comprising vials
 arranged in three spatial dimensions.</p>
 <p>This section discusses a minor aspect of this modeling framework, namely
 the numerical implementation of the initial amount of ice formed upon
@@ -189,10 +190,10 @@ requires rearranging the enthalpy balance. This will be discussed in the
 following.</p>
 <p>With respect to numerical implementation, version 1.0 contains the
 “indirect” method only, while version 1.1 supports both methods.</p>
-<div class="section" id="model-derivation">
-<h3>Model derivation<a class="headerlink" href="#model-derivation" title="Permalink to this headline">¶</a></h3>
+<section id="model-derivation">
+<h3>Model derivation<a class="headerlink" href="#model-derivation" title="Permalink to this heading">¶</a></h3>
 <p>The starting point for these methods are equations
-<span class="math notranslate nohighlight">\(\ref{eq8_org}\)</span> to <span class="math notranslate nohighlight">\(\ref{eq10_org}\)</span> of the manuscript by <span id="id3">Deck <em>et al.</em> [<a class="reference internal" href="#id9" title="Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic shelf-scale modeling framework for the freezing stage in freeze-drying processes. International Journal of Pharmaceutics, 613:121276, 2022. URL: https://www.sciencedirect.com/science/article/pii/S0378517321010826, doi:https://doi.org/10.1016/j.ijpharm.2021.121276.">DOM22a</a>]</span>. The relevant equations are:</p>
+<span class="math notranslate nohighlight">\(\ref{eq8_org}\)</span> to <span class="math notranslate nohighlight">\(\ref{eq10_org}\)</span> of the manuscript by <span id="id3">Deck <em>et al.</em> [<a class="reference internal" href="#id9" title="Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic shelf-scale modeling framework for the freezing stage in freeze-drying processes. International Journal of Pharmaceutics, 613:121276, 2022. URL: https://www.sciencedirect.com/science/article/pii/S0378517321010826, doi:https://doi.org/10.1016/j.ijpharm.2021.121276.">DOM22b</a>]</span>. The relevant equations are:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{align}
 \dot{Q}_{(m,n)} &amp;=\left( m_{\mathrm{s}} c_{\mathrm{p,s}} + m_{\mathrm{\ell},(m,n)} c_{\mathrm{p,\ell}} + m_{\mathrm{i},(m,n)} c_{\mathrm{p,i}} \right) \dfrac{\mathrm{d}T_{(m,n)}^{\mathrm{eq}}}{\mathrm{d}t} \\
@@ -222,9 +223,9 @@ system of two equations in two unknowns. When inserting</p>
    - \frac{\dot{Q}_{(m,n)}}{m_{\mathrm{v}}} &amp;=  \dfrac{\mathrm{d}\sigma_{(m,n)}}{\mathrm{d}t}  \left[ \left( w_{\mathrm{s}} c_{\mathrm{p,s}} + (1- w_{\mathrm{s}})(c_{\mathrm{p,\ell}} + \sigma_{(m,n)}( c_{\mathrm{p,i}}-c_{\mathrm{p,\ell}})) \right)  \frac{D}{(1 - \sigma_{(m,n)})^2 } \right. \\
   &amp;\left. \vphantom{\dfrac{\mathrm{d}\sigma_{(m,n)}}{\mathrm{d}t}} + \lambda_{\mathrm{w}} (1-w_{\mathrm{s}}) \right] \label{eq5} \tag{5}
 \end{align}\end{split}\]</div>
-</div>
-<div class="section" id="indirect-method">
-<h3>Indirect method<a class="headerlink" href="#indirect-method" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="indirect-method">
+<h3>Indirect method<a class="headerlink" href="#indirect-method" title="Permalink to this heading">¶</a></h3>
 <p>This method relies on the enthalpy balance (equations <span class="math notranslate nohighlight">\(\ref{eq8_org}\)</span> and <span class="math notranslate nohighlight">\(\ref{eq1}\)</span>) to calculate the amount
 of ice formed upon nucleation. In line with the overall description of
 freezing used in the derivation, nucleation is considered to be an
@@ -253,9 +254,9 @@ balance simplifies to:</p>
 <p>Rearranging leads to the final expression for the formed ice:</p>
 <div class="math notranslate nohighlight">
 \[\sigma_{\mathrm{nuc},(m,n)} = \frac{T^{\mathrm{eq}}_{\ell} - T^{\mathrm{nuc}}_{(m,n)}}{D + \frac{\lambda_{\mathrm{w}}}{c_{\mathrm{p}}}(1 - w_{\mathrm{s}})}\label{eq9} \tag{9}\]</div>
-</div>
-<div class="section" id="direct-method">
-<h3>Direct method<a class="headerlink" href="#direct-method" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="direct-method">
+<h3>Direct method<a class="headerlink" href="#direct-method" title="Permalink to this heading">¶</a></h3>
 <p>The second method relies on the use of equation <span class="math notranslate nohighlight">\(\ref{eq10_org}\)</span>
 and its rescaled equivalent, equation <span class="math notranslate nohighlight">\(\ref{eq3}\)</span>. Again, we
 insert the expression for the equilibrium freezing temperature to obtain
@@ -270,39 +271,43 @@ a system dependent only on <span class="math notranslate nohighlight">\(\sigma\)
 following quadratic equation, which may be solved analytically:</p>
 <div class="math notranslate nohighlight">
 \[\sigma_{(m,n)}^2 (- \gamma) +  \sigma_{(m,n)} ( T_{\mathrm{m}} - T^{\mathrm{nuc}}_{(m,n)} + \gamma) + D - T_{\mathrm{m}} + T^{\mathrm{nuc}}_{(m,n)} = 0\label{12} \tag{12}\]</div>
-</div>
-<div class="section" id="comparison-of-the-two-methods">
-<h3>Comparison of the two methods<a class="headerlink" href="#comparison-of-the-two-methods" title="Permalink to this headline">¶</a></h3>
-<p>For the system studied by <span id="id4">Deck <em>et al.</em> [<a class="reference internal" href="#id9" title="Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic shelf-scale modeling framework for the freezing stage in freeze-drying processes. International Journal of Pharmaceutics, 613:121276, 2022. URL: https://www.sciencedirect.com/science/article/pii/S0378517321010826, doi:https://doi.org/10.1016/j.ijpharm.2021.121276.">DOM22a</a>]</span> and by
-<span id="id5">Deck <em>et al.</em> [<a class="reference internal" href="#id10" title="Leif-Thore Deck, David Richard Ochsenbein, and Marco Mazzotti. Stochastic ice nucleation governs the freezing process of biopharmaceuticals in vials. ChemRxiv, 2022. doi:10.26434/chemrxiv-2022-gnwhf.">DOM22b</a>]</span>, namely a 5 wt.% sucrose solution, the
+</section>
+<section id="comparison-of-the-two-methods">
+<h3>Comparison of the two methods<a class="headerlink" href="#comparison-of-the-two-methods" title="Permalink to this heading">¶</a></h3>
+<p>For the system studied by <span id="id4">Deck <em>et al.</em> [<a class="reference internal" href="#id9" title="Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic shelf-scale modeling framework for the freezing stage in freeze-drying processes. International Journal of Pharmaceutics, 613:121276, 2022. URL: https://www.sciencedirect.com/science/article/pii/S0378517321010826, doi:https://doi.org/10.1016/j.ijpharm.2021.121276.">DOM22b</a>]</span> and by
+<span id="id5">Deck <em>et al.</em> [<a class="reference internal" href="#id10" title="Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic ice nucleation governs the freezing process of biopharmaceuticals in vials. International Journal of Pharmaceutics, 625:122051, September 2022. URL: https://doi.org/10.1016/j.ijpharm.2022.122051, doi:10.1016/j.ijpharm.2022.122051.">DOM22a</a>]</span>, namely a 5 wt.% sucrose solution, the
 predictions of both methods for the initial amount of formed ice are
 compared. Figure <a class="reference external" href="#fig:models">1</a> visualizes the predictions and the
 relative error between the two methods.</p>
-<div class="figure align-center" id="fig-models">
-<img alt="Comparison of the two models." src="_images/comparison_methods.svg" /><p class="caption"><span class="caption-text">Comparison of the two models. Left: Prediction of the amount of ice
+<figure class="align-center" id="fig-models">
+<img alt="Comparison of the two models." src="_images/comparison_methods.svg" /><figcaption>
+<p><span class="caption-text">Comparison of the two models. Left: Prediction of the amount of ice
 formed. Right: Relative error between the two predictions.</span><a class="headerlink" href="#fig-models" title="Permalink to this image">¶</a></p>
-</div>
+</figcaption>
+</figure>
 <p>It is found that for the relevant range of nucleation temperatures, i.e.
 -10°C to -15°C, the relative error between the predictions is below
 0.1%, so that both methods may be considered as equivalent. In a second
 step, we compare the impact of both methods on the freezing of a complex
 system. We chose a box of 20x12x3 vials, a system discussed in detail by
-<span id="id6">Deck <em>et al.</em> [<a class="reference internal" href="#id10" title="Leif-Thore Deck, David Richard Ochsenbein, and Marco Mazzotti. Stochastic ice nucleation governs the freezing process of biopharmaceuticals in vials. ChemRxiv, 2022. doi:10.26434/chemrxiv-2022-gnwhf.">DOM22b</a>]</span>. This is shown in Figure <a class="reference external" href="#fig:box">2</a>.</p>
-<div class="figure align-default" id="fig-box">
-<img alt="Freezing of a box of vials." src="_images/comparison_box.svg" /><p class="caption"><span class="caption-text">Freezing of a box of vials. Comparison of the two methods to compute
+<span id="id6">Deck <em>et al.</em> [<a class="reference internal" href="#id10" title="Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic ice nucleation governs the freezing process of biopharmaceuticals in vials. International Journal of Pharmaceutics, 625:122051, September 2022. URL: https://doi.org/10.1016/j.ijpharm.2022.122051, doi:10.1016/j.ijpharm.2022.122051.">DOM22a</a>]</span>. This is shown in Figure <a class="reference external" href="#fig:box">2</a>.</p>
+<figure class="align-default" id="fig-box">
+<img alt="Freezing of a box of vials." src="_images/comparison_box.svg" /><figcaption>
+<p><span class="caption-text">Freezing of a box of vials. Comparison of the two methods to compute
 the initial amount of ice. (a): Distribution of nucleation
 temperatures. (b) Distribution of solidification times. (c):
 Distribution of nucleation times.</span><a class="headerlink" href="#fig-box" title="Permalink to this image">¶</a></p>
-</div>
+</figcaption>
+</figure>
 <p>As can be seen, no relevant difference is observed between the two model
 predictions. Given that their computational costs are similar and that
 both are grounded on the same set of model equations, both represent
 suitable choices for implementation in the model. Thus, both methods are
 integrated in version 1.1. of the SNOW package.</p>
-</div>
-</div>
-<div class="section" id="numerical-validation-of-snow-version-1-1">
-<h2>Numerical validation of SNOW version 1.1<a class="headerlink" href="#numerical-validation-of-snow-version-1-1" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="numerical-validation-of-snow-version-1-1">
+<h2>Numerical validation of SNOW version 1.1<a class="headerlink" href="#numerical-validation-of-snow-version-1-1" title="Permalink to this heading">¶</a></h2>
 <p>Similar to the validation of SNOW version 1.0, the numerical
 implementation of version 1.1. is also validated by comparison with the
 earlier MATLAB implementation. We refer the reader to the initial
@@ -311,18 +316,20 @@ discussion of the approach.</p>
 <p>Here, we present simulation results for pallet freezing, the main
 application of version 1.1. The model system is a pallet comprising
 40x36x18 vials, in line with the systems studied in the pre-print by
-<span id="id7">Deck <em>et al.</em> [<a class="reference internal" href="#id10" title="Leif-Thore Deck, David Richard Ochsenbein, and Marco Mazzotti. Stochastic ice nucleation governs the freezing process of biopharmaceuticals in vials. ChemRxiv, 2022. doi:10.26434/chemrxiv-2022-gnwhf.">DOM22b</a>]</span>. The two most “extreme” storage
+<span id="id7">Deck <em>et al.</em> [<a class="reference internal" href="#id10" title="Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic ice nucleation governs the freezing process of biopharmaceuticals in vials. International Journal of Pharmaceutics, 625:122051, September 2022. URL: https://doi.org/10.1016/j.ijpharm.2022.122051, doi:10.1016/j.ijpharm.2022.122051.">DOM22a</a>]</span>. The two most “extreme” storage
 temperatures are considered here, i.e. -8°C and -40°C to enable a
 comprehensive comparison. 128 simulations are carried out, a typical
 number of repetitions used in the manuscript. The run at -8°C was
 simulated for a total of 6e6 seconds, while the one at -40°C was faster
 with 1e6 s.</p>
-<div class="figure align-default" id="fig-pallet">
-<img alt="Freezing of a pallet of vials." src="_images/validation_pallet.svg" /><p class="caption"><span class="caption-text">Freezing of a pallet of vials. Comparison of the model predictions
+<figure class="align-default" id="fig-pallet">
+<img alt="Freezing of a pallet of vials." src="_images/validation_pallet.svg" /><figcaption>
+<p><span class="caption-text">Freezing of a pallet of vials. Comparison of the model predictions
 obtained from the MATLAB and python implementations. Left:
 Distribution of nucleation temperatures. Center: Distribution of
 solidification times. Right: Distribution of nucleation times.</span><a class="headerlink" href="#fig-pallet" title="Permalink to this image">¶</a></p>
-</div>
+</figcaption>
+</figure>
 <p>Figure <a class="reference external" href="#fig:pallet">3</a> shows a close agreement between both
 implementations, independent of studied storage temperature. This
 indicates that both implementations may be used interchangeably for
@@ -339,16 +346,16 @@ difference in runtime is small enough to be not a limiting factor of
 use.</p>
 <div class="docutils container" id="id8">
 <dl class="citation">
-<dt class="label" id="id9"><span class="brackets">DOM22a</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id3">2</a>,<a href="#id4">3</a>)</span></dt>
-<dd><p>Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic shelf-scale modeling framework for the freezing stage in freeze-drying processes. <em>International Journal of Pharmaceutics</em>, 613:121276, 2022. URL: <a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S0378517321010826">https://www.sciencedirect.com/science/article/pii/S0378517321010826</a>, <a class="reference external" href="https://doi.org/https://doi.org/10.1016/j.ijpharm.2021.121276">doi:https://doi.org/10.1016/j.ijpharm.2021.121276</a>.</p>
+<dt class="label" id="id10"><span class="brackets">DOM22a</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id5">2</a>,<a href="#id6">3</a>,<a href="#id7">4</a>)</span></dt>
+<dd><p>Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic ice nucleation governs the freezing process of biopharmaceuticals in vials. <em>International Journal of Pharmaceutics</em>, 625:122051, September 2022. URL: <a class="reference external" href="https://doi.org/10.1016/j.ijpharm.2022.122051">https://doi.org/10.1016/j.ijpharm.2022.122051</a>, <a class="reference external" href="https://doi.org/10.1016/j.ijpharm.2022.122051">doi:10.1016/j.ijpharm.2022.122051</a>.</p>
 </dd>
-<dt class="label" id="id10"><span class="brackets">DOM22b</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id5">2</a>,<a href="#id6">3</a>,<a href="#id7">4</a>)</span></dt>
-<dd><p>Leif-Thore Deck, David Richard Ochsenbein, and Marco Mazzotti. Stochastic ice nucleation governs the freezing process of biopharmaceuticals in vials. <em>ChemRxiv</em>, 2022. <a class="reference external" href="https://doi.org/10.26434/chemrxiv-2022-gnwhf">doi:10.26434/chemrxiv-2022-gnwhf</a>.</p>
+<dt class="label" id="id9"><span class="brackets">DOM22b</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id3">2</a>,<a href="#id4">3</a>)</span></dt>
+<dd><p>Leif-Thore Deck, David R. Ochsenbein, and Marco Mazzotti. Stochastic shelf-scale modeling framework for the freezing stage in freeze-drying processes. <em>International Journal of Pharmaceutics</em>, 613:121276, 2022. URL: <a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S0378517321010826">https://www.sciencedirect.com/science/article/pii/S0378517321010826</a>, <a class="reference external" href="https://doi.org/https://doi.org/10.1016/j.ijpharm.2021.121276">doi:https://doi.org/10.1016/j.ijpharm.2021.121276</a>.</p>
 </dd>
 </dl>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -369,7 +376,7 @@ use.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021-2022, Leif-Thore Deck, David Ochsenbein.
+        &copy; Copyright 2021-2024, Leif-Thore Deck, Andraž Košir, David Ochsenbein.
 
     </p>
   </div>
@@ -391,7 +398,7 @@ use.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.1.0',
+            VERSION:'1.1.0.post1.dev34+ga1dec07.d20230707',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -401,6 +408,7 @@ use.</p>
       <script type="text/javascript" src="_static/documentation_options.js"></script>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/_sphinx_javascript_frameworks_compat.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 

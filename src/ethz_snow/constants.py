@@ -3,6 +3,7 @@
 # Loading yaml config file
 import pkg_resources
 import yaml
+from numpy import pi
 
 from collections.abc import Mapping
 
@@ -86,7 +87,6 @@ def _loadConfig(fpath: Optional[str] = None) -> dict:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     if fpath is not None:
-
         with open(fpath) as f:
             customConfig = yaml.load(f, Loader=yaml.FullLoader)
 
@@ -134,23 +134,81 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
     config = _loadConfig(fpath)
 
     const = dict()
+
     # copy directly from yaml
     T_eq = float(config["solution"]["T_eq"])
     kb = float(config["kinetics"]["kb"])
     b = float(config["kinetics"]["b"])
 
-    # derived properties of vial
-    if not config["vial"]["geometry"]["shape"].startswith("cub"):
+    rho_l = float(config["solution"]["rho_l"])
+    height = float(config["vial"]["geometry"]["height"])
+    diameter = float(config["vial"]["geometry"]["diameter"])
+
+    dimensionality = str(config["dimensionality"])
+    configuration = str(config["configuration"])
+
+    # check configuration
+    if configuration not in {"shelf", "VISF", "jacket"}:
+        raise NotImplementedError(
+            (
+                f'Configuration "{configuration}" '
+                + 'not correctly specified, use "shelf", "jacket" or "VISF".'
+            )
+        )
+
+    # check model dimensionality
+    if dimensionality not in {"homogeneous", "spatial_1D", "spatial_2D"}:
+        raise NotImplementedError(
+            (
+                f'Model dimensionality "{dimensionality}" '
+                + "not correctly specified, use homogeneous, spatial_1D or spatial_2D."
+            )
+        )
+
+    # derived properties of vial for cubic shape
+    if config["vial"]["geometry"]["shape"].startswith("cub"):
+        A = float(config["vial"]["geometry"]["length"]) * float(
+            config["vial"]["geometry"]["width"]
+        )
+
+    # vial properties for cylindrical shape, commented out for now
+    # elif config["vial"]["geometry"]["shape"].startswith("cyl"):
+    #     geoKeys = config["vial"]["geometry"].keys()
+    #     if ("radius" in geoKeys) and (config["vial"]["geometry"]["radius"] is not None):
+    #         # radius is specified (not in defaults!)
+    #         cyl_r = float(config["vial"]["geometry"]["radius"])
+    #     elif ("diameter" in geoKeys) and (
+    #         config["vial"]["geometry"]["diameter"] is not None
+    #     ):
+    #         # diameter is specified
+    #         cyl_r = float(config["vial"]["geometry"]["diameter"]) / 2
+    #     elif ("length" in geoKeys) and ("width" in geoKeys):
+    #         # length and width specified
+    #         assert float(config["vial"]["geometry"]["length"]) == float(
+    #             config["vial"]["geometry"]["width"]
+    #         ), "Length and width must match for cylinders."
+
+    #         # interpret as diameter
+    #         cyl_r = float(config["vial"]["geometry"]["length"]) / 2
+    #     elif "length" in geoKeys:
+    #         # only length specified
+    #         cyl_r = float(config["vial"]["geometry"]["length"]) / 2
+    #     elif "width" in geoKeys:
+    #         # only width specified
+    #         cyl_r = float(config["vial"]["geometry"]["width"]) / 2
+
+    #     A = pi * cyl_r**2
+
+    else:
         raise NotImplementedError(
             (
                 f'Cannot handle shape "{config["vial"]["geometry"]["shape"]}". '
-                + "Only cubic shape is supported at this moment."
+                + 'Only "cubic" shape is supported. In Snowing, the shape is automatically rewritten to "cylinder".'
             )
         )
-    A = float(config["vial"]["geometry"]["length"]) * float(
-        config["vial"]["geometry"]["width"]
-    )
-    V = A * float(config["vial"]["geometry"]["height"])
+
+    # volume
+    V = A * height
 
     # derived properties of solution
     cp_s = float(config["solution"]["cp_s"])
@@ -164,7 +222,8 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
     )  # heat capacity of solution
 
     # Shortcut definitions
-    mass = float(config["solution"]["rho_l"]) * V
+    mass = rho_l * V
+
     hl = mass * cp_solution
     depression = (
         float(config["solution"]["k_f"])
@@ -179,9 +238,26 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
 
     T_eq_l = T_eq - depression
 
-    # bundle things into a dict now
-    # don't do it earlier for readability
+    # latent heat of fusion
+    Dh = float(config["water"]["Dh"])
+
+    # needed for solving nucleation
+    k_f = float(config["solution"]["k_f"])
+    M_s = float(config["solution"]["M_s"])
+
+    # general constants
+    sigma_B = float(config["general"]["sigma_B"])
+    k_B = float(config["general"]["k_B"])
+
+    # mass of solute and water in the solution
+    mass_solute = mass * solid_fraction
+    mass_water = mass * (1 - solid_fraction)
+
+    # freezing configuration
+    configuration = str(config["configuration"])
+
     constVars = [
+        "dimensionality",
         "T_eq",
         "T_eq_l",
         "kb",
@@ -189,6 +265,7 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         "A",
         "V",
         "cp_s",
+        "rho_l",
         "solid_fraction",
         "cp_w",
         "cp_i",
@@ -198,8 +275,93 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         "depression",
         "alpha",
         "beta_solution",
+        "Dh",
+        "k_f",
+        "M_s",
+        "sigma_B",
+        "k_B",
+        "mass_solute",
+        "mass_water",
+        "height",
+        "diameter",
+        "configuration",
     ]
 
+    # check that spatial model is chosen for VISF
+    if config["configuration"] == "VISF":
+        if config["dimensionality"] == "homogeneous":
+            raise NotImplementedError(
+                (
+                    f'For simulating "{config["configuration"]}" '
+                    + "a spatial model is required."
+                )
+            )
+
+        # set up additional parameters for VISF
+        p_vac = float(config["VISF"]["p_vac"])
+        kappa = float(config["VISF"]["kappa"])
+        Dh_evaporation = float(config["VISF"]["Dh_evaporation"])
+        m_water = float(config["VISF"]["m_water"])
+        t_vac_start = float(config["VISF"]["t_vac_start"])
+        t_vac_duration = float(config["VISF"]["t_vac_duration"])
+
+        constVars.extend(
+            [
+                "p_vac",
+                "kappa",
+                "Dh_evaporation",
+                "m_water",
+                "t_vac_start",
+                "t_vac_duration",
+            ]
+        )
+
+    # check that spatial model is chosen for jacket
+    elif config["configuration"] == "jacket":
+        if config["dimensionality"] != "spatial_2D":
+            raise NotImplementedError(
+                (
+                    f'For simulating "{config["configuration"]}" '
+                    + "a 2D model is required."
+                )
+            )
+
+        # set up additional parameters for jacket-ramped freezing
+        air_gap = float(config["jacket"]["air_gap"])
+        lambda_air = float(config["jacket"]["lambda_air"])
+
+        constVars.extend(["lambda_air", "air_gap"])
+
+    # warn that cylindrical gemoetry instead of cubic geometry is used for spatial model
+    if config["dimensionality"] != "homogeneous":
+        print(
+            (
+                f'WARNING: For simulating a "{config["dimensionality"]}" '
+                + "model a cylindrical geometry is required. Shape is automatically rewritten to cylinder."
+            )
+        )
+
+        # this is not a lumped capacitance model
+        # effective heat conductivity (for non-homog. vial temps)
+        lambda_s = float(config["solution"]["lambda_s"])
+        lambda_w = float(config["water"]["lambda_w"])
+        lambda_i = float(config["water"]["lambda_i"])
+
+        # effective heat conductivity of solution
+        lambda_solution = solid_fraction * lambda_s + (1 - solid_fraction) * lambda_w
+
+        # extend the list of constant variables
+        constVars.extend(
+            [
+                "lambda_s",
+                "lambda_i",
+                "lambda_w",
+                "lambda_solution",
+            ]
+        )
+
+    # bundle things into a dict now
+    # don't do it earlier for readability
     for myvar in constVars:
         const[myvar] = locals()[myvar]
 
