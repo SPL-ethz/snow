@@ -5,10 +5,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview &mdash; ethz_snow 1.1.0 documentation</title>
+  <title>Overview &mdash; ethz_snow 1.1.0.post1.dev34+ga1dec07.d20230707 documentation</title>
   
 
   
@@ -37,7 +38,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="ethz_snow 1.1.0 documentation" href="index.html"/>
+    <link rel="top" title="ethz_snow 1.1.0.post1.dev34+ga1dec07.d20230707 documentation" href="index.html"/>
         <link rel="next" title="Tutorial" href="tutorial.html"/>
         <link rel="prev" title="ethz_snow" href="index.html"/> 
 
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.1.0.post1.dev34+ga1dec07.d20230707
               </div>
             
           
@@ -92,7 +93,8 @@
                 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#description">Description</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#additional-features-currently-supported-as-of-version-1-1">Additional features currently supported (as of version 1.1)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#additional-features-supported-by-version-2-0">Additional features supported by version 2.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#additional-features-supported-by-version-1-1">Additional features supported by version 1.1</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#features-supported-as-of-version-1-0">Features supported as of version 1.0</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#features-in-preparation">Features in preparation</a></li>
 </ul>
@@ -169,35 +171,43 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="overview">
-<span id="readme"></span><h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
-<p><span class="raw-html-m2r"><img src="/docs_src/_media/snowLogo_inv_v1.png" width="400"></span></p>
+  <section id="overview">
+<span id="readme"></span><h1>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h1>
+<p><span class="raw-html-m2r"><img src="https://github.com/SPL-ethz/snow/raw/main/docs_src/_media/snowLogo_v1.png" width="400"></span></p>
 <a class="reference external image-reference" href="https://img.shields.io/github/v/tag/SPL-ethz/snow"><img alt="tag" src="https://img.shields.io/github/v/tag/SPL-ethz/snow" /></a>
 <a class="reference external image-reference" href="https://img.shields.io/pypi/v/ethz-snow"><img alt="pypi" src="https://img.shields.io/pypi/v/ethz-snow" /></a>
 <a class="reference external image-reference" href="https://img.shields.io/github/workflow/status/SPL-ethz/snow/Python%20package"><img alt="build" src="https://img.shields.io/github/workflow/status/SPL-ethz/snow/Python%20package" /></a>
-<a class="reference external image-reference" href="https://coveralls.io/github/SPL-ethz/snow?branch=feature/coveralls"><img alt="Coverage Status" src="https://coveralls.io/repos/github/SPL-ethz/snow/badge.svg?branch=feature/coveralls" /></a>
+<a class="reference external image-reference" href="https://coveralls.io/repos/github/SPL-ethz/snow/badge.svg?branch=main"><img alt="Coverage Status" src="https://coveralls.io/repos/github/SPL-ethz/snow/badge.svg?branch=main" /></a>
 <a class="reference external image-reference" href="https://img.shields.io/github/stars/SPL-ethz/snow?style=social"><img alt="" src="https://img.shields.io/github/stars/SPL-ethz/snow?style=social" /></a>
 <a class="reference external image-reference" href="https://img.shields.io/github/watchers/SPL-ethz/snow?style=social"><img alt="" src="https://img.shields.io/github/watchers/SPL-ethz/snow?style=social" /></a>
 <a class="reference external image-reference" href="https://img.shields.io/github/commit-activity/m/SPL-ethz/snow"><img alt="" src="https://img.shields.io/github/commit-activity/m/SPL-ethz/snow" /></a>
 <a class="reference external image-reference" href="https://img.shields.io/github/issues-raw/SPL-ethz/snow"><img alt="" src="https://img.shields.io/github/issues-raw/SPL-ethz/snow" /></a>
 <a class="reference external image-reference" href="https://img.shields.io/pypi/l/ethz-snow"><img alt="" src="https://img.shields.io/pypi/l/ethz-snow" /></a>
 <a class="reference external image-reference" href="https://img.shields.io/badge/code%20style-black-black"><img alt="" src="https://img.shields.io/badge/code%20style-black-black" /></a>
-<p>SNOW (<strong>S</strong>tochastic <strong>N</strong>ucleation <strong>O</strong>f <strong>W</strong>ater) is an open source modeling framework to simulate the freezing process in a large number of vials, tailored towards pharmaceutical freeze-drying processes. SNOW was developed as part of a research collaboration between ETH Zurich’s Separation Processes Laboratory and Janssen (pharmaceutical companies of J&amp;J). It is brought to you by Leif-Thore Deck and Dr. David Ochsenbein.</p>
-<div class="section" id="description">
-<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>SNOW (<strong>S</strong>tochastic <strong>N</strong>ucleation <strong>O</strong>f <strong>W</strong>ater) is an open source modeling framework to simulate the freezing process in a large number of vials, tailored towards pharmaceutical freeze-drying processes. SNOW was developed as part of a research collaboration between ETH Zurich’s Separation Processes Laboratory and Janssen (pharmaceutical companies of J&amp;J). It is brought to you by Leif-Thore Deck, Andraž Košir and Dr. David Ochsenbein.</p>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
 <p>SNOW is a model capable of simulating the entire freezing process for a batch of vials, from the liquid state to the completely frozen state. It combines balance equations, thermodynamics and a stochastic approach to ice nucleation to provide a comprehensive view of freezing and is entirely derived from first principles.</p>
 <p>In addition to the simulation of the thermal evolution of vials during freezing, SNOW tracks a number of characteristic quantities of the freezing process for each vial. These quantities are the nucleation time, the nucleation temperature and the solidification time. Both nucleation and solidification are correlated with attributes of the frozen product such as the mean crystal size and the product activity of an API. Variability in these quantities among vials may thus be used as surrogate for batch heterogeneity. SNOW consequently may be used in process design and optimization to identify suitable cooling protocols with sufficiently small batch heterogeneity.</p>
-<p>A more detailed description of the modeling framework is presented in a recent publication, which is publicly accessible under <a class="reference external" href="https://doi.org/10.1016/j.ijpharm.2021.121276">https://doi.org/10.1016/j.ijpharm.2021.121276</a> While version 1.0 is tailored towards simulations of the freezing stage in freeze-drying, version 1.1. was developed for pallet freezing; pallet freezing is for example used in the manufacturing of the Janssen COVID-19 vaccine, which served as case study for the model. Version 1.1 and the case study on the COVID-vaccine are discussed in detail in a recent pre-print at ChemRxiv: <a class="reference external" href="https://doi.org/10.26434/chemrxiv-2022-gnwhf">https://doi.org/10.26434/chemrxiv-2022-gnwhf</a></p>
-<div class="section" id="additional-features-currently-supported-as-of-version-1-1">
-<h3>Additional features currently supported (as of version 1.1)<a class="headerlink" href="#additional-features-currently-supported-as-of-version-1-1" title="Permalink to this headline">¶</a></h3>
+<p>A more detailed description of the modeling framework is presented in a recent publication, which is publicly accessible under <a class="reference external" href="https://doi.org/10.1016/j.ijpharm.2021.121276">https://doi.org/10.1016/j.ijpharm.2021.121276</a> While version 1.0 is tailored towards simulations of the freezing stage in freeze-drying, version 1.1. was developed for pallet freezing; pallet freezing is for example used in the manufacturing of the Janssen COVID-19 vaccine, which served as case study for the model. Version 1.1 and the case study on the COVID-vaccine are discussed in detail in a recent scientific publication: <a class="reference external" href="https://doi.org/10.1016/j.ijpharm.2022.122051">https://doi.org/10.1016/j.ijpharm.2022.122051</a></p>
+<p>An extension of the modeling framework for the simulation of the freezing process with spatial resolution within individual containers has been implemented in version 2.0 and is discussed in detail within the scope of a recent scientific publication: <a class="reference external" href="https://doi.org/10.1016/j.cej.2024.148660">https://doi.org/10.1016/j.cej.2024.148660</a>.</p>
+<section id="additional-features-supported-by-version-2-0">
+<h3>Additional features supported by version 2.0<a class="headerlink" href="#additional-features-supported-by-version-2-0" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Spatial simulation of freezing within individual containers with different dimensionalities (0D, 1D, 2D)</p></li>
+<li><p>Simulation of three process configurations (shelf-ramped freezing, vacuum-induced surface freezing, jacket-ramped freezing)</p></li>
+</ul>
+</section>
+<section id="additional-features-supported-by-version-1-1">
+<h3>Additional features supported by version 1.1<a class="headerlink" href="#additional-features-supported-by-version-1-1" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Simulation of systems comprising vials arranged in three spatial dimensions</p></li>
 <li><p>Arbitrary initial temperature of the vials</p></li>
 <li><p>Improvements in the numerical implementation (Second method to compare the initial amount of ice formed, faster data saving)</p></li>
 </ul>
-</div>
-<div class="section" id="features-supported-as-of-version-1-0">
-<h3>Features supported as of version 1.0<a class="headerlink" href="#features-supported-as-of-version-1-0" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="features-supported-as-of-version-1-0">
+<h3>Features supported as of version 1.0<a class="headerlink" href="#features-supported-as-of-version-1-0" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Simulation of the thermal evolution and ice formation for a batch with arbitrary number of vials</p></li>
 <li><p>Arbitrary cooling protocols (i.e., user may choose cooling rate, integrate holding steps and controlled nucleation)</p></li>
@@ -205,25 +215,25 @@
 <li><p>Stochastic nucleation in the form of a Monte Carlo approach as well as controlled nucleation in the form of forced initiation of nucleation at a certain point in time</p></li>
 <li><p>Cubic geometry of vial and rectangular arrangement on the shelf</p></li>
 </ul>
-</div>
-<div class="section" id="features-in-preparation">
-<h3>Features in preparation<a class="headerlink" href="#features-in-preparation" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="features-in-preparation">
+<h3>Features in preparation<a class="headerlink" href="#features-in-preparation" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Hexagonal arrangement of vials on the shelf for freeze-drying</p></li>
 <li><p>Additional modes of heat transfer (e.g. thermal radiation)</p></li>
 <li><p>Alternative vial / vessel geometries</p></li>
 <li><p>Spatial simulation of freezing within a single vessel</p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="bug-reports">
-<h2>Bug reports<a class="headerlink" href="#bug-reports" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="bug-reports">
+<h2>Bug reports<a class="headerlink" href="#bug-reports" title="Permalink to this heading">¶</a></h2>
 <p>Please report bugs as <a class="reference external" href="https://github.com/SPL-ethz/snow/issues/new?assignees=ltdeck&amp;labels=bug">Github issues</a> or via <a class="reference external" href="mailto:deckl&#37;&#52;&#48;ethz&#46;ch">Email</a>, preferably
 including a screenshot that illustrates the problem.</p>
-<p>Copyright (c) 2021-2022 Leif-Thore Deck, David Ochsenbein</p>
+<p>Copyright (c) 2021-2024 Leif-Thore Deck, Andraž Košir, David Ochsenbein</p>
 <p><span class="raw-html-m2r"><sub>The snow package logo has been designed using resources from Flaticon.com.</sub></span></p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -266,7 +276,7 @@ including a screenshot that illustrates the problem.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.1.0',
+            VERSION:'1.1.0.post1.dev34+ga1dec07.d20230707',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -276,6 +286,7 @@ including a screenshot that illustrates the problem.</p>
       <script type="text/javascript" src="_static/documentation_options.js"></script>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/_sphinx_javascript_frameworks_compat.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
 
   
