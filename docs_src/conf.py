@@ -82,6 +82,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "m2r2",
     "sphinxcontrib.bibtex",
+    "sphinx.ext.githubpages",
 ]
 
 bibtex_bibfiles = ["refs.bib"]
