@@ -3,6 +3,7 @@
 This module contains the Snowflake class used to run simulations
 of water nucleation in vials.
 """
+
 from ethz_snow.operatingConditions import OperatingConditions
 from ethz_snow.constants import calculateDerived
 
@@ -13,7 +14,7 @@ import warnings
 
 # import matplotlib.pyplot as plt
 import seaborn as sns
-
+from scipy.stats import norm
 from scipy.sparse import csr_matrix
 from typing import List, Tuple, Type, Union, Sequence, Optional
 
@@ -418,9 +419,16 @@ class Snowflake:
         T_eq_l = self.const["T_eq_l"]
         # T_init = self.const["T_init"]
         hl = self.const["hl"]
-        kb = self.const["kb"]
+        # kb = self.const["kb"]
+        a = self.const["a"]
         b = self.const["b"]
+        c = self.const["c"]
         V = self.const["V"]
+
+        # pre-exponential nucleation parameter
+        np.random.seed(2024)
+        xi_v = norm.ppf(np.random.rand(self.N_vials_total))
+        kb = 10 ** (-(a + xi_v * c))
 
         N_timeSteps = (
             int(np.ceil(self.opcond.t_tot / self.dt)) + 1
@@ -506,7 +514,10 @@ class Snowflake:
                 diceRolls = np.zeros(N_vials_total)
 
                 P[nucleationCandidatesMask] = (
-                    kb * V * (T_eq_l - T_k[nucleationCandidatesMask]) ** b * self.dt
+                    kb[nucleationCandidatesMask]
+                    * V
+                    * (T_eq_l - T_k[nucleationCandidatesMask]) ** b
+                    * self.dt
                 )
                 # when we reach the timepoint of controlled nucleation
                 # all vials (that thermodynamically can) nucleate
@@ -544,7 +555,7 @@ class Snowflake:
                     C_direct = T_k[nucleatedVialsMask] - T_eq + depression
 
                     sigma_k[nucleatedVialsMask] = (
-                        -B_direct + np.sqrt(B_direct ** 2 + 4 * gamma_direct * C_direct)
+                        -B_direct + np.sqrt(B_direct**2 + 4 * gamma_direct * C_direct)
                     ) / (-2 * gamma_direct)
 
                 # assumption is that during solidification T = Teq

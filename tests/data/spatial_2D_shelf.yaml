@@ -70,13 +70,15 @@ solution:
   k_f: 1.853
   # molar mass of solute [kg/mol]
   M_s: 0.3423
-
+  
 # nucleation kinetics
 kinetics:
-  # pre-exponential nucleation parameter [1/m3sKb]
-  kb: 1e-9
+  # vial-independent pre-exponential nucleation parameter [-]
+  a: 29.0
   # exponential nucleation parameter [-]
-  b: 12
+  b: 29.3
+  # vial-dependent pre-exponential nucleation parameter [-]
+  c: 1.00
 
 general:
   # the Stefan-Boltzmann constant [W/m2]

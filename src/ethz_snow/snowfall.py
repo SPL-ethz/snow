@@ -4,6 +4,7 @@ This module contains the Snowfall class used to run repeated (!)
 simulations of water nucleation in vials. It makes use of class
 Snowflake for the individual simulations.
 """
+
 import numpy as np
 import pandas as pd
 import re
@@ -291,9 +292,9 @@ class Snowfall:
                 stats_df.columns.get_loc("value"),
             )
             for i in range(1, self.Nrep):
-                stats_df.iloc[
-                    i * N_tot * 3 : (i + 1) * N_tot * 3, [varCol, valCol]
-                ] = pd.DataFrame(self.stats[i]).melt()
+                stats_df.iloc[i * N_tot * 3 : (i + 1) * N_tot * 3, [varCol, valCol]] = (
+                    pd.DataFrame(self.stats[i]).melt()
+                )
                 # this assumes that the first stats_df 'melted' in the same way
                 # we will add a test to ensure this assumption is not violated
             stats_df["seed"] = np.repeat(np.arange(0, self.Nrep), N_tot * 3)

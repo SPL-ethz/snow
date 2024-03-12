@@ -18,6 +18,7 @@ import multiprocessing as mp
 import matplotlib.pyplot as plt
 from scipy.integrate import simps
 from typing import Optional
+from scipy.stats import norm
 import matplotlib.patches as patches
 from matplotlib.legend_handler import HandlerTuple
 
@@ -334,8 +335,15 @@ class Snowing:
         T_eq_l = T_m - depression
 
         # nucleation kinetics
-        kb = self.const["kb"]
+        # kb = self.const["kb"]
+        a = self.const["a"]
         b = self.const["b"]
+        c = self.const["c"]
+
+        # pre-exponential nucleation parameter
+        np.random.seed(2024)
+        xi_v = norm.ppf(np.random.rand())
+        kb = 10 ** (-(a + xi_v * c))
 
         # latent heat of fusion
         Dh = self.const["Dh"]
@@ -380,11 +388,15 @@ class Snowing:
             # update temperature
             T_old = T_new
             # check if nucleation occurs stochastically
-            J = kb * (T_eq_l - T_new) ** b * (T_eq_l - T_new > 0)
+            if T_eq_l > T_new:
+                J = kb * (T_eq_l - T_new) ** b
+            else:
+                J = 0
             # frequency of nucleation events
             K_v = J * V
             # expected number of nuclei
-            E_t += K_v * dt
+            if K_v >= 0:
+                E_t += K_v * dt
             # CDF of probability
             F_nuc = 1 - np.exp(-E_t)
             if self.opcond.cnTemp == None:
@@ -555,8 +567,15 @@ class Snowing:
         T_eq_l = T_m - depression
 
         # nucleation kinetics
-        kb = self.const["kb"]
+        # kb = self.const["kb"]
+        a = self.const["a"]
         b = self.const["b"]
+        c = self.const["c"]
+
+        # pre-exponential nucleation parameter
+        np.random.seed(2024)
+        xi_v = norm.ppf(np.random.rand())
+        kb = 10 ** (-(a + xi_v * c))
 
         # general
         k_B = self.const["k_B"]
@@ -725,7 +744,10 @@ class Snowing:
             raise ValueError("Nucleation did not occur, prolong process time.")
 
         # kinetic mean nucleation temperature
-        T_nuc_kin = (A / K_v) * simps(T_nuc * J_z, z)
+        if K_v > 0:
+            T_nuc_kin = (A / K_v) * simps(T_nuc * J_z, z)
+        else:
+            T_nuc_kin = 273.15
 
         # save nucleation temperatures
         self._stats = {
@@ -1023,8 +1045,15 @@ class Snowing:
         T_eq_l = T_m - depression
 
         # nucleation kinetics
-        kb = self.const["kb"]
+        # kb = self.const["kb"]
+        a = self.const["a"]
         b = self.const["b"]
+        c = self.const["c"]
+
+        # pre-exponential nucleation parameter
+        np.random.seed(2024)
+        xi_v = norm.ppf(np.random.rand())
+        kb = 10 ** (-(a + xi_v * c))
 
         # general
         k_B = self.const["k_B"]
@@ -1325,7 +1354,10 @@ class Snowing:
 
         # compute the mean kinetic mean nucleation temperature
         f_z = 2 * np.pi * simps(r * T_nuc * J_z_r, r)
-        T_nuc_kin = (1 / K_v) * simps(f_z, z)
+        if K_v > 0:
+            T_nuc_kin = (1 / K_v) * simps(f_z, z)
+        else:
+            T_nuc_kin = 273.15
 
         # save nucleation temperatures
         self._stats = {
@@ -2037,7 +2069,6 @@ class Snowing:
             handler_map={list: HandlerTuple(ndivide=None, pad=0)},
             loc="best",
         )
-        plt.show()
 
     # plot ice mass fraction evolution
     def _plot_ice_mass_fraction_evolution(self):
@@ -2149,7 +2180,6 @@ class Snowing:
             handler_map={list: HandlerTuple(ndivide=None, pad=0)},
             loc="best",
         )
-        plt.show()
 
     # plot evolution function
     def plot_evolution(self, what: str = "temperature"):

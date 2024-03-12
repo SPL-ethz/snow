@@ -30,41 +30,63 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
 
 .. code-block:: yaml
 
-   vial:
-    geometry:
-    # base shape of vial (currently only cube is accepted)
-    shape: cube
-    # length [m]
-    length: 0.01
-    # width [m]
-    width: 0.01
-    # height [m]
-    height: 0.01
- water:
-  # J/[Kkg] heat capacity liquid water
-  cp_w: 4187
-  # J/[Kkg] heat capacity ice 0°C
-  cp_i: 2108
-  # J/kg heat of fusion water
-  Dh: 333550
- solution:
-  # kg/m^3 density of water / assumed constant for all phases
-  rho_l: 1000
-  # K kg / mol cryoscopic constant
-  k_f: 1.853
-  # J/Kkg, heat capacity sucrose
-  cp_s: 1240
-  # molar mass sucrose [kg/mol]
-  M_s: 0.3423
-  # mass fraction of solute in solution
-  solid_fraction: 0.05
-  # °C equilibrium freezing temperature pure water
-  T_eq: 0
-  # initial temperature of the solution
-  T_init: 20
- kinetics:
-  kb: 1e-9 # m−3 s−1 K−b
-  b: 12
+    # model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
+    dimensionality: homogeneous
+
+    # freezing configuration to be simulated (shelf, VISF, jacket)
+    configuration: shelf
+
+    # all vial-related parameters
+    vial:
+        # define the geometry
+        geometry:
+            # base shape of vial (snow and snowfall only accepts cube, snowing rewrites it to cylinder)
+            shape: cube
+            # height of the filled product when shape is cube [m]
+            height: 0.01
+            # length of the vial when shape is cube [m]
+            length: 0.01
+            # width of the vial when shape is cube [m]
+            width: 0.01
+
+    # all parameters realted to water
+    water:
+        # specific heat capacity of liquid water [J/kgK]
+        cp_w: 4187
+        # specific heat capacity of ice [J/kgK]
+        cp_i: 2108
+        # heat conductivity of liquid water [W/mK]
+        lambda_w: 0.598
+        # heat conductivity of ice [W/mK]
+        lambda_i: 2.25
+        # latent heat of fusion of water [J/kg]
+        Dh: 333550
+
+    # all solution parameters
+    solution:
+        # solute mass fraction [-]
+        solid_fraction: 0.05
+        # melting temperature of pure water [°C]
+        T_eq: 0
+        # density of liquid water [kg/m3]
+        rho_l: 1000
+        # specific heat capacity of solute [J/kgK]
+        cp_s: 1240
+        # heat conductivity of solute [W/mK]
+        lambda_s: 0.126
+        # cryoscopic constant of water [K/kgmol]
+        k_f: 1.853
+        # molar mass of solute [kg/mol]
+        M_s: 0.3423
+
+    # nucleation kinetics
+    kinetics:
+        # vial-independent pre-exponential nucleation parameter [-]
+        a: 29.0
+        # exponential nucleation parameter [-]
+        b: 29.3
+        # vial-dependent pre-exponential nucleation parameter [-]
+        c: 1.00
 
 Example
 ========
@@ -162,91 +184,93 @@ The spatial model (termed Snowing) accounts for different **dimensionalities (0D
 
 .. code-block:: yaml
 
-   # model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
-   dimensionality: spatial_1D
+    # model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
+    dimensionality: spatial_1D
 
-   # freezing configuration to be simulated (shelf, VISF, jacket)
-   configuration: shelf
-   
-   # all vial-related parameters
-   vial:
-     # define the geometry
-     geometry:
-       # base shape of vial (snow and snowfall only accepts cube, snowing rewrites it to cylinder)
-       shape: cube
-       # diameter of the vial for cylindrical geometry (only spatial model) [m]
-       diameter: 0.01
-       # height of the filled product for cubic (snow/snowfall) and cylindrical geometry (only spatial model) [m]
-       height: 0.01
-       # length of the vial when shape is cube [m]
-       length: 0.01
-       # width of the vial when shape is cube [m]
-       width: 0.01
-   
-   # parameters used in VISF simulation
-   VISF:
-     # vacuum pressure [Pa]
-     p_vac: 100
-     # evaporation coefficient [-]
-     kappa: 0.01
-     # latent heat of vaporization for water [J/kg]
-     Dh_evaporation: 2500.9e3
-     # mass of water molecule [kg]
-     m_water: 2.99e-26
-     # time for vacuum start [h]
-     t_vac_start: 0.75
-     # duration of the vacuum [h]
-     t_vac_duration: 0.1
-   
-   # parameters for jacket-ramped freezing
-   jacket:
-     # air gap between the wall and the vial [m]
-     air_gap: 0.001
-     # heat conductivity of air [W/mK]
-     lambda_air: 0.025
-   
-   # all parameters related to water
-   water:
-     # specific heat capacity of liquid water [J/kgK]
-     cp_w: 4187
-     # specific heat capacity of ice [J/kgK]
-     cp_i: 2108
-     # heat conductivity of liquid water [W/mK]
-     lambda_w: 0.598
-     # heat conductivity of ice [W/mK]
-     lambda_i: 2.25
-     # latent heat of fusion of water [J/kg]
-     Dh: 333550
-   
-   # all solution parameters
-   solution:
-     # solute mass fraction [-]
-     solid_fraction: 0.05
-     # melting temperature of pure water [°C]
-     T_eq: 0
-     # density of liquid water [kg/m3]
-     rho_l: 1000
-     # specific heat capacity of solute [J/kgK]
-     cp_s: 1240
-     # heat conductivity of solute [W/mK]
-     lambda_s: 0.126
-     # cryoscopic constant of water [K/kgmol]
-     k_f: 1.853
-     # molar mass of solute [kg/mol]
-     M_s: 0.3423
-   
-   # nucleation kinetics
-   kinetics:
-     # pre-exponential nucleation parameter [1/m3sKb]
-     kb: 1e-9
-     # exponential nucleation parameter [-]
-     b: 12
-   
-   general:
-     # Stefan-Boltzmann constant [W/m2]
-     sigma_B: 5.67e-8
-     # Boltzmann constant [JK]
-     k_B: 1.38e-23
+    # freezing configuration to be simulated (shelf, VISF, jacket)
+    configuration: shelf
+
+    # all vial-related parameters
+    vial:
+        # define the geometry
+        geometry:
+        # base shape of vial (snow and snowfall only accepts cube, snowing rewrites it to cylinder)
+        shape: cube
+        # diameter of the vial for cylindrical geometry (only spatial model) [m]
+        diameter: 0.01
+        # height of the filled product for cubic (snow/snowfall) and cylindrical geometry (only spatial model) [m]
+        height: 0.01
+        # length of the vial when shape is cube [m]
+        length: 0.01
+        # width of the vial when shape is cube [m]
+        width: 0.01
+
+    # parameters used in VISF simulation
+    VISF:
+        # vacuum pressure [Pa]
+        p_vac: 100
+        # evaporation coefficient [-]
+        kappa: 0.01
+        # latent heat of vaporization for water [J/kg]
+        Dh_evaporation: 2500.9e3
+        # mass of water molecule [kg]
+        m_water: 2.99e-26
+        # time for vacuum start [h]
+        t_vac_start: 0.75
+        # duration of the vacuum [h]
+        t_vac_duration: 0.1
+
+    # parameters for jacket-ramped freezing
+    jacket:
+        # air gap between the wall and the vial [m]
+        air_gap: 0.001
+        # heat conductivity of air [W/mK]
+        lambda_air: 0.025
+
+    # all parameters related to water
+    water:
+        # specific heat capacity of liquid water [J/kgK]
+        cp_w: 4187
+        # specific heat capacity of ice [J/kgK]
+        cp_i: 2108
+        # heat conductivity of liquid water [W/mK]
+        lambda_w: 0.598
+        # heat conductivity of ice [W/mK]
+        lambda_i: 2.25
+        # latent heat of fusion of water [J/kg]
+        Dh: 333550
+
+    # all solution parameters
+    solution:
+        # solute mass fraction [-]
+        solid_fraction: 0.05
+        # melting temperature of pure water [°C]
+        T_eq: 0
+        # density of liquid water [kg/m3]
+        rho_l: 1000
+        # specific heat capacity of solute [J/kgK]
+        cp_s: 1240
+        # heat conductivity of solute [W/mK]
+        lambda_s: 0.126
+        # cryoscopic constant of water [K/kgmol]
+        k_f: 1.853
+        # molar mass of solute [kg/mol]
+        M_s: 0.3423
+
+    # nucleation kinetics
+    kinetics:
+        # vial-independent pre-exponential nucleation parameter [-]
+        a: 29.0
+        # exponential nucleation parameter [-]
+        b: 29.3
+        # vial-dependent pre-exponential nucleation parameter [-]
+        c: 1.00
+
+    general:
+        # Stefan-Boltzmann constant [W/m2]
+        sigma_B: 5.67e-8
+        # Boltzmann constant [JK]
+        k_B: 1.38e-23
 
 Vial geometry, other constants and operating conditions are specified as established in previous versions. We start by importing the new **Snowing** module:
 

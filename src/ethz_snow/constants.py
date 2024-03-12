@@ -137,8 +137,10 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
 
     # copy directly from yaml
     T_eq = float(config["solution"]["T_eq"])
-    kb = float(config["kinetics"]["kb"])
+    # kb = float(config["kinetics"]["kb"]) Changed to vial dependent nuc model (11.03.2024)
+    a = float(config["kinetics"]["a"])
     b = float(config["kinetics"]["b"])
+    c = float(config["kinetics"]["c"])
 
     rho_l = float(config["solution"]["rho_l"])
     height = float(config["vial"]["geometry"]["height"])
@@ -260,8 +262,9 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         "dimensionality",
         "T_eq",
         "T_eq_l",
-        "kb",
+        "a",
         "b",
+        "c",
         "A",
         "V",
         "cp_s",

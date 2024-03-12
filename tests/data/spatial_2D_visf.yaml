@@ -22,7 +22,7 @@ vial:
 # parameters used in VISF simulation
 VISF:
   # vacuum pressure [Pa]
-  p_vac: 100
+  p_vac: 10
   # evaporation coefficient [-]
   kappa: 0.01
   # latent heat of vaporization for water [J/kg]
@@ -73,10 +73,12 @@ solution:
 
 # nucleation kinetics
 kinetics:
-  # pre-exponential nucleation parameter [1/m3sKb]
-  kb: 1e-9
+  # vial-independent pre-exponential nucleation parameter [-]
+  a: 29.0
   # exponential nucleation parameter [-]
-  b: 12
+  b: 29.3
+  # vial-dependent pre-exponential nucleation parameter [-]
+  c: 1.00
 
 general:
   # the Stefan-Boltzmann constant [W/m2]

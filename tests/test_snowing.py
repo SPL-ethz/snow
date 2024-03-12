@@ -1,4 +1,5 @@
 """Implement unit tests for Snowing class."""
+
 import os
 import pytest
 import numpy as np
@@ -219,8 +220,8 @@ def test_correct_plots():
     config = THIS_DIR + "/data/homogeneous_shelf.yaml"
     S = Snowing(k=d, opcond=op, configPath=config)
     S.run()
-    S._plot_temperature_evolution()
-    S._plot_ice_mass_fraction_evolution()
+    assert S._plot_temperature_evolution() == None
+    assert S._plot_ice_mass_fraction_evolution() == None
 
     S = Snowing(k=d, opcond=op, configPath=config, Nrep=100)
     S.run()
@@ -230,17 +231,17 @@ def test_correct_plots():
     config = THIS_DIR + "/data/spatial_1D_shelf.yaml"
     S = Snowing(k=d, opcond=op, configPath=config)
     S.run()
-    S._plot_temperature_evolution()
-    S._plot_ice_mass_fraction_evolution()
+    assert S._plot_temperature_evolution() == None
+    assert S._plot_ice_mass_fraction_evolution() == None
 
     config = THIS_DIR + "/data/spatial_2D_shelf.yaml"
     S = Snowing(k=d, opcond=op, configPath=config)
     S.run()
-    S._plot_temperature_evolution()
-    S._plot_ice_mass_fraction_evolution()
+    assert S._plot_temperature_evolution() == None
+    assert S._plot_ice_mass_fraction_evolution() == None
 
 
-""" Unit tests for Utils class containing helper functins for Snowing. """
+""" Unit tests for Utils class containing helper functions for Snowing. """
 
 
 def test_vapour_pressure_liquid():

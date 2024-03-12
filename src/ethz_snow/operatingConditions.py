@@ -4,6 +4,7 @@ This module contains the OperatingConditions class used to
 store information regarding the operating conditions
 in freezing processes.
 """
+
 import numpy as np
 import warnings
 
