@@ -58,6 +58,13 @@ try:
         # This is a rudimentary parse_version to avoid external dependencies
         args = args[1:]
 
+        # change the args list due to ETH adding all files to ONE Drive (12.03.2024, akosir)
+        if len(args) > 8:
+            api_path = "".join(args[3], args[4], args[5], args[6])
+            module_path = "".join(args[7], args[8], args[9], args[10])
+            # update args list
+            args = args[:3].append(api_path, module_path)
+
     apidoc.main(args)
 except Exception as e:
     print("Running `sphinx-apidoc` failed!\n{}".format(e))
