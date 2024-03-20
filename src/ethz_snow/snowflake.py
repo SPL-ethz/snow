@@ -432,7 +432,6 @@ class Snowflake:
         # random numbers to determine vial-dependent nucleation parameters
         np.random.seed(self.seed_v)
         vial_random_numbers = np.random.rand(self.N_vials_total)
-        print(vial_random_numbers)
         xi_v = norm.ppf(vial_random_numbers)
 
         # pre-exponential nucleation parameter
