@@ -18,7 +18,7 @@ from scipy.stats import norm
 from scipy.sparse import csr_matrix
 from typing import List, Tuple, Type, Union, Sequence, Optional
 
-from .__init__ import __citation__, __bibtex__
+from ethz_snow.__init__ import __citation__, __bibtex__
 
 HEATFLOW_REQUIREDKEYS = ("int", "ext", "s0")
 VIAL_GROUPS = (
@@ -54,6 +54,7 @@ class Snowflake:
         N_vials_total (int): Total number of vials.
         opcond (OperatingConditions): Operating conditions of run.
         seed (int): Seed to be used in rng.
+        seed_v (int): Seed to be used in rng for vial-dependent parameters.
         simulationStatus (int): Status of simulation (0 = not run, 1 = run).
         solidificationThreshold (float): What sigma value constitutes a 'solid'.
         stats (dict): Run statistics (nucleation time, etc.).
@@ -75,6 +76,7 @@ class Snowflake:
         solidificationThreshold: float = 0.9,
         dt: float = 2,
         seed: int = 2021,
+        seed_v: int = 2024,
         opcond: OperatingConditions = OperatingConditions(),
         configPath: Optional[str] = None,
         initIce: str = "indirect",
@@ -95,6 +97,7 @@ class Snowflake:
                 a 'solid'. Defaults to 0.9.
             dt (float, optional): Time step size. Defaults to 2.
             seed (int, optional): Seed to use for rng. Defaults to 2021.
+            seed_v (int, optional): Vial-dependent seed to use for rng. Defaults to 2024.
             opcond (OperatingConditions, optional): Operating conditions to apply.
                 Defaults to OperatingConditions().
             configPath (Optional[str], optional): The location of a custom configuration
@@ -169,6 +172,7 @@ class Snowflake:
 
         # store the seed to look it up if need be
         self.seed = seed
+        self.seed_v = seed_v
 
         # remember what N_vials was used to build heat flow matrices
         # so if it changes we know to rebuild them
@@ -425,9 +429,13 @@ class Snowflake:
         c = self.const["c"]
         V = self.const["V"]
 
+        # random numbers to determine vial-dependent nucleation parameters
+        np.random.seed(self.seed_v)
+        vial_random_numbers = np.random.rand(self.N_vials_total)
+        print(vial_random_numbers)
+        xi_v = norm.ppf(vial_random_numbers)
+
         # pre-exponential nucleation parameter
-        np.random.seed(2024)
-        xi_v = norm.ppf(np.random.rand(self.N_vials_total))
         kb = 10 ** (-(a + xi_v * c))
 
         N_timeSteps = (
@@ -1121,5 +1129,5 @@ class Snowflake:
         """
         return (
             f"Snowflake([N_vials: {self.N_vials}, "
-            + f"dt: {self.dt}, seed: {self.seed}])"
+            + f"dt: {self.dt}, seed: {self.seed}, seed_v: {self.seed_v}])"
         )
