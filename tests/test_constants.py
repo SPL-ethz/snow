@@ -48,3 +48,12 @@ def test_notImplementedShape():
     # make sure that non-cubic shape raises exception
     with pytest.raises(NotImplementedError):
         config = scon.calculateDerived(THIS_DIR + "/data/notImplementedShape.yaml")
+
+
+def test_notImplementedVialArrangement():
+    """Test not implemented vial arrangement raise error."""
+    # make sure only square or hexagonal arrangements are accepted
+    with pytest.raises(NotImplementedError):
+        config = scon.calculateDerived(
+            THIS_DIR + "/data/notImplementedVialArrangement.yaml"
+        )

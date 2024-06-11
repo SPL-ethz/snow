@@ -1,12 +1,12 @@
 # additional parameters for the shelf-scale model (Snowfall and Snowflake modules)
 snowfall_parameters:
   # arrangment of vials (only for homogeneous dimensionality model)
-  vial_arrangement: hexagonal
+  vial_arrangement: square
 
 # additional parameters for the spatial model (Snowing module)
 snowing_parameters:
   # model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
-  dimensionality: spatial_2D
+  dimensionality: spatial_1D
   # freezing configuration to be simulated (shelf, VISF, jacket)
   configuration: VISF
 
@@ -17,9 +17,9 @@ vial:
     # base shape of vial (snow and snowfall only accepts cube, snowing rewrites it to cylinder)
     shape: cube
     # diameter of the vial for cylindrical geometry (only spatial model) [m]
-    diameter: 0.5
+    diameter: 0.01
     # height of the filled product for cubic (snow/snowfall) and cylindrical geometry (only spatial model) [m]
-    height: 0.5
+    height: 0.01
     # length of the vial when shape is cube [m]
     length: 0.01
     # width of the vial when shape is cube [m]
@@ -28,7 +28,7 @@ vial:
 # parameters used in VISF simulation
 VISF:
   # vacuum pressure [Pa]
-  p_vac: 10
+  p_vac: 100
   # evaporation coefficient [-]
   kappa: 0.01
   # latent heat of vaporization for water [J/kg]
@@ -91,5 +91,3 @@ general:
   sigma_B: 5.67e-8
   # Boltzmann cosntant [JK]
   k_B: 1.38e-23
-
-

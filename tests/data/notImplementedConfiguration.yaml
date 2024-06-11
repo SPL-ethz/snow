@@ -1,1 +1,2 @@
-configuration: ice_fog
+snowing_parameters:
+  configuration: ice_fog

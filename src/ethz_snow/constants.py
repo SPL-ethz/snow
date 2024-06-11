@@ -146,8 +146,12 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
     height = float(config["vial"]["geometry"]["height"])
     diameter = float(config["vial"]["geometry"]["diameter"])
 
-    dimensionality = str(config["dimensionality"])
-    configuration = str(config["configuration"])
+    # snowing parameters
+    dimensionality = str(config["snowing_parameters"]["dimensionality"])
+    configuration = str(config["snowing_parameters"]["configuration"])
+
+    # snowfall parameters
+    vial_arrangement = str(config["snowfall_parameters"]["vial_arrangement"])
 
     # check configuration
     if configuration not in {"shelf", "VISF", "jacket"}:
@@ -155,6 +159,15 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
             (
                 f'Configuration "{configuration}" '
                 + 'not correctly specified, use "shelf", "jacket" or "VISF".'
+            )
+        )
+
+    # check vial arrangement
+    if vial_arrangement not in {"hexagonal", "square"}:
+        raise NotImplementedError(
+            (
+                f'Vial arrangment "{vial_arrangement}" '
+                + 'not correctly specified, use "hexagonal" or "square".'
             )
         )
 
@@ -209,6 +222,15 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
             )
         )
 
+    # # vial arrangement is only considered in the homogeneous model
+    # if dimensionality in {"homogeneous", "spatial_1D", "spatial_2D"}:
+    #     print(
+    #         (
+    #             f'WARNING: Vial arrangement "{vial_arrangement}" '
+    #             + "is relevant only for Snowfall and Snowflake simulations."
+    #         )
+    #     )
+
     # volume
     V = A * height
 
@@ -255,11 +277,9 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
     mass_solute = mass * solid_fraction
     mass_water = mass * (1 - solid_fraction)
 
-    # freezing configuration
-    configuration = str(config["configuration"])
-
     constVars = [
         "dimensionality",
+        "vial_arrangement",
         "T_eq",
         "T_eq_l",
         "a",
@@ -291,13 +311,10 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
     ]
 
     # check that spatial model is chosen for VISF
-    if config["configuration"] == "VISF":
-        if config["dimensionality"] == "homogeneous":
+    if configuration == "VISF":
+        if dimensionality == "homogeneous":
             raise NotImplementedError(
-                (
-                    f'For simulating "{config["configuration"]}" '
-                    + "a spatial model is required."
-                )
+                (f'For simulating "{configuration}" ' + "a spatial model is required.")
             )
 
         # set up additional parameters for VISF
@@ -320,13 +337,10 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         )
 
     # check that spatial model is chosen for jacket
-    elif config["configuration"] == "jacket":
-        if config["dimensionality"] != "spatial_2D":
+    elif configuration == "jacket":
+        if dimensionality != "spatial_2D":
             raise NotImplementedError(
-                (
-                    f'For simulating "{config["configuration"]}" '
-                    + "a 2D model is required."
-                )
+                (f'For simulating "{configuration}" ' + "a 2D model is required.")
             )
 
         # set up additional parameters for jacket-ramped freezing
@@ -336,13 +350,13 @@ def calculateDerived(fpath: Optional[str] = None) -> dict:
         constVars.extend(["lambda_air", "air_gap"])
 
     # warn that cylindrical gemoetry instead of cubic geometry is used for spatial model
-    if config["dimensionality"] != "homogeneous":
-        print(
-            (
-                f'WARNING: For simulating a "{config["dimensionality"]}" '
-                + "model a cylindrical geometry is required. Shape is automatically rewritten to cylinder."
-            )
-        )
+    if dimensionality != "homogeneous":
+        # print(
+        #     (
+        #         f'WARNING: For simulating a "{dimensionality}" '
+        #         + "model a cylindrical geometry is required. Shape is automatically rewritten to cylinder."
+        #     )
+        # )
 
         # this is not a lumped capacitance model
         # effective heat conductivity (for non-homog. vial temps)

@@ -1,8 +1,14 @@
-# model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
-dimensionality: spatial_1D
+# additional parameters for the shelf-scale model (Snowfall and Snowflake modules)
+snowfall_parameters:
+  # arrangment of vials (only for homogeneous dimensionality model)
+  vial_arrangement: hexagonal
 
-# freezing configuration to be simulated (shelf, VISF, jacket)
-configuration: shelf
+# additional parameters for the spatial model (Snowing module)
+snowing_parameters:
+  # model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)
+  dimensionality: spatial_1D
+  # freezing configuration to be simulated (shelf, VISF, jacket)
+  configuration: shelf
 
 # all vial-related parameters
 vial:

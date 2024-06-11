@@ -1,8 +1,12 @@
 """Implement unit tests for Snowflake class."""
+
+import os
 import pytest
 from ethz_snow.operatingConditions import OperatingConditions
 from ethz_snow.snowflake import Snowflake
 import numpy as np
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 @pytest.mark.parametrize("inits", [[1, 2, 3], "something"])
@@ -94,9 +98,32 @@ def test_storeStatesMeaningless(input):
         (("core", "corner_random_2"), 3),
     ],
 )
-def test_storageMaskFunction(input_result):
+def test_storageMaskFunction_square(input_result):
     """Ensure valid storeStates are interpreted correctly."""
-    S = Snowflake(N_vials=(3, 3, 1), storeStates=input_result[0])
+    config = THIS_DIR + "/data/square.yaml"
+    S = Snowflake(N_vials=(3, 3, 1), storeStates=input_result[0], configPath=config)
+
+    assert np.sum(S._storageMask) == input_result[1]
+
+
+@pytest.mark.parametrize(
+    "input_result",
+    [
+        (None, 0),
+        ("all", 9),
+        ("corner", 2),
+        ("edge", 6),
+        ("core", 1),
+        (["corner", "edge"], 8),
+        ("random4", 4),
+        ("uniform+3", 3),
+        (("core", "corner_random_2"), 3),
+    ],
+)
+def test_storageMaskFunction_hexagonal(input_result):
+    """Ensure valid storeStates are interpreted correctly."""
+    config = THIS_DIR + "/data/hexagonal.yaml"
+    S = Snowflake(N_vials=(3, 3, 1), storeStates=input_result[0], configPath=config)
 
     assert np.sum(S._storageMask) == input_result[1]
 
@@ -118,7 +145,8 @@ def fakeS():
 
     Fake in that states are manually provided to avoid rng issues.
     """
-    S = Snowflake(N_vials=(2, 2, 1), storeStates="all")
+    config = THIS_DIR + "/data/square.yaml"
+    S = Snowflake(N_vials=(2, 2, 1), storeStates="all", configPath=config)
     S._t = np.array([0, 1, 2, 3])
     S._X = np.concatenate(
         [
@@ -196,22 +224,35 @@ def test_to_frame(fakeS, S_331_all):
 @pytest.fixture(scope="module")
 def S_333_all():
     """Fixture to share Snowflake across tests."""
-    S = Snowflake(N_vials=(3, 3, 3))
+    config = THIS_DIR + "/data/square.yaml"
+    S = Snowflake(N_vials=(3, 3, 3), configPath=config)
     return S
 
 
 @pytest.fixture(scope="module")
 def S_331_all():
     """Fixture to share Snowflake across tests."""
-    S = Snowflake(N_vials=(3, 3, 1), storeStates="all", initialStates=dict(temp=21))
+    config = THIS_DIR + "/data/square.yaml"
+    S = Snowflake(
+        N_vials=(3, 3, 1),
+        storeStates="all",
+        initialStates=dict(temp=21),
+        configPath=config,
+    )
     S.run()
     return S
 
 
 @pytest.fixture(scope="module")
 def S_331_edge():
+    config = THIS_DIR + "/data/square.yaml"
     """Fixture to share Snowflake across tests."""
-    S = Snowflake(N_vials=(3, 3, 1), storeStates="edge", initialStates=dict(temp=21))
+    S = Snowflake(
+        N_vials=(3, 3, 1),
+        storeStates="edge",
+        initialStates=dict(temp=21),
+        configPath=config,
+    )
     S.run()
     return S
 
@@ -291,7 +332,8 @@ def test_statsConsistency(S_331_all, S_331_edge, fun):
 
 def test_interactionMatrix():
     """Ensure interaction matrices are computed correctly."""
-    S = Snowflake(N_vials=(3, 3, 1))
+    config = THIS_DIR + "/data/square.yaml"
+    S = Snowflake(N_vials=(3, 3, 1), configPath=config)
     mint, mext = S._buildInteractionMatrices()
 
     assert mint.shape == (9, 9)
@@ -304,3 +346,18 @@ def test_interactionMatrix():
     assert (np.sum(mint, axis=1) == 0).all()
 
     assert (4 + mint.diagonal() == mext).all()
+
+    # same checks but for the hexagonal setup
+    config = THIS_DIR + "/data/hexagonal.yaml"
+    S = Snowflake(N_vials=(3, 3, 1), configPath=config)
+    mint, mext = S._buildInteractionMatrices()
+
+    assert mint.shape == (9, 9)
+    assert mint.nnz == 41
+    assert mint[3, 0] == 1
+    assert mint[0, 3] == 1
+    assert mint[1, 1] == -4
+    assert mint[3, 3] == -5
+    assert mint[4, 4] == -6
+    assert (np.sum(mint, axis=0) == 0).all()
+    assert (np.sum(mint, axis=1) == 0).all()

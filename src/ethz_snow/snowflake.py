@@ -786,28 +786,60 @@ class Snowflake:
         _, VIAL_EXT = self._buildInteractionMatrices()
 
         myMask = np.zeros(self.N_vials_total, dtype=bool)
-        for g in group:
-            if g == "corner":
-                # for the 3D case, a corner vial has 3 external IAs
-                myMask = myMask | (VIAL_EXT == 3 - (self.N_vials[2] == 1))
-            elif g == "edge":
-                myMask = myMask | (VIAL_EXT == 2 - (self.N_vials[2] == 1))
-            elif g == "side":
-                # side and edge are equivalent for 2D
-                myMask = myMask | (VIAL_EXT == 1)
-            elif g == "core":
-                myMask = myMask | (VIAL_EXT == 0)
-            elif g == "center":
-                myMask = myMask | (VIAL_EXT == 0)
-                warnings.warn(
-                    "'center' is deprecated terminology. Please use 'core' instead.",
-                    DeprecationWarning,
-                )
-            elif g == "all":
-                myMask = np.ones(self.N_vials_total, dtype=bool)
-                break
-            else:
-                raise ValueError(f"Group {g} is not a known vial group.")
+
+        # square vial arrangement
+        if self.const["vial_arrangement"] == "square":
+            for g in group:
+                if g == "corner":
+                    # for the 3D case, a corner vial has 3 external IAs
+                    myMask = myMask | (VIAL_EXT == 3 - (self.N_vials[2] == 1))
+                elif g == "edge":
+                    myMask = myMask | (VIAL_EXT == 2 - (self.N_vials[2] == 1))
+                elif g == "side":
+                    # side and edge are equivalent for 2D
+                    myMask = myMask | (VIAL_EXT == 1)
+                elif g == "core":
+                    myMask = myMask | (VIAL_EXT == 0)
+                elif g == "center":
+                    myMask = myMask | (VIAL_EXT == 0)
+                    warnings.warn(
+                        "'center' is deprecated terminology. Please use 'core' instead.",
+                        DeprecationWarning,
+                    )
+                elif g == "all":
+                    myMask = np.ones(self.N_vials_total, dtype=bool)
+                    break
+                else:
+                    raise ValueError(f"Group {g} is not a known vial group.")
+
+        # hexagonal vial arrangement: only considering corner, edge and core
+        else:
+            for g in group:
+                if g == "corner":
+                    # corner vials have 4 ext. IAs in 2D batch
+                    myMask = myMask | (VIAL_EXT == 5 - (self.N_vials[2] == 1))
+                elif g == "edge":
+                    myMask = myMask | (
+                        (VIAL_EXT > 0) & (VIAL_EXT < 5 - (self.N_vials[2] == 1))
+                    )
+                elif g == "side":
+                    # side and edge are equivalent for the hexagonal
+                    myMask = myMask | (
+                        (VIAL_EXT > 0) & (VIAL_EXT < 5 - (self.N_vials[2] == 1))
+                    )
+                elif g == "core":
+                    myMask = myMask | (VIAL_EXT == 0)
+                elif g == "center":
+                    myMask = myMask | (VIAL_EXT == 0)
+                    warnings.warn(
+                        "'center' is deprecated terminology. Please use 'core' instead.",
+                        DeprecationWarning,
+                    )
+                elif g == "all":
+                    myMask = np.ones(self.N_vials_total, dtype=bool)
+                    break
+                else:
+                    raise ValueError(f"Group {g} is not a known vial group.")
 
         return myMask
 
@@ -963,7 +995,69 @@ class Snowflake:
             delete_n_x = [k - i for k in idy_delete]  # remove all interactions
             dy_pattern[delete_n_x] = 0
 
-        DY = csr_matrix(np.diag(dy_pattern, k=n_x) + np.diag(dy_pattern, k=-n_x))
+        if self.const["vial_arrangement"] == "square":
+            DY = csr_matrix(np.diag(dy_pattern, k=n_x) + np.diag(dy_pattern, k=-n_x))
+
+        else:
+            # for hexagonal arrangement matrix contains more elements, hence additional dy_pattern
+            # elements, also we build the DY matrix for each z-layer and then construct it
+            # later for vertical directions (AK, 24.04.2024)
+            # COnfiguration details: (1) in z-direction, the vials are directly on top of each other, no change of positions
+            # across layers, (2) the first vial in the top left corner (1,1) interact in y-direction with (2,1),
+            # meaning that the second row is shifted left to create the hexagonal arrangement
+            # TODO: refine the definition of dy_patterns and documentation
+
+            dy_pattern_center = np.ones((n_x * (n_y - 1),))
+            if n_x * (n_y - 1) > 0:
+                dy_pattern_extra_upper = np.ones((n_x * (n_y - 1) - 1,))
+                dy_pattern_extra_lower = np.ones((n_x * (n_y - 1) + 1,))
+
+                if n_x * (n_y - 1) > 1:
+                    dy_pattern_extra_upper[0] = 0
+                dy_pattern_extra_lower[0] = 0
+
+                for j in range(n_y):
+                    if j % 2 == 0:
+                        if j == 0:
+                            dy_pattern_extra_upper[j * n_x + 1 : (j + 1) * n_x] = 0
+                        else:
+                            dy_pattern_extra_upper[j * n_x - 1 : (j + 1) * n_x] = 0
+
+                for j in range(n_y):
+                    if j % 2 == 1:
+                        dy_pattern_extra_lower[j * n_x : (j + 1) * n_x + 1] = 0
+
+                        # print(j%2, j * n_x,  (j + 1) * n_x + 1)
+
+                # for i in range(n_x):  # need to extract n_x points (i.e. an entire row)
+                #     # every time we have an interaction
+                #     delete_n_x = [k - i for k in idy_delete]  # remove all interactions
+                #     dy_pattern_extra_upper[delete_n_x] = 0
+                #     dy_pattern_extra_lower[delete_n_x] = 0
+
+                # print("\n dy_pattern_center: ", dy_pattern_center)
+                # print("\n dy_pattern_extra_upper: ", dy_pattern_extra_upper)
+                # print("\n dy_pattern_extra_lower: ", dy_pattern_extra_lower)
+
+                DY_one_layer = (
+                    np.diag(dy_pattern_center, k=n_x)
+                    + np.diag(dy_pattern_center, k=-n_x)
+                    + np.diag(dy_pattern_extra_upper, k=n_x + 1)
+                    + np.diag(dy_pattern_extra_lower, k=n_x - 1)
+                    + np.diag(dy_pattern_extra_upper, k=-(n_x + 1))
+                    + np.diag(dy_pattern_extra_lower, k=-(n_x - 1))
+                )
+
+                # print("\n DY_one_layer: \n", DY_one_layer)
+
+                DY_total = np.zeros((n_x * n_y * n_z, n_x * n_y * n_z))
+                for i in range(n_z):
+                    DY_total[
+                        i * (n_x * n_y) : (i + 1) * (n_x * n_y),
+                        i * (n_x * n_y) : (i + 1) * (n_x * n_y),
+                    ] = DY_one_layer
+
+                DY = csr_matrix(DY_total)
 
         # create interaction matrix for upwards/downwards direction interactions
         # matrix is 1 where two vials have an interaction and 0 otherwise
@@ -996,7 +1090,11 @@ class Snowflake:
         # number of external interactions (excl. the shelf).
         # For the 3D case this max is 6.
 
-        maxInteractions = 4 + (n_z > 1) * 2
+        # max interactions depends on the vial arrangement
+        if self.const["vial_arrangement"] == "square":
+            maxInteractions = 4 + (n_z > 1) * 2
+        else:
+            maxInteractions = 6 + (n_z > 1) * 2
 
         VIAL_EXT = maxInteractions * np.ones((n_x * n_y * n_z,)) - VIAL_INT.diagonal()
 
@@ -1085,10 +1183,30 @@ class Snowflake:
         _, VIAL_EXT = self._buildInteractionMatrices()
 
         df["group"] = VIAL_EXT
-        df.loc[df.group == 3 - (self.N_vials[2] == 1), "group"] = "corner"
-        df.loc[df.group == 2 - (self.N_vials[2] == 1), "group"] = "edge"
-        df.loc[df.group == 1, "group"] = "side"
-        df.loc[df.group == 0, "group"] = "core"
+        # square arrangement
+        if self.const["vial_arrangement"] == "square":
+            df.loc[df.group == 3 - (self.N_vials[2] == 1), "group"] = "corner"
+            df.loc[df.group == 2 - (self.N_vials[2] == 1), "group"] = "edge"
+            df.loc[df.group == 1, "group"] = "side"
+            df.loc[df.group == 0, "group"] = "core"
+        # hexagonal arrangement
+        else:
+            df.loc[df.group == 5 - (self.N_vials[2] == 1), "group"] = "corner"
+            df.loc[
+                (df.group == 1)
+                | (df.group == 2)
+                | (df.group == 3)
+                | (df.group == 4 - (self.N_vials[2] == 1)),
+                "group",
+            ] = "edge"
+            df.loc[
+                (df.group == 1)
+                | (df.group == 2)
+                | (df.group == 3)
+                | (df.group == 4 - (self.N_vials[2] == 1)),
+                "group",
+            ] = "side"
+            df.loc[df.group == 0, "group"] = "core"
 
         stats_df = df.melt(id_vars=["group", "vial"])
 
@@ -1107,11 +1225,23 @@ class Snowflake:
             )
             df["vial"] = np.tile(np.where(self._storageMask)[0], 2)
             df["group"] = np.tile(VIAL_EXT[self._storageMask], 2)
+            # square arrangement
+            if self.const["vial_arrangement"] == "square":
+                df.loc[df.group == 3 - (self.N_vials[2] == 1), "group"] = "corner"
+                df.loc[df.group == 2 - (self.N_vials[2] == 1), "group"] = "edge"
+                df.loc[df.group == 1 - (self.N_vials[2] == 1), "group"] = "side"
+                df.loc[df.group == 0, "group"] = "core"
 
-            df.loc[df.group == 3 - (self.N_vials[2] == 1), "group"] = "corner"
-            df.loc[df.group == 2 - (self.N_vials[2] == 1), "group"] = "edge"
-            df.loc[df.group == 1 - (self.N_vials[2] == 1), "group"] = "side"
-            df.loc[df.group == 0, "group"] = "core"
+            # hexagonal arrangement
+            else:
+                df.loc[df.group == 5 - (self.N_vials[2] == 1), "group"] = "corner"
+                df.loc[
+                    (df.group > 0) & (df.group < 5 - (self.N_vials[2] == 1)), "group"
+                ] = "edge"
+                df.loc[
+                    (df.group > 0) & (df.group < 5 - (self.N_vials[2] == 1)), "group"
+                ] = "side"
+                df.loc[df.group == 0, "group"] = "core"
 
             traj_df = df.melt(id_vars=["group", "vial", "state"])
         else:

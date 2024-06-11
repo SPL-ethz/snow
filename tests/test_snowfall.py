@@ -1,4 +1,6 @@
 """Implement unit tests for Snowfall class."""
+
+import os
 import pytest
 from ethz_snow.snowfall import Snowfall
 from ethz_snow.snowflake import Snowflake
@@ -7,10 +9,19 @@ from ethz_snow.operatingConditions import OperatingConditions
 import numpy as np
 import pandas as pd
 
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 def test_passSnowflakeArgs():
     """Test that Snowflake arguments are passed correctly."""
-    S = Snowfall(N_vials=(3, 3, 1), dt=5, seed=121, solidificationThreshold=0.5)
+    config = THIS_DIR + "/data/square.yaml"
+    S = Snowfall(
+        N_vials=(3, 3, 1),
+        dt=5,
+        seed=121,
+        solidificationThreshold=0.5,
+        configPath=config,
+    )
     Sf = Snowflake()
 
     # seed input is deleted
@@ -32,7 +43,10 @@ def myOpcond():
 @pytest.fixture(scope="module")
 def S_seq(myOpcond):
     """Fixture to only calculate S_seq once."""
-    S_seq = Snowfall(N_vials=(3, 3, 1), dt=5, opcond=myOpcond, Nrep=5)
+    config = THIS_DIR + "/data/square.yaml"
+    S_seq = Snowfall(
+        N_vials=(3, 3, 1), dt=5, opcond=myOpcond, Nrep=5, configPath=config
+    )
     S_seq.run(how="sequential")
 
     return S_seq
@@ -41,7 +55,10 @@ def S_seq(myOpcond):
 @pytest.mark.slow
 def test_runTypesIdentical(S_seq, myOpcond):
     """Test that output is independent of parallelization."""
-    S_async = Snowfall(N_vials=(3, 3, 1), dt=5, opcond=myOpcond, Nrep=5)
+    config = THIS_DIR + "/data/square.yaml"
+    S_async = Snowfall(
+        N_vials=(3, 3, 1), dt=5, opcond=myOpcond, Nrep=5, configPath=config
+    )
     S_async.run(how="async")
     t_nuc_async = np.concatenate(
         [S_async.stats[key]["t_nucleation"] for key in S_async.stats]
@@ -49,7 +66,9 @@ def test_runTypesIdentical(S_seq, myOpcond):
     # need to sort because order of seeds might change in parallelization
     t_nuc_async.sort()
 
-    S_sync = Snowfall(N_vials=(3, 3, 1), dt=5, opcond=myOpcond, Nrep=5)
+    S_sync = Snowfall(
+        N_vials=(3, 3, 1), dt=5, opcond=myOpcond, Nrep=5, configPath=config
+    )
     S_sync.run(how="sync")
     t_nuc_sync = np.concatenate(
         [S_sync.stats[key]["t_nucleation"] for key in S_sync.stats]

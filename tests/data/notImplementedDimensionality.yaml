@@ -1,1 +1,2 @@
-dimensionality: spatial_random
+snowing_parameters:
+  dimensionality: spatial_3D
