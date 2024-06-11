@@ -164,6 +164,31 @@ def fakeS():
     return S
 
 
+@pytest.fixture(scope="module")
+def fakeS_hex():
+    """Fixture to share a fake Snowflake across tests.
+
+    Fake in that states are manually provided to avoid rng issues.
+    """
+    config = THIS_DIR + "/data/hexagonal.yaml"
+    S = Snowflake(N_vials=(2, 2, 1), storeStates="all", configPath=config)
+    S._t = np.array([0, 1, 2, 3])
+    S._X = np.concatenate(
+        [
+            np.zeros((4, 4)),
+            np.array(
+                [[0, 0, 0.5, 0.95], [0, 0.7, 0.75, 1], [0, 0, 0, 0], [0, 1, 1, 1]]
+            ),
+        ],
+        axis=0,
+    )
+    S.stats["t_solidification"] = np.array([3, 3, np.nan, 1])
+    S.stats["t_nucleation"] = np.array([2, 1, np.nan, 1])
+    S.stats["T_nucleation"] = np.array([0, 0, np.nan, 0])
+
+    return S
+
+
 def test_sigmaCounter(fakeS):
     """Test that sigmas are calculated correctly."""
     assert fakeS.sigmaCounter(time=1) == 1
@@ -172,7 +197,7 @@ def test_sigmaCounter(fakeS):
     assert fakeS.sigmaCounter(time=2, threshold=0.4, fromStates=True) == 3
 
 
-def test_getvialgroup(S_331_all, S_333_all):
+def test_getvialgroup(S_331_all, S_331_all_hex, S_333_all, S_333_all_hex):
     """Test that vialgrouping masks are correctly computed."""
     assert np.where(S_331_all.getVialGroup("core"))[0] == 4
     assert all(
@@ -180,6 +205,10 @@ def test_getvialgroup(S_331_all, S_333_all):
     )
 
     assert S_331_all.getVialGroup("side").sum() == S_331_all.getVialGroup("edge").sum()
+    assert (
+        S_331_all_hex.getVialGroup("side").sum()
+        == S_331_all_hex.getVialGroup("edge").sum()
+    )
 
     with pytest.raises(ValueError):
         S_331_all.getVialGroup("rubbish")
@@ -189,6 +218,12 @@ def test_getvialgroup(S_331_all, S_333_all):
     assert S_333_all.getVialGroup("side").sum() == 6
     assert S_333_all.getVialGroup("edge").sum() == 12
     assert S_333_all.getVialGroup("all").sum() == 27
+
+    assert S_333_all_hex.getVialGroup("core").sum() == 1
+    assert S_333_all_hex.getVialGroup("corner").sum() == 4
+    assert S_333_all_hex.getVialGroup("side").sum() == 22
+    assert S_333_all_hex.getVialGroup("edge").sum() == 22
+    assert S_333_all_hex.getVialGroup("all").sum() == 27
 
 
 @pytest.mark.slow
@@ -221,6 +256,36 @@ def test_to_frame(fakeS, S_331_all):
         assert (np.where(S_331_all.getVialGroup(g))[0] == vials).all()
 
 
+@pytest.mark.slow
+def test_to_frame_hex(fakeS_hex, S_331_all_hex):
+    """Test that conversion to dataframe works as intended."""
+    stats_df, traj_df = fakeS_hex.to_frame(n_timeSteps=4)
+
+    assert all(
+        [col in stats_df.columns for col in ["group", "vial", "variable", "value"]]
+    )
+    assert stats_df.shape[0] == 12
+    assert S_331_all_hex.getVialGroup("corner").sum() == 2
+
+    assert (
+        traj_df.loc[
+            (traj_df.vial == 0) & (traj_df.state == "sigma") & (traj_df.Time == 3),
+            "value",
+        ].item()
+        == 0.95
+    )
+
+    # making sure getVialGroup and to_frame have same
+    # interpretation of groups
+    df = S_331_all_hex.to_frame()[0]
+    groupVial = (
+        df[["group", "vial"]].drop_duplicates().groupby("group")["vial"].unique()
+    )
+
+    for g, vials in groupVial.items():
+        assert (np.where(S_331_all_hex.getVialGroup(g))[0] == vials).all()
+
+
 @pytest.fixture(scope="module")
 def S_333_all():
     """Fixture to share Snowflake across tests."""
@@ -230,9 +295,31 @@ def S_333_all():
 
 
 @pytest.fixture(scope="module")
+def S_333_all_hex():
+    """Fixture to share Snowflake across tests."""
+    config = THIS_DIR + "/data/hexagonal.yaml"
+    S = Snowflake(N_vials=(3, 3, 3), configPath=config)
+    return S
+
+
+@pytest.fixture(scope="module")
 def S_331_all():
     """Fixture to share Snowflake across tests."""
     config = THIS_DIR + "/data/square.yaml"
+    S = Snowflake(
+        N_vials=(3, 3, 1),
+        storeStates="all",
+        initialStates=dict(temp=21),
+        configPath=config,
+    )
+    S.run()
+    return S
+
+
+@pytest.fixture(scope="module")
+def S_331_all_hex():
+    """Fixture to share Snowflake across tests."""
+    config = THIS_DIR + "/data/hexagonal.yaml"
     S = Snowflake(
         N_vials=(3, 3, 1),
         storeStates="all",
@@ -257,10 +344,26 @@ def S_331_edge():
     return S
 
 
-def test_initialTemp(S_331_all, S_331_edge):
+@pytest.fixture(scope="module")
+def S_331_edge_hex():
+    config = THIS_DIR + "/data/hexagonal.yaml"
+    """Fixture to share Snowflake across tests."""
+    S = Snowflake(
+        N_vials=(3, 3, 1),
+        storeStates="edge",
+        initialStates=dict(temp=21),
+        configPath=config,
+    )
+    S.run()
+    return S
+
+
+def test_initialTemp(S_331_all, S_331_all_hex, S_331_edge, S_331_edge_hex):
     # we had defined initial temperature as 21
     assert all(S_331_all.X_T[:, 0] == 21)
     assert all(S_331_edge.X_T[:, 0] == 21)
+    assert all(S_331_all_hex.X_T[:, 0] == 21)
+    assert all(S_331_edge_hex.X_T[:, 0] == 21)
 
 
 @pytest.fixture(scope="module")

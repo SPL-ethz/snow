@@ -1236,10 +1236,18 @@ class Snowflake:
             else:
                 df.loc[df.group == 5 - (self.N_vials[2] == 1), "group"] = "corner"
                 df.loc[
-                    (df.group > 0) & (df.group < 5 - (self.N_vials[2] == 1)), "group"
+                    (df.group == 1)
+                    | (df.group == 2)
+                    | (df.group == 3)
+                    | (df.group == 4 - (self.N_vials[2] == 1)),
+                    "group",
                 ] = "edge"
                 df.loc[
-                    (df.group > 0) & (df.group < 5 - (self.N_vials[2] == 1)), "group"
+                    (df.group == 1)
+                    | (df.group == 2)
+                    | (df.group == 3)
+                    | (df.group == 4 - (self.N_vials[2] == 1)),
+                    "group",
                 ] = "side"
                 df.loc[df.group == 0, "group"] = "core"
 

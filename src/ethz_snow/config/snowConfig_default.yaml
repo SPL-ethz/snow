@@ -1,7 +1,7 @@
 # additional parameters for the shelf-scale model (Snowfall and Snowflake modules)
 snowfall_parameters:
   # arrangment of vials (only for homogeneous dimensionality model)
-  vial_arrangement: square
+  vial_arrangement: hexagonal
 
 # additional parameters for the spatial model (Snowing module)
 snowing_parameters:
