@@ -1,7 +1,7 @@
-# additional parameters for the shelf-scale model (Snowfall and Snowflake modules)
+# additional parameters for Snowfall and Snowflake modules
 snowfall_parameters:
-  # arrangment of vials (only for homogeneous dimensionality model)
-  vial_arrangement: hexagonal
+  # arrangment of vials
+  vial_arrangement: square
 
 # additional parameters for the spatial model (Snowing module)
 snowing_parameters:
@@ -47,7 +47,7 @@ jacket:
   # heat conductivity of air [W/mK]
   lambda_air: 0.025
 
-# all parameters realted to water
+# all parameters related to water
 water:
   # specific heat capacity of liquid water [J/kgK]
   cp_w: 4187
@@ -87,7 +87,7 @@ kinetics:
   c: 1.00
 
 general:
-  # the Stefan-Boltzmann constant [W/m2]
+  # Stefan-Boltzmann constant [W/m2]
   sigma_B: 5.67e-8
-  # Boltzmann cosntant [JK]
+  # Boltzmann constant [JK]
   k_B: 1.38e-23
