@@ -191,26 +191,25 @@
 <p>Below is a copy of the yaml file used to configure the constants used in <strong>Snowflake</strong> / <strong>Snowfall</strong>.
 If you wish to modify any (subset) of these constants, simply create a new yaml that follows the same schema in an arbitrary location and link to it via the <strong>configPath</strong> input of Snowflake.
 A partial config is allowed (e.g., one only containing a new water:cp_w entry). The remaining keys will be taken from the default.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)</span>
-<span class="nt">dimensionality</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">homogeneous</span>
-
-<span class="c1"># freezing configuration to be simulated (shelf, VISF, jacket)</span>
-<span class="nt">configuration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">shelf</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># additional parameters for the shelf-scale model (Snowfall and Snowflake modules)</span>
+<span class="nt">snowfall_parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># arrangment of vials (square or hexagonal)</span>
+<span class="w">    </span><span class="nt">vial_arrangement</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">square</span>
 
 <span class="c1"># all vial-related parameters</span>
 <span class="nt">vial</span><span class="p">:</span>
 <span class="w">    </span><span class="c1"># define the geometry</span>
 <span class="w">    </span><span class="nt">geometry</span><span class="p">:</span>
-<span class="w">        </span><span class="c1"># base shape of vial (snow and snowfall only accepts cube, snowing rewrites it to cylinder)</span>
+<span class="w">        </span><span class="c1"># base shape of vial</span>
 <span class="w">        </span><span class="nt">shape</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cube</span>
-<span class="w">        </span><span class="c1"># height of the filled product when shape is cube [m]</span>
+<span class="w">        </span><span class="c1"># height of the filled product [m]</span>
 <span class="w">        </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
 <span class="w">        </span><span class="c1"># length of the vial when shape is cube [m]</span>
 <span class="w">        </span><span class="nt">length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
 <span class="w">        </span><span class="c1"># width of the vial when shape is cube [m]</span>
 <span class="w">        </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
 
-<span class="c1"># all parameters realted to water</span>
+<span class="c1"># all parameters related to water</span>
 <span class="nt">water</span><span class="p">:</span>
 <span class="w">    </span><span class="c1"># specific heat capacity of liquid water [J/kgK]</span>
 <span class="w">    </span><span class="nt">cp_w</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4187</span>
@@ -248,6 +247,12 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
 <span class="w">    </span><span class="nt">b</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">29.3</span>
 <span class="w">    </span><span class="c1"># vial-dependent pre-exponential nucleation parameter [-]</span>
 <span class="w">    </span><span class="nt">c</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.00</span>
+
+<span class="nt">general</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># the Stefan-Boltzmann constant [W/m2]</span>
+<span class="w">    </span><span class="nt">sigma_B</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5.67e-8</span>
+<span class="w">    </span><span class="c1"># Boltzmann constant [JK]</span>
+<span class="w">    </span><span class="nt">k_B</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.38e-23</span>
 </pre></div>
 </div>
 </section>
@@ -315,26 +320,23 @@ A partial config is allowed (e.g., one only containing a new water:cp_w entry). 
 <h2>Version 2.0. Freezing simulations with internal gradients<a class="headerlink" href="#version-2-0-freezing-simulations-with-internal-gradients" title="Link to this heading">¶</a></h2>
 <p>In version 2.0. new functionalities related to spatial phenomena during freezing are integrated into the package: when simulating the freezing process in a single container of arbitrary size, the model considers gradients of temperature and of ice mass fraction within the container. Such spatial simulation of freezing is currently only available for a single container, i.e., it does not consider thermal interactions with potential neighboring containers. Hence the spatial freezing model in version 2.0. provides complimentary information to the process-scale freezing models introduced earlier. An upcoming scientific publication will discuss the model development, validation, and relevant use cases in detail.</p>
 <p>The spatial model (termed Snowing) accounts for different <strong>dimensionalities (0D, 1D and 2D)</strong> of the vial and for different <strong>freezing configurations (shelf-ramped freezing, vacuum-induced surface freezing (VISF) and jacket-ramped freezing)</strong>. These three configurations represent common freezing conditions employed in both commercial manufacturing and in academia. Both model dimensionality and freezing configuration are specified in the yaml file used to specify the constants. To this end, we add additional blocks of parameters used for the spatial simulation to the yaml. An example of the updated yaml file is provided below:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)</span>
-<span class="nt">dimensionality</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spatial_1D</span>
-
-<span class="c1"># freezing configuration to be simulated (shelf, VISF, jacket)</span>
-<span class="nt">configuration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">shelf</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># additional parameters for the spatial model (Snowing module)</span>
+<span class="nt">snowing_parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># model dimensionality/temperature resolution within vial (homogeneous, spatial_1D, spatial_2D)</span>
+<span class="w">    </span><span class="nt">dimensionality</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spatial_1D</span>
+<span class="w">    </span><span class="c1"># freezing configuration to be simulated (shelf, VISF, jacket)</span>
+<span class="w">    </span><span class="nt">configuration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">shelf</span>
 
 <span class="c1"># all vial-related parameters</span>
 <span class="nt">vial</span><span class="p">:</span>
 <span class="w">    </span><span class="c1"># define the geometry</span>
 <span class="w">    </span><span class="nt">geometry</span><span class="p">:</span>
-<span class="w">    </span><span class="c1"># base shape of vial (snow and snowfall only accepts cube, snowing rewrites it to cylinder)</span>
+<span class="w">    </span><span class="c1"># base shape of vial (snow and snowfall only accepts cube, snowing automatically rewrites it to cylinder)</span>
 <span class="w">    </span><span class="nt">shape</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cube</span>
 <span class="w">    </span><span class="c1"># diameter of the vial for cylindrical geometry (only spatial model) [m]</span>
 <span class="w">    </span><span class="nt">diameter</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
-<span class="w">    </span><span class="c1"># height of the filled product for cubic (snow/snowfall) and cylindrical geometry (only spatial model) [m]</span>
+<span class="w">    </span><span class="c1"># height of the filled product [m]</span>
 <span class="w">    </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
-<span class="w">    </span><span class="c1"># length of the vial when shape is cube [m]</span>
-<span class="w">    </span><span class="nt">length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
-<span class="w">    </span><span class="c1"># width of the vial when shape is cube [m]</span>
-<span class="w">    </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
 
 <span class="c1"># parameters used in VISF simulation</span>
 <span class="nt">VISF</span><span class="p">:</span>
