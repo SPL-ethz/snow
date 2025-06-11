@@ -1,4 +1,4 @@
-# import modules: SNowflake and OperatingConditions
+# import modules: Snowfall and OperatingConditions
 from ethz_snow.snowfall import Snowfall
 from ethz_snow.operatingConditions import OperatingConditions
 
@@ -12,6 +12,8 @@ h = []
 # create an instance of the operating conditions class
 op = OperatingConditions(t_tot=3 * 3600, cooling=c, holding=h)
 
-# run a single simulation
-S = Snowfall(k=d, opcond=op, N_vials=(5, 5, 5))
-S.run()
+# run simulation
+if __name__ == "__main__":
+
+    S = Snowfall(k=d, opcond=op, N_vials=(5, 5, 1))
+    S.run()

@@ -16,7 +16,7 @@ import pandas as pd
 import seaborn as sns
 import multiprocessing as mp
 import matplotlib.pyplot as plt
-from scipy.integrate import simps
+from scipy.integrate import simpson
 from typing import Optional
 from scipy.stats import norm
 import matplotlib.patches as patches
@@ -700,7 +700,7 @@ class Snowing:
             J_z[superCooledMask] = kb * (T_eq_l - T_k[superCooledMask]) ** b
 
             # compute the frequency of nucleation
-            K_v = A * simps(J_z, z)
+            K_v = A * simpson(J_z, z)
 
             # check the range of LCS = LocalSupercooling
             LCS_i = T_k < T_eq_l
@@ -745,7 +745,7 @@ class Snowing:
 
         # kinetic mean nucleation temperature
         if K_v > 0:
-            T_nuc_kin = (A / K_v) * simps(T_nuc * J_z, z)
+            T_nuc_kin = (A / K_v) * simpson(T_nuc * J_z, z)
         else:
             T_nuc_kin = 273.15
 
@@ -935,7 +935,7 @@ class Snowing:
                 i_save = i_save + 1
 
             # solidification sigma
-            sigma_new = (1 / z[-1]) * simps(m_ice, z) / (mass - mass_solute)
+            sigma_new = (1 / z[-1]) * simpson(m_ice, z) / (mass - mass_solute)
             # save solidification time
             if (self._stats["t_sol"] is None) & (sigma_new >= 0.9):
                 Nt_sol_end = i
@@ -1305,9 +1305,9 @@ class Snowing:
             J_z_r[superCooledMask] = kb * (T_eq_l - T_k[superCooledMask]) ** b
 
             # frequency of nucleation events itegrated over z
-            K_r = 2 * np.pi * simps(r * J_z_r, r)
+            K_r = 2 * np.pi * simpson(r * J_z_r, r)
             # frequency of nucleation events itegrated over r
-            K_v = simps(K_r, z)
+            K_v = simpson(K_r, z)
 
             # Check for local supercooling.
             # check the range of LCS = LocalSupercooling
@@ -1353,9 +1353,9 @@ class Snowing:
             raise ValueError("Nucleation did not occur, prolong process time.")
 
         # compute the mean kinetic mean nucleation temperature
-        f_z = 2 * np.pi * simps(r * T_nuc * J_z_r, r)
+        f_z = 2 * np.pi * simpson(r * T_nuc * J_z_r, r)
         if K_v > 0:
-            T_nuc_kin = (1 / K_v) * simps(f_z, z)
+            T_nuc_kin = (1 / K_v) * simpson(f_z, z)
         else:
             T_nuc_kin = 273.15
 
@@ -1737,8 +1737,8 @@ class Snowing:
                 i_save = i_save + 1
 
             # solidification sigma
-            w_i_r = 2 * np.pi * simps(r * w_i_new, r)
-            w_i = simps(w_i_r, z)
+            w_i_r = 2 * np.pi * simpson(r * w_i_new, r)
+            w_i = simpson(w_i_r, z)
             sigma_new = (
                 (1 / (np.pi * r[-1] ** 2 * z[-1])) * w_i * mass / (mass - mass_solute)
             )

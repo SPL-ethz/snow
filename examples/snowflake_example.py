@@ -1,4 +1,4 @@
-# import modules: SNowflake and OperatingConditions
+# import modules: Snowflake and OperatingConditions
 from ethz_snow.snowflake import Snowflake
 from ethz_snow.operatingConditions import OperatingConditions
 
@@ -10,8 +10,8 @@ c = {"rate": 0.5 / 60, "start": 20, "end": -50}
 h = []
 
 # create an instance of the operating conditions class
-op = OperatingConditions(t_tot=3 * 3600, cooling=c)
+op = OperatingConditions(t_tot=3 * 3600, cooling=c, holding=h)
 
-# run a single simulation
+# run simulation
 S = Snowflake(k=d, opcond=op, N_vials=(5, 5, 1))
 S.run()
